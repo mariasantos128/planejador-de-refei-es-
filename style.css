@@ -17,31 +17,45 @@ h1, h2, h3 {
     color: #2c3e50;
 }
 
-/* Estilo dos formulários e seções (Box Model básico) */
+/* Estilo dos formulários e seções (Cards modernos) */
 section, form, article {
     background-color: #ffffff;
-    border: 1px solid #dddddd;
-    border-radius: 8px;
-    padding: 20px;
+    border: none; 
+    border-radius: 12px; 
+    padding: 25px;
     margin: 15px auto;
     max-width: 600px;
-    text-align: left; /* Alinha formulários à esquerda */
+    text-align: left;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); 
+    transition: transform 0.3s ease; 
 }
+
+/* Efeito: o cartão levanta levemente quando o mouse passa por cima */
+section:hover, form:hover, article:hover {
+    transform: translateY(-2px);
+}
+
 
 /* Estilo padrão para Botões */
 button {
     background-color: #007bff;
     color: #ffffff;
     font-size: 16px;
-    padding: 10px 20px;
+    font-weight: bold; 
+    padding: 12px 24px; 
     border: none;
-    border-radius: 5px;
+    border-radius: 8px; 
     cursor: pointer;
     margin-top: 10px;
+    transition: background-color 0.3s ease, transform 0.1s; 
 }
 
 button:hover {
     background-color: #0056b3;
+}
+
+button:active {
+    transform: scale(0.97); /* Efeito de clique */
 }
 
 /* Tabelas (Visualizar Cardápio/Histórico) */
@@ -118,4 +132,58 @@ table {
     section, form, article {
         max-width: 800px; /* Caixas maiores no PC */
     }
+}
+
+/* Estilo para campos de texto, e-mail, senhas e seleções */
+input[type="text"],
+input[type="email"],
+input[type="number"],
+select,
+textarea {
+    width: 100%;
+    padding: 12px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    font-size: 16px;
+    box-sizing: border-box; 
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* Efeito visual quando o usuário clica para digitar */
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); 
+}
+
+/* =========================================
+   AJUSTES ESPECÍFICOS PARA O CRONOGRAMA
+   ========================================= */
+
+/* Permite que a seção do cronograma seja mais larga que as outras */
+#planejamento {
+    max-width: 1100px; /* Abre espaço para os 7 dias da semana */
+    overflow-x: auto;  /* Se a tela for muito pequena (celular), ele cria uma barra de rolagem horizontal */
+}
+
+/* Força a tabela a ter um tamanho legível */
+#planejamento table {
+    min-width: 900px; /* Garante que a tabela não encolha demais */
+    font-size: 16px;  /* Aumenta a letra da tabela */
+}
+
+/* Dá mais respiro dentro das células da tabela */
+#planejamento th, 
+#planejamento td {
+    padding: 12px 8px;
+}
+
+/* Aumenta as caixinhas de seleção para dar para ler o nome da comida */
+#planejamento select {
+    min-width: 150px; /* Garante que caiba nomes como "Macarrão à Bolonhesa" */
+    font-size: 15px;
+    padding: 8px;
+    cursor: pointer;
 }
