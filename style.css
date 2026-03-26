@@ -11,7 +11,7 @@ body {
 
 /* Header em Rosa Claro */
 header {
-    background-color: #f8bbd0; /* Rosa pastel */
+    background-color: #e6b0b0; /* Rosa pastel */
     padding: 20px;
     text-align: center;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -44,7 +44,7 @@ nav a {
 
 nav a:hover {
     background: rgba(255, 255, 255, 0.5);
-    color: #d81b60;
+    color: #d81b60bb;
 }
 
 /* Containers das Seções */
@@ -57,7 +57,7 @@ section {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); 
 }
 
-h2, h3 { color: #d81b60; /* Tom de rosa mais escuro para títulos */ }
+h2, h3 { color: #d81b60bb; /* Tom de rosa mais escuro para títulos */ }
 
 /* Botões */
 button {
@@ -74,7 +74,7 @@ button {
 }
 
 button:hover {
-    background-color: #f48fb1; /* Rosa um pouco mais forte no hover */
+    background-color: #c2728d; /* Rosa um pouco mais forte no hover */
     transform: translateY(-2px);
 }
 
