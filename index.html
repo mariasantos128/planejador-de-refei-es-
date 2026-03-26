@@ -1,17 +1,12 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Planejamento Familiar</title>
-
-
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-
-
     <header>
         <h1>FamilyChef - Planejador Alimentar</h1>
         <nav>
@@ -24,53 +19,42 @@
         </nav>
     </header>
 
-    <hr>
-
     <section id="usuario">
         <h2>1. Perfil e Acesso</h2>
 
         <fieldset>
-            <legend>Dados do Usuário</legend>
-            <label for="nome">Nome:</label>
-            <input type="text" id="nome" name="nome"><br><br>
-
-            <label for="email">E-mail:</label>
-            <input type="email" id="email" name="email"><br><br>
-
-            <label>Tipo de Perfil:</label>
-            <select name="perfil">
-                <option value="admin">Administrador (Edita tudo)</option>
-                <option value="membro">Membro Convidado (Apenas visualiza)</option>
-            </select>
+            <legend>Membros Atuais</legend>
+            <ul id="lista-membros-ui" style="list-style: none; padding: 0;">
+                </ul>
         </fieldset>
-
-        <br>
-
-        <fieldset>
-            <legend>Restrições Alimentares</legend>
-            <input type="checkbox" id="gluten" name="restricao" value="gluten">
-            <label for="gluten">Intolerância a Glúten</label><br>
-
-            <input type="checkbox" id="lactose" name="restricao" value="lactose">
-            <label for="lactose">Intolerância a Lactose</label><br>
-        </fieldset>
-
         <br>
 
         <fieldset>
             <legend>Convidar Membros da Família</legend>
             <label for="email_convite">E-mail do convidado:</label>
-            <input type="email" id="email_convite">
-            <button type="button">Enviar Convite</button>
+            <input type="email" id="email_convite" placeholder="exemplo@email.com">
+            <label>Tipo de Perfil:</label>
+            <select id="perfil_convite">
+                <option value="admin">Administrador</option>
+                <option value="membro">Membro Convidado</option>
+            </select>
+            <button type="button" id="btn-convidar">Enviar Convite</button>
+            <p id="msg-convite" style="color: green; display: none; margin-top: 10px;"></p>
+        </fieldset>
+        <br>
+
+        <fieldset>
+            <legend>Restrições Alimentares da Família</legend>
+            <input type="checkbox" id="gluten" name="restricao" value="gluten">
+            <label for="gluten">Intolerância a Glúten</label><br>
+            <input type="checkbox" id="lactose" name="restricao" value="lactose">
+            <label for="lactose">Intolerância a Lactose</label><br>
         </fieldset>
     </section>
-
-    <hr>
 
     <section id="planejamento">
         <h2>2. Cronograma Semanal </h2>
         <p>Instrução: Selecione as refeições para cada dia.</p>
-
         <table border="1" cellpadding="10" cellspacing="0" width="100%">
             <thead>
                 <tr>
@@ -87,13 +71,7 @@
             <tbody>
                 <tr>
                     <td><strong>Café da Manhã</strong></td>
-                    <td>
-                        <select>
-                            <option>-- Selecione --</option>
-                            <option>Omelete</option>
-                            <option>Pão com Ovo</option>
-                        </select>
-                    </td>
+                    <td><select><option>-- Selecione --</option></select></td>
                     <td><select><option>-- Selecione --</option></select></td>
                     <td><select><option>-- Selecione --</option></select></td>
                     <td><select><option>-- Selecione --</option></select></td>
@@ -103,13 +81,7 @@
                 </tr>
                 <tr>
                     <td><strong>Almoço</strong></td>
-                    <td>
-                        <select>
-                            <option>-- Selecione --</option>
-                            <option>Macarrão</option>
-                            <option>Salada</option>
-                        </select>
-                    </td>
+                    <td><select><option>-- Selecione --</option></select></td>
                     <td><select><option>-- Selecione --</option></select></td>
                     <td><select><option>-- Selecione --</option></select></td>
                     <td><select><option>-- Selecione --</option></select></td>
@@ -131,100 +103,52 @@
         </table>
     </section>
 
-    <hr>
-
     <section id="receitas">
         <h2>3. Livro de Receitas</h2>
 
         <label for="busca">Buscar Receita:</label>
-        <input type="search" id="busca" placeholder="Ex: Vegetariana, Rápida...">
-        <button type="button">Filtrar</button>
-
+        <input type="search" id="busca" placeholder="Ex: Macarrão, Rápida...">
         <br><br>
 
-        <details>
-            <summary><strong>+ Adicionar Nova Receita (Admin)</strong></summary>
-            <div style="border: 1px solid black; padding: 10px; margin-top: 10px;">
-                <label>Nome do Prato:</label><br>
-                <input type="text"><br><br>
+        <details id="detalhes-form-receita">
+            <summary><strong>+ Adicionar/Editar Receita (Admin)</strong></summary>
+            <div style="border: 1px solid #ccc; padding: 15px; margin-top: 10px; border-radius: 8px; background-color: #fafafa;">
+                <input type="hidden" id="rec-id"> <label>Nome do Prato:</label><br>
+                <input type="text" id="rec-nome"><br>
                 
                 <label>Categoria:</label><br>
-                <select>
+                <select id="rec-categoria">
                     <option>Café</option>
                     <option>Almoço</option>
                     <option>Jantar</option>
                     <option>Lanche</option>
-                </select><br><br>
+                </select><br>
 
                 <label>Ingredientes:</label><br>
-                <textarea rows="4" cols="50"></textarea><br><br>
+                <textarea id="rec-ingredientes" rows="3"></textarea><br>
+
+                <label>URL da Foto (Opcional):</label><br>
+                <input type="text" id="rec-foto" placeholder="Cole o link da imagem aqui"><br>
 
                 <label>Contém Alérgenos?</label><br>
-                <input type="checkbox"> Glúten
-                <input type="checkbox"> Lactose
+                <input type="checkbox" id="rec-gluten"> Glúten
+                <input type="checkbox" id="rec-lactose"> Lactose
                 <br><br>
-                <button type="button">Salvar Receita</button>
+                <button type="button" id="btn-salvar-receita">Salvar Receita</button>
             </div>
         </details>
 
-        <h3>Lista de Receitas </h3>
-        
-        <article style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
-            <h4>Macarrão à Bolonhesa</h4>
-            <p><strong>Categoria:</strong> Almoço</p>
-            <p><strong>Ingredientes:</strong> Macarrão, Carne Moída, Molho de Tomate.</p>
-            
-            <p style="color: red;"><strong>⚠️ ATENÇÃO: Contém Glúten</strong></p>
-            
-            <button type="button">Editar Receita</button>
-        </article>
-
-        <article style="border: 1px solid #ccc; padding: 10px;">
-            <h4>Salada de Frutas</h4>
-            <p><strong>Categoria:</strong> Lanche</p>
-            <p><strong>Ingredientes:</strong> Maçã, Banana, Laranja.</p>
-            <button type="button">Editar Receita</button>
-        </article>
+        <h3>Minhas Receitas</h3>
+        <div id="grid-receitas" class="receitas-grid"></div>
     </section>
-
-    <hr>
 
     <section id="compras">
         <h2>4. Lista de Compras</h2>
-        <button type="button">Gerar Lista com Base no Cronograma </button>
-
-        <h3>Setor: Hortifruti</h3>
-        <ul>
-            <li>
-                <input type="checkbox" id="item1"> 
-                <label for="item1">Alface</label>
-            </li>
-            <li>
-                <input type="checkbox" id="item2"> 
-                <label for="item2">Tomate</label>
-            </li>
-        </ul>
-
-        <h3>Setor: Açougue</h3>
-        <ul>
-            <li>
-                <input type="checkbox" id="item3"> 
-                <label for="item3">500g Carne Moída</label>
-            </li>
-        </ul>
-
-        <h3>Setor: Mercearia</h3>
-        <ul>
-            <li>
-                <input type="checkbox" id="item4"> 
-                <label for="item4">Pacote de Macarrão</label>
-            </li>
-        </ul>
+        <button type="button" id="btn-gerar-compras">Gerar Lista com Base no Cronograma</button>
+        <div id="conteudo-lista-compras">
+            <p style="margin-top: 15px; color: #666;">Clique em "Gerar Lista" para calcular os ingredientes da semana.</p>
+        </div>
     </section>
-
-    <hr>
-
-<hr>
 
     <script src="script.js"></script> 
 </body>
