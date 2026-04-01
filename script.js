@@ -81,44 +81,21 @@ document.getElementById('btn-convidar').addEventListener('click', () => {
    2. GESTÃO DE RECEITAS (SALVAR, EDITAR, LISTAR COM FOTOS)
    ========================================================== */
 
-let receitasDb = [
-    // CAFÉ DA MANHÃ
-    { id: 1, nome: 'Pão na Chapa com Manteiga', categoria: 'Café', ingredientes: 'Pão francês, manteiga', gluten: true, lactose: true, 
-      img: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }, // Link da foto do pão
-    
-    { id: 2, nome: 'Cuscuz com Ovo', categoria: 'Café', ingredientes: 'Flocão de milho, ovo, sal, manteiga', gluten: false, lactose: true, 
-      img: 'https://images.unsplash.com/photo-1525059696034-4967a8e1dca2?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }, // Link da foto
-      
-    { id: 3, nome: 'Tapioca com Queijo', categoria: 'Café', ingredientes: 'Goma de tapioca, queijo coalho, sal', gluten: false, lactose: true, 
-      img: 'https://images.unsplash.com/photo-1528659588667-142277d33b5c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }, // Link da foto
-    
-    // ALMOÇO
-    { id: 4, nome: 'Arroz, Feijão e Frango', categoria: 'Almoço', ingredientes: 'Arroz, feijão, peito de frango, alho, cebola, óleo, sal', gluten: false, lactose: false, 
-      img: 'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }, // Link da foto
-      
-    { id: 5, nome: 'Macarrão à Bolonhesa', categoria: 'Almoço', ingredientes: 'Macarrão, carne moída, molho de tomate, cebola, alho', gluten: true, lactose: false, 
-      img: 'https://images.unsplash.com/photo-1621996311214-411db18903c7?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }, // Link da foto
-      
-    { id: 6, nome: 'Estrogonofe de Carne', categoria: 'Almoço', ingredientes: 'Carne em tiras, creme de leite, champignon, ketchup, mostarda, arroz, batata palha', gluten: false, lactose: true, 
-      img: 'https://images.unsplash.com/photo-1606850245648-52fb18124237?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }, // Link da foto
-    
-    // JANTAR
-    { id: 7, nome: 'Sopa de Legumes com Carne', categoria: 'Jantar', ingredientes: 'Batata, cenoura, chuchu, carne em cubos, macarrão, cebola, alho', gluten: true, lactose: false, 
-      img: 'https://images.unsplash.com/photo-1547592180-85f173990554?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }, // Link da foto
-      
-    { id: 8, nome: 'Omelete Recheado', categoria: 'Jantar', ingredientes: 'Ovo, queijo, presunto, tomate, orégano, sal', gluten: false, lactose: true, 
-      img: 'https://images.unsplash.com/photo-1510693214829-1ee06798e188?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }, // Link da foto
-      
-    { id: 9, nome: 'Cachorro Quente', categoria: 'Jantar', ingredientes: 'Pão de hot dog, salsicha, molho de tomate, milho, batata palha', gluten: true, lactose: false, 
-      img: 'https://images.unsplash.com/photo-1615486171430-848e0d9b439c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }, // Link da foto
-    
-    // LANCHE
-    { id: 10, nome: 'Salada de Frutas', categoria: 'Lanche', ingredientes: 'Maçã, banana, mamão, laranja, mel', gluten: false, lactose: false, 
-      img: 'https://images.unsplash.com/photo-1490474504059-1f1e15ab9822?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }, // Link da foto
-      
-    { id: 11, nome: 'Bolo de Fubá', categoria: 'Lanche', ingredientes: 'Fubá, farinha de trigo, açúcar, leite, ovo, óleo, fermento', gluten: true, lactose: true, 
-      img: 'https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' } // Link da foto
-];
+let receitasDb = []; // Começa vazio, pois vai puxar do Banco de Dados!
+
+document.addEventListener("DOMContentLoaded", async () => {
+    try {
+        await iniciarBanco(); // Chama a função do seu db.js
+        await atualizarTela();
+    } catch (erro) {
+        console.error("Erro ao iniciar DB:", erro);
+    }
+});
+
+async function atualizarTela() {
+    receitasDb = await buscarItens(); // Puxa as receitas salvas no IndexedDB
+    renderReceitas(); // Desenha elas na tela
+}
 
 function renderReceitas() {
     const grid = document.getElementById('grid-receitas');
@@ -170,8 +147,9 @@ function renderReceitas() {
 document.getElementById('busca').addEventListener('input', renderReceitas);
 
 // Salvar Nova ou Editar Existente
-document.getElementById('btn-salvar-receita').addEventListener('click', () => {
-    const id = document.getElementById('rec-id').value;
+// Salvar Nova ou Editar Existente (AGORA COM BANCO DE DADOS!)
+document.getElementById('btn-salvar-receita').addEventListener('click', async () => {
+    const id = document.getElementById('rec-id').value; // Puxa o ID para saber se é edição
     const nome = document.getElementById('rec-nome').value;
     const categoria = document.getElementById('rec-categoria').value;
     const ingredientes = document.getElementById('rec-ingredientes').value;
@@ -184,24 +162,35 @@ document.getElementById('btn-salvar-receita').addEventListener('click', () => {
         return;
     }
 
-    if(!foto) foto = fotoPadrao;
+    // Se o usuário não colocar foto, usa uma padrão
+    if(!foto) foto = "https://images.unsplash.com/photo-1495521821757-a1efb6729352?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80";
 
-    if (id) {
-        // Editando
-        const index = receitasDb.findIndex(r => r.id == id);
-        receitasDb[index] = { id: Number(id), nome, categoria, ingredientes, foto, gluten, lactose, img: foto };
-        alert('Receita atualizada com sucesso!');
-    } else {
-        // Criando nova
-        const novaId = receitasDb.length ? Math.max(...receitasDb.map(r => r.id)) + 1 : 1;
-        receitasDb.push({ id: novaId, nome, categoria, ingredientes, gluten, lactose, img: foto });
-        alert('Receita adicionada com sucesso!');
+    const receitaSalvar = { 
+        nome, 
+        categoria, 
+        ingredientes, 
+        gluten, 
+        lactose, 
+        img: foto 
+    };
+
+    try {
+        if (id) {
+            // Se tem ID, é porque estamos EDITANDO. 
+            // Então deletamos a versão velha do banco antes de salvar a nova!
+            await deletarItem(Number(id));
+        }
+        
+        await adicionarItem(receitaSalvar); // Salva no banco de verdade
+        alert(id ? 'Receita atualizada com sucesso!' : 'Receita salva com sucesso!');
+        
+        limparFormReceita();
+        document.getElementById('detalhes-form-receita').removeAttribute('open');
+        
+        await atualizarTela(); // Recarrega a lista puxando do banco
+    } catch (erro) {
+        alert("Erro ao salvar a receita.");
     }
-
-    // Limpa o form e atualiza a tela
-    limparFormReceita();
-    document.getElementById('detalhes-form-receita').removeAttribute('open'); // Fecha o painel
-    renderReceitas();
 });
 
 function carregarEdicao(rec) {

@@ -3,8 +3,8 @@
    ========================================================== */
 
 const receitasPadrao = [
-    { nome: 'Pão na Chapa com Manteiga', categoria: 'Café', ingredientes: 'Pão francês, manteiga', gluten: true, lactose: true, img: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-    { nome: 'Cuscuz com Ovo', categoria: 'Café', ingredientes: 'Flocão de milho, ovo, sal, manteiga', gluten: false, lactose: true, img: 'https://images.unsplash.com/photo-1525059696034-4967a8e1dca2?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+    { nome: 'Pão com Ovo', categoria: 'Café', ingredientes: 'Pão, ovo', gluten: true, lactose: true, img: 'https://media.istockphoto.com/id/943148622/pt/foto/bread-with-scrambled-egg-brazilian-pao-com-ovo.jpg?s=1024x1024&w=is&k=20&c=vYTN1vZbBvVDGctwOIImbZ1GA2LFkGMnu1daVGSo3W0='},
+    { nome: 'Cuscuz com Ovo', categoria: 'Café', ingredientes: 'Flocão de milho, ovo, sal, manteiga', gluten: false, lactose: true, img: 'https://media.istockphoto.com/id/1304750088/pt/foto/brazilian-couscous-and-scrambled-eggs-on-black-background-breakfast-concept.jpg?s=1024x1024&w=is&k=20&c=G0W87VguUanAxAMA44f8rOq6xavSK0LhA7N6I6O-Ty0=' },
     { nome: 'Tapioca com Queijo', categoria: 'Café', ingredientes: 'Goma de tapioca, queijo coalho, sal', gluten: false, lactose: true, img: 'https://images.unsplash.com/photo-1528659588667-142277d33b5c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
     { nome: 'Arroz, Feijão e Frango', categoria: 'Almoço', ingredientes: 'Arroz, feijão, peito de frango, alho, cebola, óleo, sal', gluten: false, lactose: false, img: 'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
     { nome: 'Macarrão à Bolonhesa', categoria: 'Almoço', ingredientes: 'Macarrão, carne moída, molho de tomate, cebola, alho', gluten: true, lactose: false, img: 'https://images.unsplash.com/photo-1621996311214-411db18903c7?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
@@ -118,7 +118,8 @@ document.getElementById('btn-salvar-receita').addEventListener('click', async ()
     }
 
     if(!foto) {
-        foto = "https://images.unsplash.com/photo-1495521821757-a1efb6729352?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"; 
+        // Esta é a foto que aparece quando alguém cadastra uma receita sem colocar link
+        foto = "https://media.istockphoto.com/id/1270249705/pt/foto/juices-smoothie-different-glasses-health-concept.jpg?s=2048x2048&w=is&k=20&c=8snkn6MkebjlpxCjQo1V50V6Og_eGGeCy5yKVflrEQI="; 
     }
 
     const novaReceita = {
