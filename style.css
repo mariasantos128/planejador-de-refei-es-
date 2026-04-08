@@ -39,7 +39,7 @@ nav a {
     background: rgba(255, 255, 255, 0.3);
     padding: 8px 15px;
     border-radius: 20px;
-    transition: background 0.3s;
+    transition: background 0.3s ease, color 0.3s ease;
 }
 
 nav a:hover {
@@ -57,7 +57,9 @@ section {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); 
 }
 
-h2, h3 { color: #d81b60bb; /* Tom de rosa mais escuro para títulos */ }
+h2, h3 { 
+    color: #d81b60bb; /* Tom de rosa mais escuro para títulos */ 
+}
 
 /* Botões */
 button {
@@ -71,28 +73,32 @@ button {
     cursor: pointer;
     transition: all 0.3s ease; 
     text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Sombra sutil para dar volume */
 }
 
 button:hover {
     background-color: #c2728d; /* Rosa um pouco mais forte no hover */
     transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(194, 114, 141, 0.3); /* Sombra cresce no hover */
 }
 
 /* Inputs gerais */
 input[type="text"], input[type="email"], select, textarea, input[type="search"] {
     width: 100%;
     padding: 10px;
-    margin-top: 5px; margin-bottom: 15px;
+    margin-top: 5px; 
+    margin-bottom: 15px;
     border: 1px solid #ddd;
     border-radius: 8px;
     box-sizing: border-box;
     background-color: #fafafa;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Transição macia ao focar */
 }
 
 input:focus, select:focus, textarea:focus {
     outline: none;
     border-color: #f8bbd0;
-    box-shadow: 0 0 5px rgba(248, 187, 208, 0.5);
+    box-shadow: 0 0 8px rgba(248, 187, 208, 0.4); /* Brilho rosa ao focar */
 }
 
 /* =========================================
@@ -111,29 +117,39 @@ input:focus, select:focus, textarea:focus {
     padding: 15px;
     text-align: center;
     background: #fff;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    transition: transform 0.3s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer; /* Indica que é clicável */
 }
 
 .receita-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 4px 12px rgba(248, 187, 208, 0.4); /* Sombra rosa */
+    box-shadow: 0 8px 16px rgba(248, 187, 208, 0.35); /* Sombra rosa mais elegante */
 }
 
+/* ESTILO DA IMAGEM CIRCULAR APRIMORADO */
 .receita-img {
     width: 120px;
     height: 120px;
     object-fit: cover;
-    border-radius: 50%; /* Faz a foto ficar redonda */
+    border-radius: 50%; /* Mantém a imagem perfeitamente redonda */
     margin: 0 auto 10px auto;
     border: 3px solid #f8bbd0;
     display: block;
+    box-shadow: 0 4px 8px rgba(216, 27, 96, 0.15); /* Sombra suave ao redor da foto */
+    transition: transform 0.4s ease, box-shadow 0.4s ease; /* Prepara para a animação de hover */
+}
+
+/* Efeito de zoom na foto quando o mouse passa no card */
+.receita-card:hover .receita-img {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(216, 27, 96, 0.25);
 }
 
 .receita-card h4 {
-    margin: 5px 0;
+    margin: 10px 0 5px 0;
     color: #333;
+    font-weight: 600;
 }
 
 /* Detalhes ocultos por padrão */
@@ -143,14 +159,49 @@ input:focus, select:focus, textarea:focus {
     text-align: left;
     font-size: 14px;
     border-top: 1px solid #eee;
-    padding-top: 10px;
+    padding-top: 12px;
 }
 
-.receita-detalhes p { margin: 5px 0; color: #555; }
+.receita-detalhes p { 
+    margin: 6px 0; 
+    color: #555; 
+    line-height: 1.4; /* Melhora a leitura dos ingredientes */
+}
 
 /* Tabela do Planejamento */
-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-th, td { border: 1px solid #e0e0e0; padding: 10px; text-align: center; }
-th { background-color: #f8bbd0; color: white; }
-#planejamento { overflow-x: auto; }
-#planejamento table { min-width: 800px; }
+table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    margin-top: 15px; 
+    border-radius: 8px; /* Cantos levemente arredondados na tabela se ela estiver isolada */
+    overflow: hidden;
+}
+
+th, td { 
+    border: 1px solid #e0e0e0; 
+    padding: 12px 10px; /* Um pouco mais de respiro nas células */
+    text-align: center; 
+}
+
+th { 
+    background-color: #f8bbd0; 
+    color: white; 
+    font-weight: 600;
+}
+
+/* Destaca a linha da tabela ao passar o mouse */
+tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+tbody tr:hover {
+    background-color: #fdf2f6; /* Fundo rosinha super claro ao passar o mouse */
+}
+
+#planejamento { 
+    overflow-x: auto; 
+}
+
+#planejamento table { 
+    min-width: 800px; 
+}

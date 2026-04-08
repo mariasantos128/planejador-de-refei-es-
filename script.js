@@ -248,6 +248,40 @@ renderReceitas(); // Chama renderização inicial
     }
 
     /* ==========================================================
+       3.5. SISTEMA DE SORTEIO DE REFEIÇÕES (ALEATÓRIO)
+       ========================================================== */
+    const btnSortear = document.getElementById('btn-sortear');
+    if (btnSortear) {
+        btnSortear.addEventListener('click', () => {
+            const linhasTabela = document.querySelectorAll('#planejamento tbody tr');
+            
+            // Avisa se não tiver nenhuma receita no banco
+            if(receitasDb.length === 0) {
+                alert('Você precisa cadastrar algumas receitas primeiro para poder sortear!');
+                return;
+            }
+
+            linhasTabela.forEach((linha, index) => {
+                const selects = linha.querySelectorAll('select');
+                
+                // Identifica se a linha é Café (0), Almoço (1) ou Jantar (2)
+                let catAlvo = index === 0 ? 'Café' : index === 1 ? 'Almoço' : 'Jantar';
+                
+                // Puxa as receitas do banco que servem para esta refeição (ou Lanche)
+                let opcoesDisponiveis = receitasDb.filter(r => r.categoria === catAlvo || r.categoria === 'Lanche');
+                
+                if (opcoesDisponiveis.length > 0) {
+                    selects.forEach(select => {
+                        // Escolhe uma comida aleatória da lista disponível e preenche a caixinha
+                        const indiceAleatorio = Math.floor(Math.random() * opcoesDisponiveis.length);
+                        select.value = opcoesDisponiveis[indiceAleatorio].nome;
+                    });
+                }
+            });
+        });
+    }
+    
+    /* ==========================================================
        4. LISTA DE COMPRAS
        ========================================================== */
     document.getElementById('btn-gerar-compras').addEventListener('click', () => {
