@@ -5,8 +5,13 @@
 let usuarios = []; // Começa vazio!
 
 function renderUsuarios() {
+    // CORRIGIDO: Padronizei o nome da variável para listaUI
     const listaUI = document.getElementById('lista-membros-ui');
-    listaUI.innerHTML = ''; // Limpa a lista antes de desenhar
+    
+    // TRAVA: Só executa se a listaUI existir na página
+    if (!listaUI) return; 
+    
+    listaUI.innerHTML = '';
     
     // Se não tiver ninguém, mostra um aviso amigável
     if (usuarios.length === 0) {
@@ -36,56 +41,58 @@ function renderUsuarios() {
     });
 }
 
-// Renderiza a lista vazia ao abrir a página
 renderUsuarios(); 
 
-// Quando clicar no botão de adicionar:
-document.getElementById('btn-convidar').addEventListener('click', () => {
-    const nomeInput = document.getElementById('nome_convite');
-    const emailInput = document.getElementById('email_convite');
-    const perfilInput = document.getElementById('perfil_convite');
-    const msgInfo = document.getElementById('msg-convite');
+// CORRIGIDO: Trava no botão de convidar
+const btnConvidar = document.getElementById('btn-convidar');
+if (btnConvidar) {
+    btnConvidar.addEventListener('click', () => {
+        const nomeInput = document.getElementById('nome_convite');
+        const emailInput = document.getElementById('email_convite');
+        const perfilInput = document.getElementById('perfil_convite');
+        const msgInfo = document.getElementById('msg-convite');
 
-    // Verifica se os campos existem e se foram preenchidos
-    if(!nomeInput || !emailInput || nomeInput.value.trim() === '' || emailInput.value.trim() === '') {
-        alert('Por favor, preencha o Nome e o E-mail antes de adicionar.');
-        return;
-    }
+        if(!nomeInput || !emailInput || nomeInput.value.trim() === '' || emailInput.value.trim() === '') {
+            alert('Por favor, preencha o Nome e o E-mail antes de adicionar.');
+            return;
+        }
 
-    // Salva o usuário na nossa lista
-    usuarios.push({
-        nome: nomeInput.value.trim(),
-        email: emailInput.value.trim(),
-        perfil: perfilInput.value
+        const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!regexEmail.test(emailInput.value.trim())) {
+            alert('Por favor, insira um endereço de e-mail válido (ex: nome@email.com).');
+            return;
+        }
+
+        usuarios.push({
+            nome: nomeInput.value.trim(),
+            email: emailInput.value.trim(),
+            perfil: perfilInput.value
+        });
+        
+        renderUsuarios(); 
+
+        msgInfo.innerHTML = `✅ <strong>${nomeInput.value}</strong> foi adicionado(a) com sucesso!`;
+        msgInfo.style.display = 'block';
+        
+        nomeInput.value = '';
+        emailInput.value = '';
+        perfilInput.value = 'membro';
+        
+        setTimeout(() => {
+            msgInfo.style.display = 'none';
+        }, 3500);
     });
+}
     
-    // Atualiza a lista na tela
-    renderUsuarios(); 
-
-    // Exibe a mensagem de SUCESSO
-    msgInfo.innerHTML = `✅ <strong>${nomeInput.value}</strong> foi adicionado(a) com sucesso!`;
-    msgInfo.style.display = 'block';
-    
-    // Limpa os campos para o próximo
-    nomeInput.value = '';
-    emailInput.value = '';
-    perfilInput.value = 'membro';
-    
-    // Faz a mensagem sumir depois de 3.5 segundos
-    setTimeout(() => {
-        msgInfo.style.display = 'none';
-    }, 3500);
-});
-    
-   /* ==========================================================
+/* ==========================================================
    2. GESTÃO DE RECEITAS (SALVAR, EDITAR, LISTAR COM FOTOS)
    ========================================================== */
 
-let receitasDb = []; // Começa vazio, pois vai puxar do Banco de Dados!
+let receitasDb = []; 
 
 document.addEventListener("DOMContentLoaded", async () => {
     try {
-        await iniciarBanco(); // Chama a função do seu db.js
+        await iniciarBanco(); 
         await atualizarTela();
     } catch (erro) {
         console.error("Erro ao iniciar DB:", erro);
@@ -93,23 +100,28 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 async function atualizarTela() {
-    receitasDb = await buscarItens(); // Puxa as receitas salvas no IndexedDB
-    renderReceitas(); // Desenha elas na tela
+    receitasDb = await buscarItens(); 
+    renderReceitas(); 
 }
 
 function renderReceitas() {
     const grid = document.getElementById('grid-receitas');
+    
+    // CORRIGIDO: Troquei "lista" por "grid" na trava!
+    if (!grid) return; 
+    
     grid.innerHTML = '';
-    const termoBusca = document.getElementById('busca').value.toLowerCase();
+    
+    // Adicionado proteção para não dar erro se o campo de busca não existir
+    const campoBusca = document.getElementById('busca');
+    const termoBusca = campoBusca ? campoBusca.value.toLowerCase() : '';
 
     receitasDb.forEach(rec => {
-        // Filtro de busca
         if (!rec.nome.toLowerCase().includes(termoBusca) && !rec.categoria.toLowerCase().includes(termoBusca)) return;
 
         const card = document.createElement('div');
         card.className = 'receita-card';
         
-        // Verificação de alergias (usando lógica anterior)
         const alertaGluten = rec.gluten ? '<p style="color: red;"><strong>⚠️ Contém Glúten</strong></p>' : '';
         const alertaLactose = rec.lactose ? '<p style="color: red;"><strong>⚠️ Contém Lactose</strong></p>' : '';
 
@@ -125,175 +137,171 @@ function renderReceitas() {
             </div>
         `;
 
-        // Interatividade: Mostrar detalhes só ao clicar no card
         card.addEventListener('click', function(e) {
-            // Se clicou no botão de editar, não fecha/abre o card
             if(e.target.tagName.toLowerCase() === 'button') return; 
-            
             const detalhes = this.querySelector('.receita-detalhes');
             detalhes.style.display = detalhes.style.display === 'block' ? 'none' : 'block';
         });
 
-        // Ação do botão editar
         card.querySelector('.btn-editar').addEventListener('click', () => carregarEdicao(rec));
 
         grid.appendChild(card);
     });
     
-    atualizarSelectsCronograma(); // Atualiza as opções do calendário
+    if (typeof atualizarSelectsCronograma === "function") {
+        atualizarSelectsCronograma(); 
+    }
 }
 
-// Busca ao digitar
-document.getElementById('busca').addEventListener('input', renderReceitas);
+// CORRIGIDO: Nome da variável alterado para evitar conflito com o controller.js
+const inputBusca = document.getElementById('busca');
+if (inputBusca) {
+    inputBusca.addEventListener('input', renderReceitas);
+} 
 
-// Salvar Nova ou Editar Existente
-// Salvar Nova ou Editar Existente (AGORA COM BANCO DE DADOS!)
-document.getElementById('btn-salvar-receita').addEventListener('click', async () => {
-    const id = document.getElementById('rec-id').value; // Puxa o ID para saber se é edição
-    const nome = document.getElementById('rec-nome').value;
-    const categoria = document.getElementById('rec-categoria').value;
-    const ingredientes = document.getElementById('rec-ingredientes').value;
-    let foto = document.getElementById('rec-foto').value;
-    const gluten = document.getElementById('rec-gluten').checked;
-    const lactose = document.getElementById('rec-lactose').checked;
 
-    if(!nome || !ingredientes) {
-        alert('Nome e ingredientes são obrigatórios!');
-        return;
-    }
+// CORRIGIDO: Trava no botão de salvar receita
+const btnSalvarRec = document.getElementById('btn-salvar-receita');
+if (btnSalvarRec) {
+    btnSalvarRec.addEventListener('click', async () => {
+        const id = document.getElementById('rec-id').value; 
+        const nome = document.getElementById('rec-nome').value;
+        const categoria = document.getElementById('rec-categoria').value;
+        const ingredientes = document.getElementById('rec-ingredientes').value;
+        let foto = document.getElementById('rec-foto').value;
+        const gluten = document.getElementById('rec-gluten').checked;
+        const lactose = document.getElementById('rec-lactose').checked;
 
-    // Se o usuário não colocar foto, usa uma padrão
-    if(!foto) foto = "https://images.unsplash.com/photo-1495521821757-a1efb6729352?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80";
-
-    const receitaSalvar = { 
-        nome, 
-        categoria, 
-        ingredientes, 
-        gluten, 
-        lactose, 
-        img: foto 
-    };
-
-    try {
-        if (id) {
-            // Se tem ID, é porque estamos EDITANDO. 
-            // Então deletamos a versão velha do banco antes de salvar a nova!
-            await deletarItem(Number(id));
+        if(!nome || !ingredientes) {
+            alert('Nome e ingredientes são obrigatórios!');
+            return;
         }
-        
-        await adicionarItem(receitaSalvar); // Salva no banco de verdade
-        alert(id ? 'Receita atualizada com sucesso!' : 'Receita salva com sucesso!');
-        
-        limparFormReceita();
-        document.getElementById('detalhes-form-receita').removeAttribute('open');
-        
-        await atualizarTela(); // Recarrega a lista puxando do banco
-    } catch (erro) {
-        alert("Erro ao salvar a receita.");
-    }
-});
+
+        if(!foto) foto = "https://images.unsplash.com/photo-1495521821757-a1efb6729352?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80";
+
+        const receitaSalvar = { nome, categoria, ingredientes, gluten, lactose, img: foto };
+
+        try {
+            if (id) {
+                await deletarItem(Number(id));
+            }
+            
+            await adicionarItem(receitaSalvar); 
+            alert(id ? 'Receita atualizada com sucesso!' : 'Receita salva com sucesso!');
+            
+            limparFormReceita();
+            const detalhesForm = document.getElementById('detalhes-form-receita');
+            if (detalhesForm) detalhesForm.removeAttribute('open');
+            
+            await atualizarTela(); 
+        } catch (erro) {
+            alert("Erro ao salvar a receita.");
+        }
+    });
+}
 
 function carregarEdicao(rec) {
-    document.getElementById('detalhes-form-receita').setAttribute('open', 'true'); // Abre o form
+    document.getElementById('detalhes-form-receita').setAttribute('open', 'true'); 
     document.getElementById('rec-id').value = rec.id;
     document.getElementById('rec-nome').value = rec.nome;
     document.getElementById('rec-categoria').value = rec.categoria;
     document.getElementById('rec-ingredientes').value = rec.ingredientes;
-    document.getElementById('rec-foto').value = rec.img === fotoPadrao ? '' : rec.img;
+    
+    // Removi a referência a fotoPadrao pois não estava declarada
+    document.getElementById('rec-foto').value = rec.img;
     document.getElementById('rec-gluten').checked = rec.gluten;
     document.getElementById('rec-lactose').checked = rec.lactose;
     
-    // Rola a tela suavemente para o formulário
     document.getElementById('detalhes-form-receita').scrollIntoView({ behavior: 'smooth' });
 }
 
 function limparFormReceita() {
-    document.getElementById('rec-id').value = '';
-    document.getElementById('rec-nome').value = '';
-    document.getElementById('rec-ingredientes').value = '';
-    document.getElementById('rec-foto').value = '';
-    document.getElementById('rec-gluten').checked = false;
-    document.getElementById('rec-lactose').checked = false;
+    const campos = ['rec-id', 'rec-nome', 'rec-ingredientes', 'rec-foto'];
+    campos.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+    const checks = ['rec-gluten', 'rec-lactose'];
+    checks.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.checked = false;
+    });
 }
 
-renderReceitas(); // Chama renderização inicial
+renderReceitas(); 
 
-    /* ==========================================================
-       3. ATUALIZAÇÃO DO CRONOGRAMA SEMANAL
-       ========================================================== */
-    function atualizarSelectsCronograma() {
+/* ==========================================================
+   3. ATUALIZAÇÃO DO CRONOGRAMA SEMANAL
+   ========================================================== */
+function atualizarSelectsCronograma() {
+    // TRAVA PARA O CRONOGRAMA
+    const areaPlanejamento = document.getElementById('planejamento');
+    if (!areaPlanejamento) return;
+
+    const linhasTabela = document.querySelectorAll('#planejamento tbody tr');
+    
+    linhasTabela.forEach((linha, index) => {
+        const selects = linha.querySelectorAll('select');
+        
+        let catAlvo = linha.querySelector('td').getAttribute('data-categoria');
+        let opcoesParaPreencher = receitasDb.filter(r => r.categoria === catAlvo || r.categoria === 'Lanche');
+
+        selects.forEach(select => {
+            const valorAtual = select.value; 
+            select.innerHTML = '<option value="">-- Selecione --</option>';
+            
+            opcoesParaPreencher.forEach(prato => {
+                const novaOpcao = document.createElement('option');
+                novaOpcao.value = prato.nome;
+                novaOpcao.textContent = prato.nome;
+                if(prato.nome === valorAtual) novaOpcao.selected = true;
+                select.appendChild(novaOpcao);
+            });
+        });
+    });
+}
+
+/* ==========================================================
+   3.5. SISTEMA DE SORTEIO DE REFEIÇÕES (ALEATÓRIO)
+   ========================================================== */
+const btnSortear = document.getElementById('btn-sortear');
+if (btnSortear) {
+    btnSortear.addEventListener('click', () => {
         const linhasTabela = document.querySelectorAll('#planejamento tbody tr');
         
+        if(receitasDb.length === 0) {
+            alert('Você precisa cadastrar algumas receitas primeiro para poder sortear!');
+            return;
+        }
+
         linhasTabela.forEach((linha, index) => {
             const selects = linha.querySelectorAll('select');
+            let catAlvo = linha.querySelector('td').getAttribute('data-categoria');
+            let opcoesDisponiveis = receitasDb.filter(r => r.categoria === catAlvo || r.categoria === 'Lanche');
             
-            // Filtra as receitas baseadas na linha (Café, Almoço, Jantar)
-            let catAlvo = index === 0 ? 'Café' : index === 1 ? 'Almoço' : 'Jantar';
-            let opcoesParaPreencher = receitasDb.filter(r => r.categoria === catAlvo || r.categoria === 'Lanche');
-
-            selects.forEach(select => {
-                // Mantém a seleção atual se existir
-                const valorAtual = select.value; 
-                select.innerHTML = '<option value="">-- Selecione --</option>';
-                
-                opcoesParaPreencher.forEach(prato => {
-                    const novaOpcao = document.createElement('option');
-                    novaOpcao.value = prato.nome;
-                    novaOpcao.textContent = prato.nome;
-                    if(prato.nome === valorAtual) novaOpcao.selected = true;
-                    select.appendChild(novaOpcao);
+            if (opcoesDisponiveis.length > 0) {
+                selects.forEach(select => {
+                    const indiceAleatorio = Math.floor(Math.random() * opcoesDisponiveis.length);
+                    select.value = opcoesDisponiveis[indiceAleatorio].nome;
                 });
-            });
-        });
-    }
-
-    /* ==========================================================
-       3.5. SISTEMA DE SORTEIO DE REFEIÇÕES (ALEATÓRIO)
-       ========================================================== */
-    const btnSortear = document.getElementById('btn-sortear');
-    if (btnSortear) {
-        btnSortear.addEventListener('click', () => {
-            const linhasTabela = document.querySelectorAll('#planejamento tbody tr');
-            
-            // Avisa se não tiver nenhuma receita no banco
-            if(receitasDb.length === 0) {
-                alert('Você precisa cadastrar algumas receitas primeiro para poder sortear!');
-                return;
             }
-
-            linhasTabela.forEach((linha, index) => {
-                const selects = linha.querySelectorAll('select');
-                
-                // Identifica se a linha é Café (0), Almoço (1) ou Jantar (2)
-                let catAlvo = index === 0 ? 'Café' : index === 1 ? 'Almoço' : 'Jantar';
-                
-                // Puxa as receitas do banco que servem para esta refeição (ou Lanche)
-                let opcoesDisponiveis = receitasDb.filter(r => r.categoria === catAlvo || r.categoria === 'Lanche');
-                
-                if (opcoesDisponiveis.length > 0) {
-                    selects.forEach(select => {
-                        // Escolhe uma comida aleatória da lista disponível e preenche a caixinha
-                        const indiceAleatorio = Math.floor(Math.random() * opcoesDisponiveis.length);
-                        select.value = opcoesDisponiveis[indiceAleatorio].nome;
-                    });
-                }
-            });
         });
-    }
-    
-    /* ==========================================================
-       4. LISTA DE COMPRAS
-       ========================================================== */
-    document.getElementById('btn-gerar-compras').addEventListener('click', () => {
+    });
+}
+
+/* ==========================================================
+   4. LISTA DE COMPRAS
+   ========================================================== */
+const btnGerarCompras = document.getElementById('btn-gerar-compras');
+if (btnGerarCompras) {
+    btnGerarCompras.addEventListener('click', () => {
         const listaFinal = new Set();
         
         document.querySelectorAll('#planejamento select').forEach(select => {
             const pratoNome = select.value;
             if (pratoNome) {
-                // Encontra a receita no "Banco de Dados"
                 const receita = receitasDb.find(r => r.nome === pratoNome);
                 if(receita) {
-                    // Separa os ingredientes por vírgula e adiciona à lista
                     let ings = receita.ingredientes.split(',');
                     ings.forEach(ing => listaFinal.add(ing.trim()));
                 }
@@ -301,6 +309,8 @@ renderReceitas(); // Chama renderização inicial
         });
 
         const containerLista = document.getElementById('conteudo-lista-compras');
+        if (!containerLista) return;
+
         if(listaFinal.size === 0) {
             containerLista.innerHTML = '<p style="color: red;">Selecione pratos no cronograma primeiro!</p>';
             return;
@@ -313,7 +323,6 @@ renderReceitas(); // Chama renderização inicial
         html += '</ul>';
         containerLista.innerHTML = html;
 
-        // Adiciona evento de riscar o item comprado
         document.querySelectorAll('#conteudo-lista-compras li').forEach(li => {
             const checkbox = li.querySelector('input');
             const label = li.querySelector('label');
@@ -323,3 +332,4 @@ renderReceitas(); // Chama renderização inicial
             });
         });
     });
+}

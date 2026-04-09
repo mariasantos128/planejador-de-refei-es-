@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FamilyChef - Planejador Alimentar</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>FamilyChef - Planejador Alimentar</h1>
+        <nav>
+            <ul>
+                <li><a href="usuarios.html">Gestão de Usuários</a></li>
+                <li><a href="planejamento.html">Planejamento Semanal</a></li>
+                <li><a href="receitas.html">Gestão de Receitas</a></li>
+                <li><a href="compras.html">Lista de Compras</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <script src="db.js"></script>
+    <script src="controller.js"></script>
+    <script src="script.js"></script>
+
+     <section id="receitas">
+        <h2>3. Livro de Receitas</h2>
+
+        <label for="busca">Buscar Receita:</label>
+        <input type="search" id="busca" placeholder="Ex: Macarrão, Rápida...">
+        <br><br>
+
+        <details id="detalhes-form-receita">
+            <summary><strong>+ Adicionar/Editar Receita (Admin)</strong></summary>
+            <div style="border: 1px solid #ccc; padding: 15px; margin-top: 10px; border-radius: 8px; background-color: #fafafa;">
+                <input type="hidden" id="rec-id"> <label>Nome do Prato:</label><br>
+                <input type="text" id="rec-nome"><br>
+                
+                <label>Categoria:</label><br>
+                <select id="rec-categoria">
+                    <option>Café</option>
+                    <option>Almoço</option>
+                    <option>Jantar</option>
+                    <option>Lanche</option>
+                </select><br>
+
+                <label>Ingredientes:</label><br>
+                <textarea id="rec-ingredientes" rows="3"></textarea><br>
+
+                <label>URL da Foto (Opcional):</label><br>
+                <input type="text" id="rec-foto" placeholder="Cole o link da imagem aqui"><br>
+
+                <label>Contém Alérgenos?</label><br>
+                <input type="checkbox" id="rec-gluten"> Glúten
+                <input type="checkbox" id="rec-lactose"> Lactose
+                <br><br>
+                <button type="button" id="btn-salvar-receita">Salvar Receita</button>
+            </div>
+        </details>
+
+        <h3>Minhas Receitas</h3>
+        <div id="grid-receitas" class="receitas-grid"></div>
+    </section>
+
+    
+</body>
+</html>

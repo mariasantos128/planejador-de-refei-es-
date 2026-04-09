@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FamilyChef - Planejador Alimentar</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>FamilyChef - Planejador Alimentar</h1>
+        <nav>
+            <ul>
+                <li><a href="usuarios.html">Gestão de Usuários</a></li>
+                <li><a href="planejamento.html">Planejamento Semanal</a></li>
+                <li><a href="receitas.html">Gestão de Receitas</a></li>
+                <li><a href="compras.html">Lista de Compras</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <script src="db.js"></script>
+    <script src="controller.js"></script>
+    <script src="script.js"></script>
+
+    <section id="planejamento">
+        <h2>2. Cronograma Semanal </h2>
+        <p>Instrução: Selecione as refeições para cada dia.</p>
+        
+        <button type="button" id="btn-sortear" style="margin-bottom: 15px;">🎲 Sortear Refeições</button>
+        <table border="1" cellpadding="10" cellspacing="0" width="100%">
+            <thead>
+                <tr>
+                    <th>Refeição</th>
+                    <th>Segunda</th>
+                    <th>Terça</th>
+                    <th>Quarta</th>
+                    <th>Quinta</th>
+                    <th>Sexta</th>
+                    <th>Sábado</th>
+                    <th>Domingo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-categoria="Café"><strong>Café da Manhã</strong></td>
+                    <td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td>
+                </tr>
+                <tr>
+                    <td data-categoria="Almoço"><strong>Almoço</strong></td>
+                    <td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td>
+                </tr>
+                <tr>
+                    <td data-categoria="Lanche"><strong>Lanche da Tarde</strong></td>
+                    <td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td>
+                </tr>
+                <tr>
+                    <td data-categoria="Jantar"><strong>Jantar</strong></td>
+                    <td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    
+</body>
+</html>

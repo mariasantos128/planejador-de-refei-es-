@@ -36,15 +36,15 @@ nav a {
     text-decoration: none;
     color: #fff;
     font-weight: bold;
-    background: rgba(255, 255, 255, 0.3);
+    background-color: #d81b60bb; /* Mesma cor dos botões e títulos */
     padding: 8px 15px;
     border-radius: 20px;
     transition: background 0.3s ease, color 0.3s ease;
 }
 
 nav a:hover {
-    background: rgba(255, 255, 255, 0.5);
-    color: #d81b60bb;
+    background-color: #d81b60; /* Perde a transparência ao passar o mouse, igual ao botão */
+    color: #fff;
 }
 
 /* Containers das Seções */
@@ -63,7 +63,7 @@ h2, h3 {
 
 /* Botões */
 button {
-    background-color: #f8bbd0; /* Rosa pastel */
+    background-color: #d81b60bb; /* Exatamente a mesma cor com transparência dos títulos */
     color: #fff;
     font-size: 16px;
     font-weight: bold; 
@@ -73,13 +73,13 @@ button {
     cursor: pointer;
     transition: all 0.3s ease; 
     text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Sombra sutil para dar volume */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
 }
 
 button:hover {
-    background-color: #c2728d; /* Rosa um pouco mais forte no hover */
+    background-color: #ad144b; /* Fica sólida (sem transparência) ao passar o mouse */
     transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(194, 114, 141, 0.3); /* Sombra cresce no hover */
+    box-shadow: 0 4px 10px rgba(216, 27, 96, 0.3); 
 }
 
 /* Inputs gerais */
@@ -184,7 +184,7 @@ th, td {
 }
 
 th { 
-    background-color: #f8bbd0; 
+    background-color: #d81b60bb; /* Mesma cor dos botões e títulos */
     color: white; 
     font-weight: 600;
 }

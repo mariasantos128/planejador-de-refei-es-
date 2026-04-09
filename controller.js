@@ -45,6 +45,7 @@ async function carregarReceitasDoBanco() {
 
 function renderReceitas(listaParaRenderizar) {
     const grid = document.getElementById('grid-receitas');
+    if (!grid) return; // <-- Trava adicionada aqui
     grid.innerHTML = '';
     
     if (!listaParaRenderizar) listaParaRenderizar = receitasAtuais;
@@ -94,60 +95,63 @@ function renderReceitas(listaParaRenderizar) {
     }
 }
 
-document.getElementById('busca').addEventListener('input', (e) => {
-    const termo = e.target.value.toLowerCase();
-    const filtradas = receitasAtuais.filter(rec => 
-        rec.nome.toLowerCase().includes(termo) || 
-        rec.categoria.toLowerCase().includes(termo)
-    );
-    renderReceitas(filtradas);
-});
+const campoBusca = document.getElementById('busca');
+if (campoBusca) {
+    campoBusca.addEventListener('input', (e) => {
+        const termo = e.target.value.toLowerCase();
+        const filtradas = receitasAtuais.filter(rec => 
+            rec.nome.toLowerCase().includes(termo) || 
+            rec.categoria.toLowerCase().includes(termo)
+        );
+        renderReceitas(filtradas);
+    });
+}
 
 // A função de salvar estava cortada no seu código, arrumei ela aqui:
-document.getElementById('btn-salvar-receita').addEventListener('click', async () => {
-    const nome = document.getElementById('rec-nome').value;
-    const categoria = document.getElementById('rec-categoria').value;
-    const ingredientes = document.getElementById('rec-ingredientes').value;
-    let foto = document.getElementById('rec-foto').value;
-    const gluten = document.getElementById('rec-gluten').checked;
-    const lactose = document.getElementById('rec-lactose').checked;
+const btnSalvar = document.getElementById('btn-salvar-receita');
+if (btnSalvar) {
+    btnSalvar.addEventListener('click', async () => {
+        const nome = document.getElementById('rec-nome').value;
+        const categoria = document.getElementById('rec-categoria').value;
+        const ingredientes = document.getElementById('rec-ingredientes').value;
+        let foto = document.getElementById('rec-foto').value;
+        const gluten = document.getElementById('rec-gluten').checked;
+        const lactose = document.getElementById('rec-lactose').checked;
 
-    if(!nome || !ingredientes) {
-        alert('Nome e ingredientes são obrigatórios!');
-        return;
-    }
+        if(!nome || !ingredientes) {
+            alert('Nome e ingredientes são obrigatórios!');
+            return;
+        }
 
-    if(!foto) {
-        // Esta é a foto que aparece quando alguém cadastra uma receita sem colocar link
-        foto = "https://media.istockphoto.com/id/1270249705/pt/foto/juices-smoothie-different-glasses-health-concept.jpg?s=2048x2048&w=is&k=20&c=8snkn6MkebjlpxCjQo1V50V6Og_eGGeCy5yKVflrEQI="; 
-    }
+        if(!foto) {
+            foto = "https://media.istockphoto.com/id/1270249705/pt/foto/juices-smoothie-different-glasses-health-concept.jpg?s=2048x2048&w=is&k=20&c=8snkn6MkebjlpxCjQo1V50V6Og_eGGeCy5yKVflrEQI="; 
+        }
 
-    const novaReceita = {
-        nome: nome,
-        categoria: categoria,
-        ingredientes: ingredientes,
-        img: foto,
-        gluten: gluten,
-        lactose: lactose
-    };
+        const novaReceita = {
+            nome: nome,
+            categoria: categoria,
+            ingredientes: ingredientes,
+            img: foto,
+            gluten: gluten,
+            lactose: lactose
+        };
 
-    try {
-        await adicionarItem(novaReceita); 
-        alert('Receita adicionada ao livro com sucesso!');
-        
-        // Limpa o formulário
-        document.getElementById('rec-nome').value = '';
-        document.getElementById('rec-ingredientes').value = '';
-        document.getElementById('rec-foto').value = '';
-        document.getElementById('rec-gluten').checked = false;
-        document.getElementById('rec-lactose').checked = false;
-        
-        // Fecha a aba de adicionar
-        document.getElementById('detalhes-form-receita').removeAttribute('open');
-        
-        // Recarrega tudo do banco
-        await carregarReceitasDoBanco(); 
-    } catch (erro) {
-        alert('Erro ao salvar no banco.');
-    }
-});
+        try {
+            await adicionarItem(novaReceita); 
+            alert('Receita adicionada ao livro com sucesso!');
+            
+            document.getElementById('rec-nome').value = '';
+            document.getElementById('rec-ingredientes').value = '';
+            document.getElementById('rec-foto').value = '';
+            document.getElementById('rec-gluten').checked = false;
+            document.getElementById('rec-lactose').checked = false;
+            
+            const formAbas = document.getElementById('detalhes-form-receita');
+            if (formAbas) formAbas.removeAttribute('open');
+            
+            await carregarReceitasDoBanco(); 
+        } catch (erro) {
+            alert('Erro ao salvar no banco.');
+        }
+    });
+}
