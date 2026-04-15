@@ -53,19 +53,19 @@ async function adicionarReceitasPadrao() {
     if (receitasAtuais.length === 0) {
         const receitasPadrao = [
             // CAFÉ DA MANHÃ
-            { nome: "Pão com Ovo", categoria: "Café", ingredientes: "Pão francês, 1 ovo, manteiga", foto: "https://images.unsplash.com/photo-1525351484163-7529414344d8?q=80&w=500", gluten: true, lactose: true },
-            { nome: "Cuscuz com Manteiga", categoria: "Café", ingredientes: "Flocão de milho, água, sal, manteiga", foto: "https://images.unsplash.com/photo-1596560548464-f010549b84d7?q=80&w=500", gluten: false, lactose: true },
-            { nome: "Tapioca com Queijo", categoria: "Café", ingredientes: "Massa de tapioca, queijo coalho ou mussarela", foto: "https://images.unsplash.com/photo-1504113888839-1c8eb50233d3?q=80&w=500", gluten: false, lactose: true },
+            { nome: "Pão com Ovo", categoria: "Café", ingredientes: "Pão francês, 1 ovo, manteiga", foto: "https://media.istockphoto.com/id/943148622/pt/foto/bread-with-scrambled-egg-brazilian-pao-com-ovo.webp?a=1&b=1&s=612x612&w=0&k=20&c=r-fjqQYmHu7JR8GhPBrlY-MuIZyWQmDwIwQVZvIdOVg=", gluten: true, lactose: true },
+            { nome: "Cuscuz com Manteiga", categoria: "Café", ingredientes: "Flocão de milho, água, sal, manteiga", foto: "https://media.istockphoto.com/id/1304749748/pt/foto/brazilian-couscous-on-wooden-background-brazilian-breakfast-concept.jpg?s=612x612&w=0&k=20&c=DkJBjeivl_M7QLwKLSD-CRYRDkv3e4i5_KFCZ1Uya68=", gluten: false, lactose: true },
+            { nome: "Tapioca com Queijo", categoria: "Café", ingredientes: "Massa de tapioca, queijo coalho ou mussarela", foto: "https://media.istockphoto.com/id/1256543084/pt/foto/tapioca-for-breakfast.jpg?s=612x612&w=0&k=20&c=AU62YE1mgTrK5ePN8qkNy1Pgmupqyuh2VEj2vNd1Ts8=", gluten: false, lactose: true },
             
             // ALMOÇO / JANTAR
-            { nome: "Arroz, Feijão e Ovo", categoria: "Almoço", ingredientes: "Arroz branco, feijão carioca, 2 ovos fritos", foto: "https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?q=80&w=500", gluten: false, lactose: false },
-            { nome: "Frango Grelhado com Arroz", categoria: "Almoço", ingredientes: "Peito de frango, arroz, salada de alface", foto: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?q=80&w=500", gluten: false, lactose: false },
-            { nome: "Carne de Panela", categoria: "Jantar", ingredientes: "Acém ou músculo, batata, cenoura, molho de tomate", foto: "https://images.unsplash.com/photo-1534939561126-855b86141680?q=80&w=500", gluten: false, lactose: false },
-            { nome: "Macarrão com Carne Moída", categoria: "Jantar", ingredientes: "Macarrão espaguete, carne moída, molho", foto: "https://images.unsplash.com/photo-1621996316541-0154080a527e?q=80&w=500", gluten: true, lactose: false },
+            { nome: "Arroz, Feijão e Ovo", categoria: "Almoço", ingredientes: "Arroz branco, feijão carioca, 2 ovos fritos", foto: "https://media.istockphoto.com/id/491516552/pt/foto/arroz-e-feij%C3%B5es.jpg?s=612x612&w=0&k=20&c=1N4796xrpSpyXm_kTkbrRPqVlhdju8EhhwELpmHnbWs=", gluten: false, lactose: false },
+            { nome: "Frango Grelhado com Arroz", categoria: "Almoço", ingredientes: "Peito de frango, arroz, salada de alface", foto: "https://media.istockphoto.com/id/2207230263/pt/foto/rice-beans-grilled-chicken-steak-salad-and-farofa.jpg?s=612x612&w=0&k=20&c=1uQOxbLjiZrLZU4gnoBX8xekTWORdQFNpvnKEjBmltA=", gluten: false, lactose: false },
+            { nome: "Carne de Panela", categoria: "Jantar", ingredientes: "Acém ou músculo, batata, cenoura, molho de tomate", foto: "https://media.istockphoto.com/id/516816644/pt/foto/caseiras-lenta-cozinheiro-ca%C3%A7arola-com-carne-assada.jpg?s=612x612&w=0&k=20&c=MjBH3VKYVYOfNMDSj2OdoMiYbARIrxFZkVW8yJtAYrY=", gluten: false, lactose: false },
+            { nome: "Macarrão com Carne Moída", categoria: "Jantar", ingredientes: "Macarrão espaguete, carne moída, molho", foto: "https://media.istockphoto.com/id/1215312647/pt/foto/pasta-fettuccine-with-beef-ragout-sauce-in-black-bowl-grey-background-close-up-top-view.jpg?s=612x612&w=0&k=20&c=EnfZd3RvJ7V8bWdekE9R714bMToUIi6O6i-hhh8YPfc=", gluten: true, lactose: false },
             
             // LANCHE
-            { nome: "Fruta Picada", categoria: "Lanche", ingredientes: "Banana, maçã, mamão", foto: "https://images.unsplash.com/photo-1582285141103-34e405a76da0?q=80&w=500", gluten: false, lactose: false },
-            { nome: "Iogurte com Aveia", categoria: "Lanche", ingredientes: "Iogurte natural, aveia em flocos", foto: "https://images.unsplash.com/photo-1517093740263-149d8c474c10?q=80&w=500", gluten: true, lactose: true }
+            { nome: "Fruta Picada", categoria: "Lanche", ingredientes: "Banana, maçã, mamão", foto: "https://media.istockphoto.com/id/501512015/pt/foto/fruta-fresca-de-mistura-de-salada.jpg?s=612x612&w=0&k=20&c=mmHCjiLl1kQD3NVksDZJAe1RNJDINxTnGPUf3fwowyg=", gluten: false, lactose: false },
+            { nome: "Iogurte com Aveia", categoria: "Lanche", ingredientes: "Iogurte natural, aveia em flocos", foto: "https://media.istockphoto.com/id/1396570974/pt/foto/smoothie-bowl-topped-with-fresh-berries-and-granola.jpg?s=612x612&w=0&k=20&c=AthCJYjEiuRuJ3wMDjX0JxFeKAUS1juHsHRMkHgE47A=", gluten: true, lactose: true }
         ];
 
         for (const rec of receitasPadrao) {
@@ -243,76 +243,84 @@ if (btnSortear) {
     });
 }
 
-// --- LÓGICA DE LOGIN ---
-const btnLogin = document.getElementById("btn-login");
-if (btnLogin) {
-    btnLogin.addEventListener("click", () => {
-        const nome = document.getElementById("login-nome").value.trim();
-        if (nome) {
-            mostrarNotificacao("Bem-vindo(a), " + nome + "! 🌿", "var(--cor-escura)");
-            setTimeout(() => { window.location.href = "usuarios.html"; }, 1500);
-        } else {
-            mostrarNotificacao("Por favor, digite seu nome para entrar!", "#d64545");
-        }
-    });
-}
-
-// --- GESTÃO DE USUÁRIOS ---
+// --- GESTÃO DE USUÁRIOS (VERSÃO CORRIGIDA) ---
 async function carregarUsuarios() {
-    const lista = document.getElementById("lista-usuarios");
+    // 1. Corrigido para o ID correto da lista no HTML
+    const lista = document.getElementById("lista-membros-ui");
     if (!lista) return;
 
+    // Busca do banco de dados (certifique-se que buscarUsuarios existe no db.js)
     const usuarios = (await buscarUsuarios()) || [];
     lista.innerHTML = "";
 
     if (usuarios.length === 0) {
-        lista.innerHTML = "<p style='grid-column: 1 / -1; text-align: center;'>Nenhum membro cadastrado ainda.</p>";
+        lista.innerHTML = "<p>Nenhum membro cadastrado ainda.</p>";
         return;
     }
 
     usuarios.forEach(user => {
-        const itemLista = document.createElement("li");
-        
-        itemLista.innerHTML = `
+        const item = document.createElement("li");
+        item.style.display = "flex";
+        item.style.justifyContent = "space-between";
+        item.style.alignItems = "center";
+        item.style.padding = "10px";
+        item.style.borderBottom = "1px solid #eee";
+
+        item.innerHTML = `
             <div>
-                <strong>${user.nome}</strong> 
-                <small>Restrições: ${user.restricoes || "Nenhuma"}</small>
+                <strong>${user.nome}</strong><br>
+                <small style="color: #666;">E-mail: ${user.email || "Não informado"} | Perfil: ${user.perfil || "Membro"}</small>
             </div>
-            <button class="btn-excluir" style="width: 100%;" onclick="removerUsuario(${user.id})">Remover</button>
+            <button class="btn-excluir" onclick="removerUsuario(${user.id})" 
+                    style="background:#d64545; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">
+                Remover
+            </button>
         `;
-        
-        lista.appendChild(itemLista);
+        lista.appendChild(item);
     });
 }
 
-const btnSalvarUsuario = document.getElementById("btn-salvar-usuario");
-if (btnSalvarUsuario) {
-    btnSalvarUsuario.addEventListener("click", async () => {
-        const nomeUsuario = document.getElementById("user-nome").value.trim();
-        const restricoes = document.getElementById("user-restricoes").value.trim();
+// Escuta o clique no botão de salvar usuário
+document.addEventListener("click", async (e) => {
+    // 2. Corrigido para o ID do botão no HTML
+    if (e.target.id === "btn-convidar") {
+        
+        // 3. Pegando os IDs corretos do HTML
+        const nomeInput = document.getElementById("nome_convite");
+        const emailInput = document.getElementById("email_convite");
+        const perfilInput = document.getElementById("perfil_convite");
 
-        if (!nomeUsuario) {
-            mostrarNotificacao("Preencha o nome do usuário!", "#d64545");
+        if (!nomeInput.value.trim()) {
+            // Se a função mostrarNotificacao não existir ou estiver dando erro, use um alert por enquanto:
+            // alert("O nome é obrigatório!");
+            if(typeof mostrarNotificacao === "function") {
+                mostrarNotificacao("O nome é obrigatório!", "#d64545");
+            }
             return;
         }
 
-        await adicionarUsuario({ nome: nomeUsuario, restricoes: restricoes });
+        // Criando o objeto com os dados exatos do seu formulário
+        const novoUser = {
+            nome: nomeInput.value.trim(),
+            email: emailInput.value.trim(),
+            perfil: perfilInput.value
+        };
 
-        document.getElementById("user-nome").value = "";
-        document.getElementById("user-restricoes").value = "";
-
-        mostrarNotificacao("Usuário cadastrado com sucesso! 👨‍👩‍👧‍👦");
-        carregarUsuarios(); 
-    });
-}
-
-async function removerUsuario(id) {
-    if (confirm("Tem certeza que deseja remover este membro da família?")) {
-        await deletarUsuario(id);
-        mostrarNotificacao("Usuário removido!", "#d64545");
-        carregarUsuarios(); 
+        // Chama a função do IndexedDB
+        await adicionarUsuario(novoUser);
+        
+        // Limpa os campos depois de salvar
+        nomeInput.value = "";
+        emailInput.value = "";
+        
+        if(typeof mostrarNotificacao === "function") {
+            mostrarNotificacao("Usuário adicionado! 👨‍👩‍👧‍👦");
+        }
+        
+        // Recarrega a lista na tela
+        carregarUsuarios();
     }
-}
+});
 
 // --- FUNÇÃO PARA DESTACAR O DIA ATUAL NO CRONOGRAMA ---
 function destacarDiaAtual() {

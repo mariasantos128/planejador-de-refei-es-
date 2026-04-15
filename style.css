@@ -1,4 +1,9 @@
 /* =========================================
+   IMPORTAÇÃO DA FONTE
+   ========================================= */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+/* =========================================
    PALETA DE CORES (Baseada na imagem)
    ========================================= */
 :root {
@@ -10,7 +15,7 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: var(--cor-fundo);
     color: var(--cor-texto);
     margin: 0;
@@ -60,13 +65,15 @@ nav a {
 }
 
 nav a:hover {
-    background-color: var(--cor-escura); /* Fica escuro quando passa o mouse */
-    color: #ffffff; /* Texto fica branco */
+    background-color: var(--cor-texto); /* Mudamos para o verde super escuro */
+    color: #ffffff; 
     transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(74, 90, 45, 0.486);
+    box-shadow: 0 5px 15px rgba(42, 54, 26, 0.5); /* Sombra combinando com a nova cor */
 }
 
-/* MARGENS E CONTAINERS CORRIGIDOS */
+/* =========================================
+   ESTRUTURA PRINCIPAL (Containers)
+   ========================================= */
 section {
     background-color: #ffffff;
     border-radius: 12px; 
@@ -83,7 +90,46 @@ h2, h3 {
     margin-top: 0;
 }
 
-/* Botões Gerais */
+/* =========================================
+   FORMULÁRIOS (Inputs, Fieldsets, Buttons)
+   ========================================= */
+fieldset {
+    border: 2px solid var(--cor-clara);
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 25px;
+    background-color: #fafbfc;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+}
+
+legend {
+    background-color: var(--cor-media);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+input[type="text"], input[type="email"], select, textarea, input[type="search"] {
+    width: 100%;
+    padding: 12px;
+    margin-top: 8px; 
+    margin-bottom: 20px;
+    border: 1px solid var(--cor-clara);
+    border-radius: 8px;
+    box-sizing: border-box;
+    background-color: #ffffff;
+    transition: all 0.3s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--cor-media);
+    box-shadow: 0 0 8px rgba(127, 166, 83, 0.3);
+}
+
 button {
     background-color: var(--cor-media);
     color: #fff;
@@ -97,9 +143,9 @@ button {
 }
 
 button:hover {
-    background-color: var(--cor-escura);
+    background-color: var(--cor-texto); /* Mudamos para o verde super escuro */
     transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(99, 120, 61, 0.3); 
+    box-shadow: 0 4px 10px rgba(42, 54, 26, 0.4); /* Sombra combinando com a nova cor */
 }
 
 .btn-excluir {
@@ -113,26 +159,9 @@ button:hover {
     background-color: #b53232;
 }
 
-/* Inputs e Formulários */
-input[type="text"], input[type="email"], select, textarea, input[type="search"] {
-    width: 100%;
-    padding: 12px;
-    margin-top: 8px; 
-    margin-bottom: 20px;
-    border: 1px solid var(--cor-clara);
-    border-radius: 8px;
-    box-sizing: border-box;
-    background-color: #fafbfc;
-    transition: all 0.3s ease;
-}
-
-input:focus, select:focus, textarea:focus {
-    outline: none;
-    border-color: var(--cor-media);
-    box-shadow: 0 0 8px rgba(127, 166, 83, 0.3);
-}
-
-/* Tabela do Planejamento */
+/* =========================================
+   TABELA DO PLANEJAMENTO
+   ========================================= */
 table { 
     width: 100%; 
     border-collapse: collapse; 
@@ -158,7 +187,43 @@ tbody tr:hover {
     background-color: var(--cor-fundo); 
 }
 
-/* Grade de Receitas */
+/* Ajustes para a tabela não ficar espremida */
+#planejamento {
+    overflow-x: auto; 
+    width: 100%;
+}
+
+#planejamento table {
+    min-width: 900px; /* Força a tabela a ficar larga e legível */
+    width: 100%;
+}
+
+#planejamento select {
+    width: 100%;
+    min-width: 140px; 
+    padding: 8px;
+    margin-bottom: 0; /* Remove a margem extra dentro da tabela */
+}
+
+/* Customização da Scrollbar para a Tabela */
+#planejamento::-webkit-scrollbar {
+    height: 10px;
+}
+#planejamento::-webkit-scrollbar-track {
+    background: var(--cor-fundo);
+    border-radius: 8px;
+}
+#planejamento::-webkit-scrollbar-thumb {
+    background: var(--cor-clara);
+    border-radius: 8px;
+}
+#planejamento::-webkit-scrollbar-thumb:hover {
+    background: var(--cor-media);
+}
+
+/* =========================================
+   GRADE DE RECEITAS
+   ========================================= */
 .receitas-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -200,7 +265,9 @@ tbody tr:hover {
     padding-top: 12px;
 }
 
-/* Toast de Notificação */
+/* =========================================
+   TOAST DE NOTIFICAÇÃO
+   ========================================= */
 #toast {
     visibility: hidden;
     min-width: 250px;
@@ -225,21 +292,4 @@ tbody tr:hover {
     visibility: visible;
     opacity: 1;
     bottom: 50px;
-}
-
-/* --- AJUSTES DA TABELA PARA NÃO FICAR ESPREMIDA --- */
-#planejamento {
-    overflow-x: auto; 
-    width: 100%;
-}
-
-#planejamento table {
-    min-width: 900px; /* Isso força a tabela a ficar larga e legível */
-    width: 100%;
-}
-
-#planejamento select {
-    width: 100%;
-    min-width: 140px; 
-    padding: 8px;
 }
