@@ -343,3 +343,120 @@ function destacarDiaAtual() {
         }
     });
 }
+
+// ==========================================
+// --- COMUNICAÇÃO ENTRE AS PÁGINAS E LISTA DE COMPRAS ---
+// ==========================================
+
+// 1. SALVAR AS ESCOLHAS: Toda vez que você mudar algo no planejamento, ele salva na memória
+function salvarCardapioNaMemoria() {
+    const selects = document.querySelectorAll("#planejamento tbody select");
+    if (selects.length > 0) {
+        const selecionados = Array.from(selects).map(s => s.value).filter(v => v !== "");
+        localStorage.setItem("cardapioSalvo", JSON.stringify(selecionados));
+    }
+}
+
+// Escuta quando você escolhe uma comida manualmente na tabela
+document.addEventListener("change", (e) => {
+    if (e.target.matches("#planejamento select")) {
+        salvarCardapioNaMemoria();
+    }
+});
+
+// Escuta quando você clica no botão de Sortear
+document.addEventListener("click", (e) => {
+    if (e.target.id === "btn-sortear") {
+        setTimeout(salvarCardapioNaMemoria, 300);
+    }
+});
+
+// 2. GERAR A LISTA NA PÁGINA DE COMPRAS
+document.addEventListener("DOMContentLoaded", () => {
+    const btnGerarCompras = document.getElementById("btn-gerar-compras");
+    const containerLista = document.getElementById("conteudo-lista-compras");
+
+    if (btnGerarCompras && containerLista) {
+        btnGerarCompras.addEventListener("click", async () => {
+            const comidasSelecionadas = JSON.parse(localStorage.getItem("cardapioSalvo")) || [];
+            const receitasNoBanco = (await buscarItens()) || [];
+            let ingredientesParaComprar = [];
+
+            comidasSelecionadas.forEach(nomeReceita => {
+                const receita = receitasNoBanco.find(r => r.nome === nomeReceita);
+                if (receita && receita.ingredientes) {
+                    const itens = receita.ingredientes.split(",").map(i => i.trim());
+                    ingredientesParaComprar = ingredientesParaComprar.concat(itens);
+                }
+            });
+
+            if (ingredientesParaComprar.length === 0) {
+                containerLista.innerHTML = "<p style='color: #d64545; font-weight: bold;'>Nenhuma receita selecionada no Planejamento. Escolha os pratos lá primeiro!</p>";
+                return;
+            }
+
+            const listaSemRepeticao = [...new Set(ingredientesParaComprar.filter(i => i !== ""))];
+
+            const ul = document.createElement("ul");
+            ul.style.listStyle = "none";
+            ul.style.padding = "0";
+
+           // Escreve os ingredientes na tela com checkbox para marcar
+            listaSemRepeticao.forEach(item => {
+                const li = document.createElement("li");
+                li.style.padding = "12px";
+                li.style.borderBottom = "1px solid #eee";
+                li.style.display = "flex";
+                li.style.alignItems = "center";
+                li.style.gap = "10px";
+                li.style.cursor = "pointer";
+
+                // Cria o Checkbox
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.style.width = "18px";
+                checkbox.style.height = "18px";
+                checkbox.style.cursor = "pointer";
+
+                // Texto do ingrediente
+                const span = document.createElement("span");
+                span.textContent = item;
+                span.style.fontSize = "16px";
+
+                // Evento para riscar o texto quando marcar o checkbox
+                const alternarMarcacao = () => {
+                    if (checkbox.checked) {
+                        span.style.textDecoration = "line-through";
+                        span.style.color = "#888";
+                        li.style.backgroundColor = "#f9f9f9";
+                    } else {
+                        span.style.textDecoration = "none";
+                        span.style.color = "#333";
+                        li.style.backgroundColor = "transparent";
+                    }
+                };
+
+                checkbox.addEventListener("change", alternarMarcacao);
+                
+                // Permite clicar na linha inteira para marcar
+                li.onclick = (e) => {
+                    if (e.target !== checkbox) {
+                        checkbox.checked = !checkbox.checked;
+                        alternarMarcacao();
+                    }
+                };
+
+                li.appendChild(checkbox);
+                li.appendChild(span);
+                ul.appendChild(li);
+            });
+            
+            containerLista.innerHTML = ""; 
+            containerLista.appendChild(ul); 
+            
+            if (typeof mostrarNotificacao === "function") {
+                mostrarNotificacao("Lista de ingredientes gerada!", "var(--cor-media)");
+            }
+        });
+    }
+});

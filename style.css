@@ -226,3 +226,20 @@ tbody tr:hover {
     opacity: 1;
     bottom: 50px;
 }
+
+/* --- AJUSTES DA TABELA PARA NÃO FICAR ESPREMIDA --- */
+#planejamento {
+    overflow-x: auto; 
+    width: 100%;
+}
+
+#planejamento table {
+    min-width: 900px; /* Isso força a tabela a ficar larga e legível */
+    width: 100%;
+}
+
+#planejamento select {
+    width: 100%;
+    min-width: 140px; 
+    padding: 8px;
+}
