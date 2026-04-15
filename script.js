@@ -1,8 +1,8 @@
 /* ==========================================================
    1. SISTEMA DE USUÁRIOS (ADM PRIMEIRO) & CONVITE
    ========================================================== */
-
-let usuarios = []; // Começa vazio!
+// Puxa da memória ou começa vazio se for a primeira vez
+let usuarios = JSON.parse(localStorage.getItem('membrosFamilyChef')) || [];
 
 function renderUsuarios() {
     // CORRIGIDO: Padronizei o nome da variável para listaUI
@@ -69,7 +69,10 @@ if (btnConvidar) {
             perfil: perfilInput.value
         });
         
-        renderUsuarios(); 
+        // Salva a lista atualizada na memória do navegador!
+        localStorage.setItem('membrosFamilyChef', JSON.stringify(usuarios));
+        
+        renderUsuarios();
 
         msgInfo.innerHTML = `✅ <strong>${nomeInput.value}</strong> foi adicionado(a) com sucesso!`;
         msgInfo.style.display = 'block';
@@ -102,8 +105,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function atualizarTela() {
     receitasDb = await buscarItens(); 
     renderReceitas(); 
+    
 }
-
 function renderReceitas() {
     const grid = document.getElementById('grid-receitas');
     
@@ -234,17 +237,33 @@ renderReceitas();
    3. ATUALIZAÇÃO DO CRONOGRAMA SEMANAL
    ========================================================== */
 function atualizarSelectsCronograma() {
-    // TRAVA PARA O CRONOGRAMA
+    console.log("🕵️ Iniciando atualização do cronograma...");
+    
     const areaPlanejamento = document.getElementById('planejamento');
-    if (!areaPlanejamento) return;
+    if (!areaPlanejamento) {
+        console.log("❌ Tabela com id='planejamento' não encontrada nesta página.");
+        return;
+    }
+
+    console.log(`✅ Tabela encontrada! Receitas carregadas do banco: ${receitasDb.length}`);
 
     const linhasTabela = document.querySelectorAll('#planejamento tbody tr');
     
     linhasTabela.forEach((linha, index) => {
         const selects = linha.querySelectorAll('select');
+        const td = linha.querySelector('td');
         
-        let catAlvo = linha.querySelector('td').getAttribute('data-categoria');
+        // Verifica se a tag <td> existe e se tem o data-categoria
+        let catAlvo = td ? td.getAttribute('data-categoria') : null;
+        
+        if (!catAlvo) {
+            console.log(`⚠️ Linha ${index + 1}: Sem atributo 'data-categoria'. Nenhuma opção será gerada aqui.`);
+            return; // Pula essa linha se não tiver categoria
+        }
+
         let opcoesParaPreencher = receitasDb.filter(r => r.categoria === catAlvo || r.categoria === 'Lanche');
+        
+        console.log(`🍽️ Linha ${index + 1} (Categoria: ${catAlvo}): Encontradas ${opcoesParaPreencher.length} opções.`);
 
         selects.forEach(select => {
             const valorAtual = select.value; 
