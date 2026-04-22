@@ -1,160 +1,57 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Planejamento Familiar</title>
+    <title>Sabor Semanal - Login</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <header>
-        <h1>FamilyChef - Planejador Alimentar</h1>
-        <nav>
-            <ul>
-                <li><a href="usuarios.html">Gestão de Usuários</a></li>
-                <li><a href="planejamento.html">Planejamento Semanal</a></li>
-                <li><a href="receitas.html">Gestão de Receitas</a></li>
-                <li><a href="compras.html">Lista de Compras</a></li>
-            </ul>
-        </nav>
-    </header>
+<body class="login-page">
 
-    <section id="usuario">
-        <h2>1. Perfil e Acesso</h2>
+    <div class="login-card">
+        <h1>Sabor Semanal 👨‍🍳</h1>
 
-        <fieldset>
-            <legend>Membros Atuais</legend>
-            <ul id="lista-membros-ui" style="list-style: none; padding: 0;">
-                </ul>
-        </fieldset>
-        <br>
-
-        <fieldset>
-            <fieldset>
-            <legend>Adicionar / Convidar Membros</legend>
-            
-            <label for="nome_convite">Nome:</label>
-            <input type="text" id="nome_convite" placeholder="Ex: João Silva">
-            <br><br>
-
-            <label for="email_convite">E-mail:</label>
-            <input type="email" id="email_convite" placeholder="exemplo@email.com">
-            <br><br>
-
-            <label>Tipo de Perfil:</label>
-            <select id="perfil_convite">
-                <option value="membro">Membro Convidado</option>
-                <option value="admin">Administrador</option>
-            </select>
-            <br><br>
-
-            <button type="button" id="btn-convidar">Adicionar à Lista</button>
-            <p id="msg-convite" style="color: green; display: none; margin-top: 10px;"></p>
-        </fieldset>
-        </fieldset>
-        <br>
-
-       <fieldset>
-            <legend>Restrições Alimentares da Família</legend>
-            <input type="checkbox" id="gluten" name="restricao" value="gluten">
-            <label for="gluten">Intolerância a Glúten</label><br>
-            
-            <input type="checkbox" id="lactose" name="restricao" value="lactose">
-            <label for="lactose">Intolerância a Lactose</label><br>
-            
-            <input type="checkbox" id="outro" name="restricao" value="outro">
-            <label for="outro">Outro</label><br>
-        </fieldset>
-    </section>
-
-    <section id="planejamento">
-        <h2>2. Cronograma Semanal </h2>
-        <p>Instrução: Selecione as refeições para cada dia.</p>
-        
-        <button type="button" id="btn-sortear" style="margin-bottom: 15px;">🎲 Sortear Refeições</button>
-        <table border="1" cellpadding="10" cellspacing="0" width="100%">
-            <thead>
-                <tr>
-                    <th>Refeição</th>
-                    <th>Segunda</th>
-                    <th>Terça</th>
-                    <th>Quarta</th>
-                    <th>Quinta</th>
-                    <th>Sexta</th>
-                    <th>Sábado</th>
-                    <th>Domingo</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td data-categoria="Café"><strong>Café da Manhã</strong></td>
-                    <td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td>
-                </tr>
-                <tr>
-                    <td data-categoria="Almoço"><strong>Almoço</strong></td>
-                    <td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td>
-                </tr>
-                <tr>
-                    <td data-categoria="Lanche"><strong>Lanche da Tarde</strong></td>
-                    <td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td>
-                </tr>
-                <tr>
-                    <td data-categoria="Jantar"><strong>Jantar</strong></td>
-                    <td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td><td><select><option>-- Selecione --</option></select></td>
-                </tr>
-            </tbody>
-        </table>
-    </section>
-
-    <section id="receitas">
-        <h2>3. Livro de Receitas</h2>
-
-        <label for="busca">Buscar Receita:</label>
-        <input type="search" id="busca" placeholder="Ex: Macarrão, Rápida...">
-        <br><br>
-
-        <details id="detalhes-form-receita">
-            <summary><strong>+ Adicionar/Editar Receita (Admin)</strong></summary>
-            <div style="border: 1px solid #ccc; padding: 15px; margin-top: 10px; border-radius: 8px; background-color: #fafafa;">
-                <input type="hidden" id="rec-id"> <label>Nome do Prato:</label><br>
-                <input type="text" id="rec-nome"><br>
+        <div id="box-login">
+            <form id="form-login">
+                <div class="input-group">
+                    <input type="email" id="login-email" placeholder="E-mail" required>
+                    <input type="password" id="login-senha" placeholder="Senha" required>
+                </div>
                 
-                <label>Categoria:</label><br>
-                <select id="rec-categoria">
-                    <option>Café</option>
-                    <option>Almoço</option>
-                    <option>Jantar</option>
-                    <option>Lanche</option>
-                </select><br>
-
-                <label>Ingredientes:</label><br>
-                <textarea id="rec-ingredientes" rows="3"></textarea><br>
-
-                <label>URL da Foto (Opcional):</label><br>
-                <input type="text" id="rec-foto" placeholder="Cole o link da imagem aqui"><br>
-
-                <label>Contém Alérgenos?</label><br>
-                <input type="checkbox" id="rec-gluten"> Glúten
-                <input type="checkbox" id="rec-lactose"> Lactose
-                <br><br>
-                <button type="button" id="btn-salvar-receita">Salvar Receita</button>
-            </div>
-        </details>
-
-        <h3>Minhas Receitas</h3>
-        <div id="grid-receitas" class="receitas-grid"></div>
-    </section>
-
-    <section id="compras">
-        <h2>4. Lista de Compras</h2>
-        <button type="button" id="btn-gerar-compras">Gerar Lista com Base no Cronograma</button>
-        <div id="conteudo-lista-compras">
-            <p style="margin-top: 15px; color: #666;">Clique em "Gerar Lista" para calcular os ingredientes da semana.</p>
+                <button type="submit" class="btn-primary">Entrar</button>
+                <button type="button" class="btn-guest" onclick="entrarComoConvidado()">Entrar como convidado</button>
+            </form>
+            <p class="switch-text">Não tem uma conta? <a href="#" onclick="mostrarCadastro()">Criar uma</a></p>
         </div>
-    </section>
 
-<script src="db.js"></script>
-    <script src="controller.js"></script>
-    
+        <div id="box-cadastro" style="display: none;">
+            <form id="form-cadastro">
+                <div class="input-group">
+                    <input type="text" id="cad-nome" placeholder="Nome completo" required>
+                    <input type="email" id="cad-email" placeholder="E-mail" required>
+                    <input type="password" id="cad-senha" placeholder="Senha" required>
+                </div>
+
+                <div class="optional-section">
+                    <p>Restrições (Opcional):</p>
+                    <div class="checkbox-grid">
+                        <label><input type="checkbox" class="restricao" value="Glúten"> Glúten</label>
+                        <label><input type="checkbox" class="restricao" value="Lactose"> Lactose</label>
+                        <label><input type="checkbox" class="restricao" value="Vegano"> Vegano</label>
+                        <label><input type="checkbox" class="restricao" value="Açúcar"> Açúcar</label>
+                    </div>
+                </div>
+
+                <div class="optional-section">
+                    <input type="text" id="cad-familia" placeholder="Código da Família (Opcional)">
+                </div>
+
+                <button type="submit" class="btn-primary">Criar Conta</button>
+            </form>
+            <p class="switch-text">Já tem uma conta? <a href="#" onclick="mostrarLogin()">Voltar ao entrar</a></p>
+        </div>
+    </div>
+
+    <script src="login-controller.js"></script>
 </body>
 </html>

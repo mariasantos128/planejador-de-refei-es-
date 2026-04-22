@@ -293,3 +293,126 @@ tbody tr:hover {
     opacity: 1;
     bottom: 50px;
 }
+
+/* =========================================
+   ESTILOS EXCLUSIVOS DA TELA DE LOGIN
+   ========================================= */
+:root {
+    --cor-primaria: #2A361A; /* Aquele verde escuro que você gostou */
+    --cor-fundo: #f4f7f0;
+    --cor-texto: #333;
+}
+
+.login-page {
+    background-color: var(--cor-fundo);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.login-card {
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+}
+
+h1 {
+    color: var(--cor-primaria);
+    margin-bottom: 30px;
+    font-size: 28px;
+}
+
+.input-group input, .optional-section input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box; /* Garante que o padding não aumente o tamanho */
+}
+
+.btn-primary {
+    background-color: var(--cor-primaria);
+    color: white;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #3d4f26;
+    transform: translateY(-2px);
+}
+
+.btn-guest {
+    background: none;
+    color: var(--cor-primaria);
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid var(--cor-primaria);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.btn-guest:hover {
+    background-color: #f0f3eb;
+}
+
+.switch-text {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #666;
+}
+
+.switch-text a {
+    color: var(--cor-primaria);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.optional-section {
+    text-align: left;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.optional-section p {
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+/* --- ALTERAÇÕES PARA ALINHAR AS CAIXINHAS --- */
+.checkbox-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px; /* Aumentei um pouquinho o gap para respirar melhor */
+    font-size: 13px;
+}
+
+.checkbox-grid label {
+    display: flex;
+    align-items: center; /* Alinha a caixinha e o texto no meio exato */
+    gap: 6px; /* Espaço entre o quadradinho e a palavra */
+    cursor: pointer;
+}
+
+.checkbox-grid input[type="checkbox"] {
+    width: 16px; /* Tamanho fixo para a caixinha */
+    height: 16px;
+    margin: 0; /* Remove a margem padrão do navegador que entorta tudo */
+    cursor: pointer;
+}
