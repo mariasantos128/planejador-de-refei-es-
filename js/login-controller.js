@@ -11,14 +11,14 @@ function mostrarLogin() {
 function entrarComoConvidado() {
     localStorage.setItem('usuarioAtivo', JSON.stringify({ nome: 'Convidado', tipo: 'visitante' }));
     alert("Entrando como convidado...");
-    window.location.href = 'dashboard.html'; // Mude para o nome da sua página principal
+   window.location.href = 'html/usuarios.html';
 }
 
 // Lógica de envio (Simulação)
 document.getElementById('form-login').addEventListener('submit', (e) => {
     e.preventDefault();
     alert("Login realizado!");
-    window.location.href = 'dashboard.html';
+   window.location.href = 'html/usuarios.html';
 });
 
 document.getElementById('form-cadastro').addEventListener('submit', (e) => {
