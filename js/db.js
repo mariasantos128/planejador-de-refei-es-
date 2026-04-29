@@ -1,6 +1,6 @@
 // db.js
 
-const NOME_BANCO = "FamilyChefDB";
+const NOME_BANCO = "SaborSemanalDB";
 const VERSAO_BANCO = 2; // Mudamos para 2 para forçar a criação da tabela de usuários
 const TABELA_RECEITAS = "receitas";
 const TABELA_USUARIOS = "usuarios"; // Nossa nova tabela!
@@ -28,7 +28,7 @@ function iniciarBanco() {
 
         request.onsuccess = (event) => {
             db = event.target.result;
-            resolve("Banco de dados do FamilyChef iniciado com sucesso!");
+            resolve("Banco de dados do Sabor Semanal iniciado com sucesso!");
             
             // Se estivermos na página de usuários, já carrega a lista
             if (typeof carregarUsuarios === "function") {

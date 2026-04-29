@@ -2,7 +2,7 @@
    1. SISTEMA DE USUÁRIOS (ADM PRIMEIRO) & CONVITE
    ========================================================== */
 // Puxa da memória ou começa vazio se for a primeira vez
-let usuarios = JSON.parse(localStorage.getItem('membrosFamilyChef')) || [];
+let usuarios = JSON.parse(localStorage.getItem('membrosSaborSemanal')) || [];
 
 function renderUsuarios() {
     // CORRIGIDO: Padronizei o nome da variável para listaUI
@@ -70,7 +70,7 @@ if (btnConvidar) {
         });
         
         // Salva a lista atualizada na memória do navegador!
-        localStorage.setItem('membrosFamilyChef', JSON.stringify(usuarios));
+        localStorage.setItem('membrosSaborSemanal', JSON.stringify(usuarios));
         
         renderUsuarios();
 

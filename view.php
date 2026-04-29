@@ -152,7 +152,7 @@ function renderView(?array $resultado = null): void {
         </div>
     </main>
 
-    <footer>Sabor Semanal &copy; <?= date('Y') ?> — Projeto FamilyChef</footer>
+    <footer>Sabor Semanal &copy; <?= date('Y') ?> — Projeto Sabor Semanal</footer>
 </body>
 </html>
 <?php
