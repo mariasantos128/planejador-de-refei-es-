@@ -20,6 +20,7 @@ body {
     color: var(--cor-texto);
     margin: 0;
     padding: 0;
+    --sidebar-width: 220px; /* usado para ajustar margem do conteúdo quando a sidebar colapsa */
 }
 
 header {
@@ -442,68 +443,102 @@ h1 {
     overflow: hidden; /* Impede a rolagem da página inteira, só o conteúdo rola */
 }
 
-/* AJUSTE DA BARRA LATERAL */
+/* AJUSTE DA BARRA LATERAL - VERSÃO ATUALIZADA */
 .sidebar {
-    width: 260px;
+    width: 220px; /* aumentada um pouco conforme solicitado */
     background-color: var(--cor-primaria);
     color: white;
     display: flex;
-    flex-direction: column; /* Garante que os itens fiquem em coluna */
-    height: 100vh; /* Ocupa a altura toda da tela */
-    position: sticky;
+    flex-direction: column;
+    height: 100vh;
+    position: fixed; /* fixa à esquerda para não aparecer no fim das páginas */
+    left: 0;
     top: 0;
+    z-index: 50;
+    overflow-y: auto;
+    overflow-x: hidden; /* evita barra de deslizar horizontal em baixo da sidebar */
 }
+
+/* hamburger (toggle) - linhas finas brancas sem fundo */
+.sidebar-toggle {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+    padding: 2px 6px;
+    z-index: 60;
+}
+.sidebar-toggle span { display:block; height:2px; width:20px; background: currentColor; border-radius:1px; }
 
 .nav-links {
     list-style: none;
-    padding: 20px 0;
+    padding: 0;
     margin: 0;
+    flex-grow: 1; /* empurra o rodapé para baixo */
     display: flex;
-    flex-direction: column; /* FORÇA UM EMBAIXO DO OUTRO */
-    flex: 1; /* Faz esta parte crescer para empurrar o "Sair" para o fim */
+    flex-direction: column;
 }
 
-.nav-links li {
-    width: 100%; /* Garante que o link ocupe a largura toda */
-}
+.nav-links li { border-bottom: 1px solid rgba(255,255,255,0.06); }
 
 .nav-links li a {
-    display: block; /* Ocupa a linha inteira */
-    padding: 15px 25px;
-    color: white;
-    text-decoration: none;
+    display: flex; /* permite alinhar ícone + label */
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 18px;
     font-size: 15px;
-    transition: 0.3s;
+    color: #cbd5c0;
+    text-decoration: none;
+    background: transparent; /* sem fundo — apenas linhas separam os itens */
+    transition: background-color .18s ease, color .18s ease, transform .12s ease;
 }
+
+/* estrutura interna dos links para suportar ícone (emoji) + rótulo */
+.nav-links li a .icon { display:inline-block; width:24px; text-align:center; font-size:18px; }
+.nav-links li a .label { display:inline-block; white-space:nowrap; }
 
 .nav-links li a:hover {
-    background-color: rgba(255,255,255,0.1);
+    background-color: rgba(60,80,35,0.34); /* retângulo no hover */
+    color: white;
+    transform: translateX(2px); /* leve movimento para destacar */
+    box-shadow: inset 6px 0 0 rgba(255,255,255,0.06), 0 6px 18px rgba(0,0,0,0.08);
 }
 
-/* DESTAQUE DO ITEM ATIVO */
-.nav-links li.active a {
-    background-color: rgba(255,255,255,0.15);
-    border-left: 5px solid #fff;
-    font-weight: bold;
-}
+.nav-links li.active { background-color: rgba(60,80,35,0.34); }
+.nav-links li.active a { color: white; font-weight: 700; }
 
-/* BOTÃO DE SAIR NO FINAL */
-.sidebar-footer {
-    padding: 20px;
-    border-top: 1px solid rgba(255,255,255,0.1);
-}
-
+/* RODAPÉ (SAIR) - padronizado com os itens */
+.sidebar-footer { margin-top: auto; padding: 8px; background: transparent; border-top: none; }
 .logout-link {
-    color: #ff9999; /* Um tom avermelhado suave para o Sair */
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: bold;
-    display: block;
+    display:block; width:100%; box-sizing:border-box; padding:12px 18px; color:#cbd5c0; text-decoration:none; font-weight:600; background-color: rgba(60,80,35,0.16);
 }
+.logout-link::after { content:'➜'; margin-left:8px; opacity:.9; transition:transform .18s ease; }
+.logout-link:hover { background-color: rgba(60,80,35,0.28); color:white; transform:scale(1.02); }
+.logout-link:hover::after { transform: translateX(4px) scale(1.08); }
 
-.logout-link:hover {
-    color: #ff4444;
-}
+/* collapsed state: esconder avatar e rodapé */
+.sidebar.collapsed { width: 72px; }
+.sidebar.collapsed .user-info, .sidebar.collapsed .avatar, .sidebar.collapsed .sidebar-footer { display:none; }
+.sidebar.collapsed .nav-links li a { justify-content: center; padding: 12px 10px; }
+/* no estado colapsado, esconder os rótulos e mostrar apenas o ícone/emoji */
+.sidebar.collapsed .nav-links li a .label { display: none; }
+.sidebar.collapsed .nav-links li a .icon { width: 100%; font-size: 18px; }
+
+/* avatar */
+.user-profile { padding: 20px; display:flex; align-items:center; gap:12px; border-bottom:1px solid rgba(255,255,255,0.08); }
+.avatar { width:45px; height:45px; background:rgba(255,255,255,0.18); border-radius:50%; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
 
 .user-profile {
     padding: 30px 20px;
@@ -528,40 +563,18 @@ h1 {
 .user-info h3 { margin: 0; font-size: 16px; color: white; text-shadow: none; }
 .user-info p { margin: 0; font-size: 12px; opacity: 0.7; }
 
-.nav-links {
-    list-style: none;
-    padding: 20px 0;
-    margin: 0;
-}
 
-.nav-links li a {
-    display: block;
-    padding: 15px 25px;
-    color: white;
-    text-decoration: none;
-    font-size: 15px;
-    transition: 0.3s;
-}
-
-.nav-links li a:hover {
-    background-color: rgba(255,255,255,0.1);
-}
-
-.nav-links li.active a {
-    background-color: #3d4f26; /* Verde mais claro para o item ativo */
-    border-left: 4px solid #fff;
-    font-weight: bold;
-}
 
 /* CONTEÚDO PRINCIPAL */
 .main-content {
     flex: 1;
-    padding: 40px;
+    padding: 16px; /* espaço reduzido para aproximar do sidebar */
     overflow-y: auto; /* Deixa rolar só essa parte */
 }
 
-.dash-header h2 { color: var(--cor-texto); margin-top: 0; margin-bottom: 5px; }
-.dash-header p { color: #666; margin-bottom: 30px; }
+/* Cabeçalho do dashboard: título maior e branco */
+.dash-header h2 { color: #ffffff; font-family: 'Poppins', sans-serif; font-weight:700; font-size:34px; margin:0 0 6px 0; }
+.dash-header p { color: #e6e6e6; margin-bottom:20px; }
 
 /* ALERTA INTELIGENTE */
 .alert-card {
@@ -577,8 +590,21 @@ h1 {
 /* GRID DE CARDS */
 .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 25px;
+    grid-template-columns: repeat(3, 1fr); /* força 3 colunas em telas largas */
+    gap: 12px; /* mais compacto */
+}
+
+@media (max-width: 1100px) {
+    .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 700px) {
+    .dashboard-grid { grid-template-columns: 1fr; }
+}
+
+/* Quando a sidebar estiver colapsada, aproveita o espaço extra e mostra itens principais lado-a-lado */
+body.sidebar-collapsed .dashboard-grid {
+    grid-template-columns: repeat(2, minmax(240px, 1fr));
+    gap: 12px;
 }
 
 .card-large {
@@ -587,9 +613,37 @@ h1 {
 
 .card {
     background: white;
-    border-radius: 15px;
-    padding: 25px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+}
+
+/* cards menores (exceto o card-large) com fundo cinza claro e estilo consistente */
+.dashboard-grid > .card:not(.card-large) {
+    background: #f6f7f8; /* cinza clarinho */
+    color: #2a2a2a;
+}
+
+/* garante que os conteúdos dentro dos cards menores tenham alturas similares */
+.dashboard-grid > .card:not(.card-large) .card-header,
+.dashboard-grid > .card:not(.card-large) .next-meal-highlight,
+.dashboard-grid > .card:not(.card-large) .progress-container { display:block; }
+
+/* Ajusta margem lateral do conteúdo para não ficar muito afastado da sidebar */
+body > header,
+body > main,
+body > section { margin-left: var(--sidebar-width); }
+
+/* quando o body tiver a classe sidebar-collapsed, reduz a margem para o estado compacto */
+body.sidebar-collapsed > header,
+body.sidebar-collapsed > main,
+body.sidebar-collapsed > section { margin-left: 72px; }
+
+@media (max-width: 1000px) {
+    body > header,
+    body > main,
+    body > section { margin-left: 72px; }
+    .dashboard-grid { grid-template-columns: 1fr; gap: 12px; }
 }
 
 .card h3 {
@@ -605,6 +659,27 @@ h1 {
     align-items: center;
     margin-bottom: 20px;
 }
+
+/* botão de ação dentro dos cards (ex: 'Abrir lista') — cor branca e hover verde escuro */
+.dashboard-grid .card .btn-text {
+    background: var(--cor-media); /* cor padrão verde */
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    text-decoration: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: background-color .18s ease, transform .12s ease;
+}
+.dashboard-grid .card .btn-text:hover {
+    background-color: var(--cor-escura); /* verde mais escuro no hover */
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+/* garante botão alinhado verticalmente ao centro e sem quebra */
+.dashboard-grid .card .btn-text { align-self: center; white-space: nowrap; }
 
 .card-header h3 { margin: 0; }
 
