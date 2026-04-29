@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sabor Semanal - Dashboard</title>
+    <link rel="stylesheet" type="text/css" href="../css/style.css">
+</head>
+<body class="dash-body">
+
+    <nav class="sidebar">
+        <div class="user-profile">
+            <div class="avatar" id="user-initial">U</div>
+            <div class="user-info">
+                <h3 id="display-user-name">Usuário</h3>
+                <p>Seja bem-vindo(a)!</p>
+            </div>
+        </div>
+        
+        <ul class="nav-links">
+            <li class="active"><a href="dashboard.html">🏠 Início</a></li>
+            <li><a href="planejamento.html">📅 Cronograma</a></li>
+            <li><a href="listadecompras.html">🛒 Lista de Compras</a></li>
+            <li><a href="receitas.html">🍳 Receitas</a></li>
+            <li><a href="usuarios.html">👥 Usuários</a></li>
+            <li><a href="familia.html">🏠 Família</a></li>
+            <li><a href="configuracoes.html">⚙️ Configurações</a></li>
+        </ul>
+    
+        <div class="sidebar-footer">
+            <a href="../index.html" class="logout-link">🚪 Sair da conta</a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <header class="dash-header">
+            <h2>Resumo da Semana</h2>
+            <p>Aqui está o que você tem programado para hoje.</p>
+        </header>
+
+        <div class="alert-card">
+            <p>⚠️ <strong>Atenção:</strong> Você ainda não planejou o jantar de Quinta e Sexta-feira.</p>
+        </div>
+
+        <div class="dashboard-grid">
+            
+            <div class="card card-large">
+                <div class="card-header">
+                    <h3>Planejamento da Semana</h3>
+                    <button class="btn-text" onclick="window.location.href='planejamento.html'">Ver completo</button>
+                </div>
+                <div class="planning-summary">
+                    <div class="day-row">
+                        <span class="day-name">Hoje</span>
+                        <div class="meals">
+                            <span class="tag tag-green">Almoço: Frango Grelhado</span>
+                            <span class="tag tag-green">Jantar: Sopa de Legumes</span>
+                        </div>
+                    </div>
+                    <div class="day-row">
+                        <span class="day-name">Amanhã</span>
+                        <div class="meals">
+                            <span class="tag tag-green">Almoço: Lasanha</span>
+                            <span class="tag tag-empty">Jantar: Não planejado</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Próxima Refeição</h3>
+                <div class="next-meal-highlight">
+                    <h4>Frango Grelhado com Salada</h4>
+                    <p>Almoço • Hoje</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Lista de Compras</h3>
+                    <button class="btn-text" onclick="window.location.href='listadecompras.html'">Abrir lista</button>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar"><div class="progress-fill" style="width: 35%;"></div></div>
+                    <p class="progress-text">7 de 20 itens comprados</p>
+                </div>
+                <ul class="shopping-summary">
+                    <li><label><input type="checkbox" checked class="check-item"> <span>Tomate</span></label></li>
+                    <li><label><input type="checkbox" class="check-item"> <span>Cebola</span></label></li>
+                    <li><label><input type="checkbox" class="check-item"> <span>Peito de Frango</span></label></li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>Receitas Favoritas</h3>
+                <ul class="favorites-list">
+                    <li>
+                        <span>Panqueca de Carne</span>
+                        <button class="btn-small">+ Add</button>
+                    </li>
+                    <li>
+                        <span>Escondidinho</span>
+                        <button class="btn-small">+ Add</button>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // Recupera o nome salvo e coloca na tela
+        const nome = localStorage.getItem('nomeUsuario') || 'Usuário';
+        document.getElementById('display-user-name').innerText = nome;
+        document.getElementById('user-initial').innerText = nome.charAt(0).toUpperCase();
+    </script>
+    
+</body>
+</html>
