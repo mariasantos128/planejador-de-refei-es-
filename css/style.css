@@ -433,38 +433,47 @@ h1 {
     cursor: pointer;
 }
 
-/* --- ESTILOS DO DASHBOARD --- */
-
+/* =========================================
+   1. ESTRUTURA GERAL E LAYOUT
+========================================= */
 .dash-body {
     display: flex;
     background-color: var(--cor-fundo);
     margin: 0;
     height: 100vh;
-    overflow: hidden; /* Impede a rolagem da página inteira, só o conteúdo rola */
+    overflow: hidden; /* Impede a rolagem da página inteira */
 }
 
-/* AJUSTE DA BARRA LATERAL - VERSÃO ATUALIZADA */
+/* Ajusta margem do conteúdo para não ficar embaixo da sidebar */
+body > header,
+body > main,
+body > section {
+    margin-left: var(--sidebar-width);
+}
+
+/* =========================================
+   2. BARRA LATERAL (SIDEBAR)
+========================================= */
 .sidebar {
-    width: 220px; /* aumentada um pouco conforme solicitado */
+    width: 220px;
     background-color: var(--cor-primaria);
     color: white;
     display: flex;
     flex-direction: column;
     height: 100vh;
-    position: fixed; /* fixa à esquerda para não aparecer no fim das páginas */
+    position: fixed;
     left: 0;
     top: 0;
     z-index: 50;
     overflow-y: auto;
-    overflow-x: hidden; /* evita barra de deslizar horizontal em baixo da sidebar */
+    overflow-x: hidden;
 }
 
-
-/* hamburger (toggle) - linhas finas brancas sem fundo */
+/* --- Botão Hambúrguer (Toggle) --- */
 .sidebar-toggle {
     position: absolute;
-    top: 25px; /* Alinha com a altura do perfil */
-    right: 15px;
+    top: 25px; 
+    right: 15px; 
     width: 24px;
     height: 18px;
     background: transparent;
@@ -473,34 +482,33 @@ h1 {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    z-index: 9999; /* Força ficar na frente de tudo */
+    z-index: 10000; /* Aumentamos para garantir que fique por cima */
 }
 
-/* ISSO AQUI É O QUE DESENHA AS 3 LINHAS BRANCAS */
 .sidebar-toggle span {
     display: block;
     width: 100%;
     height: 2px;
-    background-color: white;
+    background-color: #ffffff; /* Ele é branco para contrastar com o verde da sua sidebar */
     border-radius: 2px;
-    transition: all 0.3s ease; /* Deixa a animação suave */
 }
 
-.sidebar-toggle span { display:block; height:2px; width:20px; background: currentColor; border-radius:1px; }
-
+/* --- Menu de Navegação --- */
 .nav-links {
     list-style: none;
     padding: 0;
     margin: 0;
-    flex-grow: 1; /* empurra o rodapé para baixo */
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
 }
 
-.nav-links li { border-bottom: 1px solid rgba(255,255,255,0.06); }
+.nav-links li {
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
 
 .nav-links li a {
-    display: flex; /* permite alinhar ícone + label */
+    display: flex;
     align-items: center;
     gap: 12px;
     width: 100%;
@@ -509,46 +517,107 @@ h1 {
     font-size: 15px;
     color: #cbd5c0;
     text-decoration: none;
-    background: transparent; /* sem fundo — apenas linhas separam os itens */
+    background: transparent;
     transition: background-color .18s ease, color .18s ease, transform .12s ease;
 }
 
-/* estrutura interna dos links para suportar ícone (emoji) + rótulo */
-.nav-links li a .icon { display:inline-block; width:24px; text-align:center; font-size:18px; }
-.nav-links li a .label { display:inline-block; white-space:nowrap; }
+.nav-links li a .icon {
+    display: inline-block;
+    width: 24px;
+    text-align: center;
+    font-size: 18px;
+}
+
+.nav-links li a .label {
+    display: inline-block;
+    white-space: nowrap;
+}
 
 .nav-links li a:hover {
-    background-color: rgba(60,80,35,0.34); /* retângulo no hover */
+    background-color: rgba(60,80,35,0.34);
     color: white;
-    transform: translateX(2px); /* leve movimento para destacar */
+    transform: translateX(2px);
     box-shadow: inset 6px 0 0 rgba(255,255,255,0.06), 0 6px 18px rgba(0,0,0,0.08);
 }
 
-.nav-links li.active { background-color: rgba(60,80,35,0.34); }
-.nav-links li.active a { color: white; font-weight: 700; }
-
-/* RODAPÉ (SAIR) - padronizado com os itens */
-.sidebar-footer { margin-top: auto; padding: 8px; background: transparent; border-top: none; }
-.logout-link {
-    display:block; width:100%; box-sizing:border-box; padding:12px 18px; color:#cbd5c0; text-decoration:none; font-weight:600; background-color: rgba(60,80,35,0.16);
+.nav-links li.active {
+    background-color: rgba(60,80,35,0.34);
 }
-.logout-link::after { content:'➜'; margin-left:8px; opacity:.9; transition:transform .18s ease; }
-.logout-link:hover { background-color: rgba(60,80,35,0.28); color:white; transform:scale(1.02); }
-.logout-link:hover::after { transform: translateX(4px) scale(1.08); }
 
-/* collapsed state: esconder avatar e rodapé */
-.sidebar.collapsed { width: 72px; }
-.sidebar.collapsed .user-info, .sidebar.collapsed .avatar, .sidebar.collapsed .sidebar-footer { display:none; }
-.sidebar.collapsed .nav-links li a { justify-content: center; padding: 12px 10px; }
-/* no estado colapsado, esconder os rótulos e mostrar apenas o ícone/emoji */
-.sidebar.collapsed .nav-links li a .label { display: none; }
-.sidebar.collapsed .nav-links li a .icon { width: 100%; font-size: 18px; }
+.nav-links li.active a {
+    color: white;
+    font-weight: 700;
+}
 
-/* avatar */
-.user-profile { padding: 20px; display:flex; align-items:center; gap:12px; border-bottom:1px solid rgba(255,255,255,0.08); }
-.avatar { width:45px; height:45px; background:rgba(255,255,255,0.18); border-radius:50%; display:flex; align-items:center; justify-content:center; overflow:hidden; }
-.avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
+/* --- Rodapé (Logout) --- */
+.sidebar-footer {
+    margin-top: auto;
+    padding: 8px;
+    background: transparent;
+    border-top: none;
+}
 
+.logout-link {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 18px;
+    color: #cbd5c0;
+    text-decoration: none;
+    font-weight: 600;
+    background-color: rgba(60,80,35,0.16);
+}
+
+.logout-link::after {
+    content: '➜';
+    margin-left: 8px;
+    opacity: .9;
+    transition: transform .18s ease;
+}
+
+.logout-link:hover {
+    background-color: rgba(60,80,35,0.28);
+    color: white;
+    transform: scale(1.02);
+}
+
+.logout-link:hover::after {
+    transform: translateX(4px) scale(1.08);
+}
+
+/* =========================================
+   3. SIDEBAR: ESTADO COLAPSADO (FECHADO)
+========================================= */
+.sidebar.collapsed {
+    width: 72px;
+}
+
+.sidebar.collapsed .user-info, 
+.sidebar.collapsed .avatar, 
+.sidebar.collapsed .sidebar-footer,
+.sidebar.collapsed .nav-links li a .label {
+    display: none;
+}
+
+.sidebar.collapsed .nav-links li a {
+    justify-content: center;
+    padding: 12px 10px;
+}
+
+.sidebar.collapsed .nav-links li a .icon {
+    width: 100%;
+    font-size: 18px;
+}
+
+body.sidebar-collapsed > header,
+body.sidebar-collapsed > main,
+body.sidebar-collapsed > section {
+    margin-left: 72px; /* Reduz margem quando sidebar fecha */
+}
+
+/* =========================================
+   4. PERFIL DO USUÁRIO (BARRA LATERAL)
+========================================= */
 .user-profile {
     padding: 30px 20px;
     display: flex;
@@ -565,27 +634,54 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden; /* Importante para a imagem não vazar */
     font-size: 20px;
     font-weight: bold;
 }
 
-.user-info h3 { margin: 0; font-size: 16px; color: white; text-shadow: none; }
-.user-info p { margin: 0; font-size: 12px; opacity: 0.7; }
-
-
-
-/* CONTEÚDO PRINCIPAL */
-.main-content {
-    flex: 1;
-    padding: 16px; /* espaço reduzido para aproximar do sidebar */
-    overflow-y: auto; /* Deixa rolar só essa parte */
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
-/* Cabeçalho do dashboard: título maior e branco */
-.dash-header h2 { color: #ffffff; font-family: 'Poppins', sans-serif; font-weight:700; font-size:34px; margin:0 0 6px 0; }
-.dash-header p { color: #e6e6e6; margin-bottom:20px; }
+.user-info h3 {
+    margin: 0;
+    font-size: 16px;
+    color: white;
+    text-shadow: none;
+}
 
-/* ALERTA INTELIGENTE */
+.user-info p {
+    margin: 0;
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+/* =========================================
+   5. CONTEÚDO PRINCIPAL (MAIN)
+========================================= */
+.main-content {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+}
+
+.dash-header h2 {
+    color: #ffffff;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 34px;
+    margin: 0 0 6px 0;
+}
+
+.dash-header p {
+    color: #e6e6e6;
+    margin-bottom: 20px;
+}
+
+/* Alerta Inteligente */
 .alert-card {
     background-color: #e8f5e9;
     border-left: 4px solid #4caf50;
@@ -594,30 +690,24 @@ h1 {
     margin-bottom: 25px;
     color: #2e7d32;
 }
-.alert-card p { margin: 0; font-size: 14px; }
 
-/* GRID DE CARDS */
+.alert-card p {
+    margin: 0;
+    font-size: 14px;
+}
+
+/* =========================================
+   6. GRID DE CARDS (DASHBOARD)
+========================================= */
 .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* força 3 colunas em telas largas */
-    gap: 12px; /* mais compacto */
-}
-
-@media (max-width: 1100px) {
-    .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 700px) {
-    .dashboard-grid { grid-template-columns: 1fr; }
-}
-
-/* Quando a sidebar estiver colapsada, aproveita o espaço extra e mostra itens principais lado-a-lado */
-body.sidebar-collapsed .dashboard-grid {
-    grid-template-columns: repeat(2, minmax(240px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 12px;
 }
 
-.card-large {
-    grid-column: 1 / -1; /* Faz o card de planejamento ocupar a linha toda */
+body.sidebar-collapsed .dashboard-grid {
+    grid-template-columns: repeat(2, minmax(240px, 1fr));
+    gap: 12px;
 }
 
 .card {
@@ -627,39 +717,20 @@ body.sidebar-collapsed .dashboard-grid {
     box-shadow: 0 6px 18px rgba(0,0,0,0.04);
 }
 
-/* cards menores (exceto o card-large) com fundo cinza claro e estilo consistente */
+.card-large {
+    grid-column: 1 / -1; /* Ocupa a linha toda */
+}
+
+/* Estilo para cards menores */
 .dashboard-grid > .card:not(.card-large) {
-    background: #f6f7f8; /* cinza clarinho */
+    background: #f6f7f8;
     color: #2a2a2a;
 }
 
-/* garante que os conteúdos dentro dos cards menores tenham alturas similares */
 .dashboard-grid > .card:not(.card-large) .card-header,
 .dashboard-grid > .card:not(.card-large) .next-meal-highlight,
-.dashboard-grid > .card:not(.card-large) .progress-container { display:block; }
-
-/* Ajusta margem lateral do conteúdo para não ficar muito afastado da sidebar */
-body > header,
-body > main,
-body > section { margin-left: var(--sidebar-width); }
-
-/* quando o body tiver a classe sidebar-collapsed, reduz a margem para o estado compacto */
-body.sidebar-collapsed > header,
-body.sidebar-collapsed > main,
-body.sidebar-collapsed > section { margin-left: 72px; }
-
-@media (max-width: 1000px) {
-    body > header,
-    body > main,
-    body > section { margin-left: 72px; }
-    .dashboard-grid { grid-template-columns: 1fr; gap: 12px; }
-}
-
-.card h3 {
-    margin-top: 0;
-    font-size: 18px;
-    color: var(--cor-primaria);
-    margin-bottom: 20px;
+.dashboard-grid > .card:not(.card-large) .progress-container {
+    display: block;
 }
 
 .card-header {
@@ -669,29 +740,22 @@ body.sidebar-collapsed > section { margin-left: 72px; }
     margin-bottom: 20px;
 }
 
-/* botão de ação dentro dos cards (ex: 'Abrir lista') — cor branca e hover verde escuro */
-.dashboard-grid .card .btn-text {
-    background: var(--cor-media); /* cor padrão verde */
-    color: #ffffff;
-    border: none;
-    cursor: pointer;
-    font-weight: 700;
-    text-decoration: none;
-    padding: 6px 10px;
-    border-radius: 6px;
-    transition: background-color .18s ease, transform .12s ease;
-}
-.dashboard-grid .card .btn-text:hover {
-    background-color: var(--cor-escura); /* verde mais escuro no hover */
-    color: #fff;
-    transform: translateY(-2px);
+.card-header h3 {
+    margin: 0;
 }
 
-/* garante botão alinhado verticalmente ao centro e sem quebra */
-.dashboard-grid .card .btn-text { align-self: center; white-space: nowrap; }
+.card h3 {
+    margin-top: 0;
+    font-size: 18px;
+    color: var(--cor-primaria);
+    margin-bottom: 20px;
+}
 
-.card-header h3 { margin: 0; }
+/* =========================================
+   7. BOTÕES E COMPONENTES DOS CARDS
+========================================= */
 
+/* Botão em formato de link (Padrão) */
 .btn-text {
     background: none;
     border: none;
@@ -701,31 +765,177 @@ body.sidebar-collapsed > section { margin-left: 72px; }
     text-decoration: underline;
 }
 
-/* ESTILOS DOS COMPONENTES DENTRO DOS CARDS */
-.day-row { display: flex; margin-bottom: 15px; align-items: center; }
-.day-name { width: 80px; font-weight: bold; color: #555; }
-.meals { display: flex; gap: 10px; flex-wrap: wrap; }
+/* Botão de ação específico dentro do card (sobrescreve o padrão) */
+.dashboard-grid .card .btn-text {
+    background: var(--cor-media);
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    text-decoration: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    align-self: center;
+    white-space: nowrap;
+    transition: background-color .18s ease, transform .12s ease;
+}
 
-.tag { padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 500;}
-.tag-green { background-color: rgba(42, 54, 26, 0.1); color: var(--cor-primaria); }
-.tag-empty { background-color: #f0f0f0; color: #888; border: 1px dashed #ccc; }
+.dashboard-grid .card .btn-text:hover {
+    background-color: var(--cor-escura);
+    color: #fff;
+    transform: translateY(-2px);
+}
 
-.next-meal-highlight h4 { font-size: 22px; color: var(--cor-texto); margin: 0 0 5px 0; }
-.next-meal-highlight p { margin: 0; color: #666; font-size: 14px;}
+/* --- Tags de Refeição --- */
+.day-row {
+    display: flex;
+    margin-bottom: 15px;
+    align-items: center;
+}
 
-/* LISTA DE COMPRAS E PROGRESSO */
-.progress-container { margin-bottom: 15px; }
-.progress-bar { height: 8px; background: #eee; border-radius: 10px; overflow: hidden; }
-.progress-fill { height: 100%; background: var(--cor-primaria); }
-.progress-text { font-size: 12px; color: #666; margin-top: 5px; text-align: right; }
+.day-name {
+    width: 80px;
+    font-weight: bold;
+    color: #555;
+}
 
-.shopping-summary { list-style: none; padding: 0; margin: 0; }
-.shopping-summary li { margin-bottom: 10px; }
-.shopping-summary label { display: flex; align-items: center; gap: 10px; cursor: pointer; color: #444; }
-.shopping-summary input:checked + span { text-decoration: line-through; color: #999; }
+.meals {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
 
-/* FAVORITOS */
-.favorites-list { list-style: none; padding: 0; margin: 0; }
-.favorites-list li { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
-.btn-small { background: var(--cor-primaria); color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; }
-.btn-small:hover { background: #3d4f26; }
+.tag {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.tag-green {
+    background-color: rgba(42, 54, 26, 0.1);
+    color: var(--cor-primaria);
+}
+
+.tag-empty {
+    background-color: #f0f0f0;
+    color: #888;
+    border: 1px dashed #ccc;
+}
+
+.next-meal-highlight h4 {
+    font-size: 22px;
+    color: var(--cor-texto);
+    margin: 0 0 5px 0;
+}
+
+.next-meal-highlight p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+}
+
+/* --- Barra de Progresso --- */
+.progress-container {
+    margin-bottom: 15px;
+}
+
+.progress-bar {
+    height: 8px;
+    background: #eee;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--cor-primaria);
+}
+
+.progress-text {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+    text-align: right;
+}
+
+/* --- Lista de Compras --- */
+.shopping-summary {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.shopping-summary li {
+    margin-bottom: 10px;
+}
+
+.shopping-summary label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    color: #444;
+}
+
+.shopping-summary input:checked + span {
+    text-decoration: line-through;
+    color: #999;
+}
+
+/* --- Favoritos --- */
+.favorites-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.favorites-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.btn-small {
+    background: var(--cor-primaria);
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.btn-small:hover {
+    background: #3d4f26;
+}
+
+/* =========================================
+   8. RESPONSIVIDADE (MEDIA QUERIES)
+========================================= */
+@media (max-width: 1100px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 1000px) {
+    body > header,
+    body > main,
+    body > section {
+        margin-left: 72px; /* Fica no formato colapsado em telas médias */
+    }
+    
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 700px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}

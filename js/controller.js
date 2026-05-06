@@ -470,14 +470,16 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    const btnToggle = document.getElementById('btn-toggle');
-    const sidebar = document.getElementById('sidebar');
-    const body = document.body;
+    const btnToggle = document.getElementById('sidebarToggle'); // Pega o botão pelo ID
+    const sidebar = document.getElementById('sidebar');         // Pega a barra lateral
+    const body = document.body;                                 // Pega o corpo da página
 
-    // Se o botão for clicado, ele liga/desliga a classe 'sidebar-collapsed'
     if (btnToggle) {
         btnToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('sidebar-collapsed');
+            // 1. O CSS que te mandei usa 'collapsed' para a sidebar
+            sidebar.classList.toggle('collapsed');
+            
+            // 2. O CSS que te mandei usa 'sidebar-collapsed' para o body (ajustar margens)
             body.classList.toggle('sidebar-collapsed');
         });
     }
