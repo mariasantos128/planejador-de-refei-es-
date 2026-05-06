@@ -468,3 +468,17 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    const btnToggle = document.getElementById('btn-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const body = document.body;
+
+    // Se o botão for clicado, ele liga/desliga a classe 'sidebar-collapsed'
+    if (btnToggle) {
+        btnToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('sidebar-collapsed');
+            body.classList.toggle('sidebar-collapsed');
+        });
+    }
+});
