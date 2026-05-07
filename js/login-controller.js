@@ -9,22 +9,59 @@ function mostrarLogin() {
 }
 
 function entrarComoConvidado() {
-    localStorage.setItem('usuarioAtivo', JSON.stringify({ nome: 'Convidado', tipo: 'visitante' }));
+    const usuario = { 
+        nome: 'Convidado', 
+        email: 'convidado@teste.com',
+        tipo: 'visitante',
+        restricoes: [] 
+    };
+    localStorage.setItem('usuarioLogado', JSON.stringify(usuario));
     alert("Entrando como convidado...");
     window.location.href = 'html/dashboard.html';
 }
 
-// Lógica de envio (Simulação)
+// LÓGICA DE LOGIN
 document.getElementById('form-login').addEventListener('submit', (e) => {
     e.preventDefault();
-    const nomeUsuario = document.getElementById('login-email').value.split('@')[0]; // Pega o nome antes do @
-    localStorage.setItem('nomeUsuario', nomeUsuario); // Salva o nome no localStorage
+    
+    const email = document.getElementById('login-email').value;
+    
+    // Tenta buscar se esse usuário existe no sistema (simulação ou banco)
+    // Por enquanto, vamos criar um objeto baseado no e-mail para o login funcionar
+    const nomeExtraido = email.split('@')[0];
+    
+    const usuario = {
+        nome: nomeExtraido.charAt(0).toUpperCase() + nomeExtraido.slice(1), // Nome com 1ª letra maiúscula
+        email: email,
+        restricoes: []
+    };
+
+    localStorage.setItem('usuarioLogado', JSON.stringify(usuario));
     alert("Login realizado!");
     window.location.href = 'html/dashboard.html';
 });
 
+// LÓGICA DE CADASTRO (Capturando os dados reais)
 document.getElementById('form-cadastro').addEventListener('submit', (e) => {
     e.preventDefault();
-    alert("Conta criada com sucesso!");
-    mostrarLogin();
+    
+    const nome = document.getElementById('cad-nome').value;
+    const email = document.getElementById('cad-email').value;
+    
+    // Captura as restrições marcadas no cadastro
+    const checkboxes = document.querySelectorAll('.restricao:checked');
+    const restricoes = Array.from(checkboxes).map(cb => cb.value);
+
+    // Cria o objeto do usuário
+    const novoUsuario = {
+        nome: nome,
+        email: email,
+        restricoes: restricoes
+    };
+
+    // Salva no localStorage para simular que a conta foi criada e está ativa
+    localStorage.setItem('usuarioLogado', JSON.stringify(novoUsuario));
+    
+    alert("Conta criada com sucesso! Redirecionando...");
+    window.location.href = 'html/dashboard.html';
 });

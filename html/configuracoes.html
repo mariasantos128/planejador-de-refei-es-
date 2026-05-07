@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sabor Semanal - Configurações</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="dash-body">
+
+    <nav class="sidebar" id="sidebar">
+        </nav>
+
+    <main class="main-content">
+        <header class="dash-header">
+            <h2>Configurações</h2>
+            <p>Gerencie sua conta e preferências do aplicativo.</p>
+        </header>
+
+        <div class="dashboard-grid">
+            
+            <div class="card card-large">
+                <div class="card-header">
+                    <h3>Editar Perfil</h3>
+                </div>
+                
+                <form id="form-editar-perfil" class="edit-profile-form">
+                    
+                    <div class="profile-header">
+                        <div class="avatar-large" id="user-initial-large">U</div>
+                        <div class="profile-info-text">
+                            <h4 id="profile-name">Nome do Usuário</h4>
+                            <p id="profile-email">usuario@email.com</p>
+                        </div>
+                    </div>
+
+                    <hr class="divider">
+
+                    <div class="form-grid-2">
+                        <div class="input-group">
+                            <label for="edit-nome">Nome Completo</label>
+                            <input type="text" id="edit-nome" placeholder="Seu nome" value="Nome do Usuário">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="edit-email">E-mail</label>
+                            <input type="email" id="edit-email" placeholder="Seu e-mail" value="usuario@email.com">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="edit-senha">Nova Senha</label>
+                        <input type="password" id="edit-senha" placeholder="Deixe em branco para não alterar">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="edit-familia">Código da Família</label>
+                        <input type="text" id="edit-familia" placeholder="Ex: FAMILIA123 (Opcional)">
+                    </div>
+
+                    <div class="form-section">
+                        <p class="section-label">Restrições Alimentares:</p>
+                        <div class="checkbox-grid-profile">
+                            <label class="custom-checkbox">
+                                <input type="checkbox" value="Glúten"> <span>Sem Glúten</span>
+                            </label>
+                            <label class="custom-checkbox">
+                                <input type="checkbox" value="Lactose"> <span>Sem Lactose</span>
+                            </label>
+                            <label class="custom-checkbox">
+                                <input type="checkbox" value="Vegano"> <span>Vegano</span>
+                            </label>
+                            <label class="custom-checkbox">
+                                <input type="checkbox" value="Açúcar"> <span>Zero Açúcar</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-save">Salvar Alterações</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Preferências</h3>
+                </div>
+                <ul class="shopping-summary">
+                    <li>
+                        <label>
+                            <input type="checkbox" checked> 
+                            <span style="text-decoration: none; color: #444;">Receber notificações de compras</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label>
+                            <input type="checkbox"> 
+                            <span style="text-decoration: none; color: #444;">Modo Escuro (Em breve)</span>
+                        </label>
+                    </li>
+                </ul>
+            </div>
+
+
+            <nav class="sidebar" id="sidebar">
+        <button class="sidebar-toggle" id="sidebarToggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <div class="user-profile">
+            <div class="avatar" id="user-initial">U</div>
+            <div class="user-info">
+                <h3 id="display-user-name">Usuário</h3>
+                <p>Seja bem-vindo(a)!</p>
+            </div>
+        </div>
+        
+        <ul class="nav-links">
+            <li><a href="dashboard.html"><i class="material-symbols-outlined">home</i> <span class="label">Início</span></a></li>
+            <li><a href="planejamento.html"><i class="material-symbols-outlined">calendar_month</i> <span class="label">Cronograma</span></a></li>
+            <li><a href="compras.html"><i class="material-symbols-outlined">shopping_cart</i> <span class="label">Lista de Compras</span></a></li>
+            <li><a href="receitas.html"><i class="material-symbols-outlined">soup_kitchen</i> <span class="label">Receitas</span></a></li>
+            <li><a href="favoritos.html"><i class="material-symbols-outlined">star</i> <span class="label">Favoritos</span></a></li>
+            <li><a href="familia.html"><i class="material-symbols-outlined">diversity_1</i> <span class="label">Família</span></a></li>
+            
+            <li class="active"><a href="configuracoes.html"><i class="material-symbols-outlined">settings</i> <span class="label">Configurações</span></a></li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <a href="../index.html" class="logout-link"><i class="material-symbols-outlined">logout</i> <span class="label">Sair da conta</span></a>
+        </div>
+    </nav>
+
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Suporte</h3>
+                </div>
+                <p style="font-size: 14px; color: #666; margin-bottom: 20px;">Precisa de ajuda com o planejamento ou encontrou algum erro?</p>
+                <button class="btn-text" style="width: 100%; text-align: center; background: #e0e0e0; color: #333;">Falar com Suporte</button>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="../js/controller.js"></script>
+</body>
+</html>

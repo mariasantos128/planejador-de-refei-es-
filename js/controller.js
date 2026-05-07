@@ -242,85 +242,107 @@ if (btnSortear) {
         }
     });
 }
+/*======================================================
+// --- GESTÃO DE FAMÍLIA (VERSÃO FINAL UNIFICADA) ---
+========================================================*/
 
-// --- GESTÃO DE USUÁRIOS (VERSÃO CORRIGIDA) ---
 async function carregarUsuarios() {
-    // 1. Corrigido para o ID correto da lista no HTML
     const lista = document.getElementById("lista-membros-ui");
     if (!lista) return;
 
-    // Busca do banco de dados (certifique-se que buscarUsuarios existe no db.js)
-    const usuarios = (await buscarUsuarios()) || [];
+    // Busca do banco de dados (IndexedDB via db.js)
+    const usuariosDoBanco = (await buscarUsuarios()) || [];
     lista.innerHTML = "";
 
-    if (usuarios.length === 0) {
-        lista.innerHTML = "<p>Nenhum membro cadastrado ainda.</p>";
+    if (usuariosDoBanco.length === 0) {
+        lista.innerHTML = "<p style='color: #888; padding: 20px; text-align: center;'>Nenhum membro na família ainda.</p>";
         return;
     }
 
-    usuarios.forEach(user => {
+    // Ordena: Admin primeiro
+    usuariosDoBanco.sort((a, b) => (a.perfil === 'admin' ? -1 : 1));
+
+    usuariosDoBanco.forEach(user => {
         const item = document.createElement("li");
-        item.style.display = "flex";
-        item.style.justifyContent = "space-between";
-        item.style.alignItems = "center";
-        item.style.padding = "10px";
-        item.style.borderBottom = "1px solid #eee";
+        item.className = "member-item-list"; 
+
+        // Gera as tags de restrição para cada pessoa
+        const tagsHTML = user.restricoes && user.restricoes.length > 0 
+            ? user.restricoes.map(r => `<span class="tag-restricao">${r}</span>`).join('')
+            : '<span class="tag-nenhuma">Sem restrições</span>';
+
+        const adminBadge = user.perfil === 'admin' ? '<span class="badge-admin">Admin</span>' : '';
 
         item.innerHTML = `
-            <div>
-                <strong>${user.nome}</strong><br>
-                <small style="color: #666;">E-mail: ${user.email || "Não informado"} | Perfil: ${user.perfil || "Membro"}</small>
+            <div class="member-info-wrapper">
+                <div class="member-name-row">
+                    <strong>${user.nome}</strong> ${adminBadge}
+                </div>
+                <div class="member-sub-row">
+                    <small style="color: #666;">${user.email || "Sem e-mail"}</small>
+                </div>
+                <div class="member-tags-container" style="margin-top: 8px; display: flex; gap: 5px; flex-wrap: wrap;">
+                    ${tagsHTML}
+                </div>
             </div>
-            <button class="btn-excluir" onclick="removerUsuario(${user.id})" 
-                    style="background:#d64545; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">
-                Remover
+            <button class="btn-excluir-circle" onclick="removerUsuario(${user.id})" title="Remover" style="background:none; border:none; cursor:pointer; display: flex; align-items: center;">
+                <span class="material-symbols-outlined" style="color: #ffcdd2; font-size: 20px;">delete</span>
             </button>
         `;
         lista.appendChild(item);
     });
 }
 
-// Escuta o clique no botão de salvar usuário
+// Evento de clique para Adicionar Membro
 document.addEventListener("click", async (e) => {
-    // 2. Corrigido para o ID do botão no HTML
     if (e.target.id === "btn-convidar") {
-        
-        // 3. Pegando os IDs corretos do HTML
         const nomeInput = document.getElementById("nome_convite");
         const emailInput = document.getElementById("email_convite");
         const perfilInput = document.getElementById("perfil_convite");
+        
+        // Captura quais restrições foram marcadas para essa pessoa
+        const checkboxes = document.querySelectorAll("#restricoes-membro-novo input:checked");
+        const restricoesSelecionadas = Array.from(checkboxes).map(cb => cb.value);
 
-        if (!nomeInput.value.trim()) {
-            // Se a função mostrarNotificacao não existir ou estiver dando erro, use um alert por enquanto:
-            // alert("O nome é obrigatório!");
-            if(typeof mostrarNotificacao === "function") {
-                mostrarNotificacao("O nome é obrigatório!", "#d64545");
-            }
+        if (!nomeInput || !nomeInput.value.trim()) {
+            alert("O nome do familiar é obrigatório!");
             return;
         }
 
-        // Criando o objeto com os dados exatos do seu formulário
-        const novoUser = {
+        // Validação básica de e-mail
+        if (emailInput.value && !emailInput.value.includes('@')) {
+            alert("Por favor, insira um e-mail válido.");
+            return;
+        }
+
+        const novoMembro = {
             nome: nomeInput.value.trim(),
             email: emailInput.value.trim(),
-            perfil: perfilInput.value
+            perfil: perfilInput.value,
+            restricoes: restricoesSelecionadas // Salvando o array de restrições
         };
 
-        // Chama a função do IndexedDB
-        await adicionarUsuario(novoUser);
+        // Salva no banco de dados
+        await adicionarUsuario(novoMembro);
         
-        // Limpa os campos depois de salvar
-        nomeInput.value = "";
-        emailInput.value = "";
-        
+        // Feedback visual
         if(typeof mostrarNotificacao === "function") {
-            mostrarNotificacao("Usuário adicionado! 👨‍👩‍👧‍👦");
+            mostrarNotificacao(`✅ ${nomeInput.value} adicionado!`);
         }
+
+        // Limpa o formulário
+        nomeInput.value = "";
+        if(emailInput) emailInput.value = "";
+        checkboxes.forEach(cb => cb.checked = false);
         
-        // Recarrega a lista na tela
+        // Recarrega a lista atualizada
         carregarUsuarios();
     }
 });
+
+// Inicializa a lista ao carregar a página
+document.addEventListener("DOMContentLoaded", carregarUsuarios);  
+
 
 // --- FUNÇÃO PARA DESTACAR O DIA ATUAL NO CRONOGRAMA ---
 function destacarDiaAtual() {
@@ -468,7 +490,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
-
+  //SIDE BAR
 document.addEventListener('DOMContentLoaded', () => {
     const btnToggle = document.getElementById('sidebarToggle'); // Pega o botão pelo ID
     const sidebar = document.getElementById('sidebar');         // Pega a barra lateral

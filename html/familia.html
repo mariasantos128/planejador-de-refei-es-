@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sabor Semanal - Minha Família</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="dash-body">
+
+    <nav class="sidebar" id="sidebar">
+        <button class="sidebar-toggle" id="sidebarToggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        
+        <div class="user-profile">
+            <div class="avatar" id="user-initial">U</div>
+            <div class="user-info">
+                <h3 id="display-user-name">Usuário</h3>
+                <p>Seja bem-vindo(a)!</p>
+            </div>
+        </div>
+        
+        <ul class="nav-links">
+            <li><a href="dashboard.html"><i class="material-symbols-outlined">home</i> <span class="label">Início</span></a></li>
+            <li><a href="planejamento.html"><i class="material-symbols-outlined">calendar_month</i> <span class="label">Cronograma</span></a></li>
+            <li><a href="compras.html"><i class="material-symbols-outlined">shopping_cart</i> <span class="label">Lista de Compras</span></a></li>
+            <li><a href="receitas.html"><i class="material-symbols-outlined">soup_kitchen</i> <span class="label">Receitas</span></a></li>
+            <li><a href="favoritos.html"><i class="material-symbols-outlined">star</i> <span class="label">Favoritos</span></a></li>
+            
+            <li class="active"><a href="familia.html"><i class="material-symbols-outlined">diversity_1</i> <span class="label">Família</span></a></li>
+            <li><a href="configuracoes.html"><i class="material-symbols-outlined">settings</i> <span class="label">Configurações</span></a></li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <a href="../index.html" class="logout-link"><i class="material-symbols-outlined">logout</i> <span class="label">Sair da conta</span></a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <header class="dash-header">
+            <h2>Minha Família</h2>
+            <p>Gerencie quem planeja as refeições com você e as necessidades de todos.</p>
+        </header>
+
+        <div class="dashboard-grid">
+
+            <div class="card">
+    <div class="card-header">
+        <h3>Adicionar Familiar</h3>
+    </div>
+    <form class="edit-profile-form">
+        <div class="input-group">
+            <label for="nome_convite">Nome do familiar</label>
+            <input type="text" id="nome_convite" placeholder="Ex: João Silva">
+        </div>
+
+        <div class="input-group">
+            <label for="email_convite">E-mail</label>
+            <input type="email" id="email_convite" placeholder="exemplo@email.com">
+        </div>
+
+        <div class="input-group">
+            <label for="perfil_convite">Nível de Acesso</label>
+            <select id="perfil_convite">
+                <option value="membro">Membro Convidado</option>
+                <option value="admin">Administrador</option>
+            </select>
+        </div>
+
+        <div class="form-section">
+            <p class="section-label">Restrições deste membro:</p>
+            <div class="checkbox-grid-profile" id="restricoes-membro-novo">
+                <label class="custom-checkbox-mini">
+                    <input type="checkbox" value="Glúten"> <span>Glúten</span>
+                </label>
+                <label class="custom-checkbox-mini">
+                    <input type="checkbox" value="Lactose"> <span>Lactose</span>
+                </label>
+                <label class="custom-checkbox-mini">
+                    <input type="checkbox" value="Vegano"> <span>Vegano</span>
+                </label>
+            </div>
+        </div>
+
+        <button type="button" id="btn-convidar" class="btn-save">Adicionar à Família</button>
+        <p id="msg-convite" style="display: none; margin-top: 15px; text-align: center; font-weight: bold;"></p>
+    </form>
+</div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Membros do Grupo</h3>
+                </div>
+                <p style="color: #666; font-size: 14px; margin-bottom: 20px;">Pessoas que dividem o planejamento com você atualmente.</p>
+                
+                <ul id="lista-membros-ui" class="member-list">
+                    </ul>
+            </div>
+
+            <div class="card card-large">
+                <div class="card-header">
+                    <h3>Restrições da Casa</h3>
+                </div>
+                <p style="color: #666; font-size: 14px; margin-bottom: 20px;">Esses avisos ajudarão na hora de sugerir receitas ou gerar a lista de compras.</p>
+                
+                <div class="checkbox-grid-profile">
+                    <label class="custom-checkbox">
+                        <input type="checkbox" id="gluten" name="restricao" value="gluten"> 
+                        <span>Intolerância a Glúten</span>
+                    </label>
+                    
+                    <label class="custom-checkbox">
+                        <input type="checkbox" id="lactose" name="restricao" value="lactose"> 
+                        <span>Intolerância a Lactose</span>
+                    </label>
+                    
+                    <label class="custom-checkbox">
+                        <input type="checkbox" id="outro" name="restricao" value="outro"> 
+                        <span>Outras (Vegetariano, alergias, etc.)</span>
+                    </label>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="../js/db.js"></script>
+    <script src="../js/controller.js"></script>
+</body>
+</html>

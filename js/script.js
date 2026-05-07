@@ -2,7 +2,7 @@
    1. SISTEMA DE USUÁRIOS (ADM PRIMEIRO) & CONVITE
    ========================================================== */
 // Puxa da memória ou começa vazio se for a primeira vez
-let usuarios = JSON.parse(localStorage.getItem('membrosSaborSemanal')) || [];
+/* let usuarios = JSON.parse(localStorage.getItem('membrosSaborSemanal')) || [];
 
 function renderUsuarios() {
     // CORRIGIDO: Padronizei o nome da variável para listaUI
@@ -85,7 +85,7 @@ if (btnConvidar) {
             msgInfo.style.display = 'none';
         }, 3500);
     });
-}
+} */
     
 /* ==========================================================
    2. GESTÃO DE RECEITAS (SALVAR, EDITAR, LISTAR COM FOTOS)
