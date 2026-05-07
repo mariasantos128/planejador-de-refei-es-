@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sabor Semanal - Favoritos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="../css/style.css">
+</head>
+<body class="dash-body">
+
+    <nav class="sidebar" id="sidebar">
+        <button class="sidebar-toggle" id="sidebarToggle">
+            <span></span><span></span><span></span>
+        </button>
+        <div class="user-profile">
+            <div class="avatar">U</div>
+            <div class="user-info">
+                <h3>Usuário</h3>
+                <p>Favoritos</p>
+            </div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="dashboard.html"><i class="material-symbols-outlined">home</i> <span class="label">Início</span></a></li>
+            <li><a href="planejamento.html"><i class="material-symbols-outlined">calendar_month</i> <span class="label">Cronograma</span></a></li>
+            <li><a href="compras.html"><i class="material-symbols-outlined">shopping_cart</i> <span class="label">Lista de Compras</span></a></li>
+            <li><a href="receitas.html"><i class="material-symbols-outlined">soup_kitchen</i> <span class="label">Receitas</span></a></li>
+            <li class="active"><a href="favoritos.html"><i class="material-symbols-outlined">star</i> <span class="label">Favoritos</span></a></li>
+            <li><a href="familia.html"><i class="material-symbols-outlined">diversity_1</i> <span class="label">Família</span></a></li>
+            <li><a href="configuracoes.html"><i class="material-symbols-outlined">settings</i> <span class="label">Configurações</span></a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="../index.html" class="logout-link"><i class="material-symbols-outlined">logout</i> <span class="label">Sair</span></a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <header class="dash-header">
+            <h2>Suas Receitas Favoritas</h2>
+            <p>As melhores experiências culinárias da sua família em um só lugar.</p>
+        </header>
+
+        <section class="fav-header-actions">
+            <div class="search-bar">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" placeholder="Buscar entre seus favoritos...">
+            </div>
+            <button class="btn-add-new">
+                <i class="material-symbols-outlined">add</i> Novo Favorito
+            </button>
+        </section>
+
+        <div class="fav-grid">
+            
+            <article class="recipe-card">
+                <div class="recipe-img">
+                    <span class="material-symbols-outlined icon-placeholder">restaurant</span>
+                    <span class="material-symbols-outlined fav-badge">favorite</span>
+                </div>
+                <div class="recipe-content">
+                    <span class="recipe-category">Almoço</span>
+                    <h3 class="recipe-title">Lasanha Bolonhesa</h3>
+                    <div class="recipe-meta">
+                        <span><i class="material-symbols-outlined">schedule</i> 45 min</span>
+                        <span><i class="material-symbols-outlined">signal_cellular_alt</i> Fácil</span>
+                    </div>
+                    <div class="recipe-footer">
+                        <button class="btn-view">Ver Receita</button>
+                        <button class="btn-icon-action" title="Adicionar ao Planejamento">
+                            <i class="material-symbols-outlined">calendar_add_on</i>
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <article class="recipe-card">
+                <div class="recipe-img">
+                    <span class="material-symbols-outlined icon-placeholder">bakery_dining</span>
+                    <span class="material-symbols-outlined fav-badge">favorite</span>
+                </div>
+                <div class="recipe-content">
+                    <span class="recipe-category">Café da Manhã</span>
+                    <h3 class="recipe-title">Panqueca de Aveia</h3>
+                    <div class="recipe-meta">
+                        <span><i class="material-symbols-outlined">schedule</i> 15 min</span>
+                        <span><i class="material-symbols-outlined">signal_cellular_alt</i> Iniciante</span>
+                    </div>
+                    <div class="recipe-footer">
+                        <button class="btn-view">Ver Receita</button>
+                        <button class="btn-icon-action" title="Adicionar ao Planejamento">
+                            <i class="material-symbols-outlined">calendar_add_on</i>
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+    </main>
+
+    <script src="../js/controller.js"></script>
+</body>
+</html>

@@ -75,7 +75,6 @@ async function adicionarReceitasPadrao() {
 }
 
 // --- GESTÃO DE RECEITAS ---
-// --- GESTÃO DE RECEITAS ---
 async function carregarReceitas() {
     const grid = document.getElementById("grid-receitas");
     if (!grid) return; 
@@ -242,6 +241,51 @@ if (btnSortear) {
         }
     });
 }
+
+/*=====================USUARIOS==========================*/
+// --- FUNÇÃO PARA CARREGAR OS DADOS DO USUÁRIO LOGADO ---
+function carregarPerfilLogado() {
+    // 1. Pega o "pacote" que o login salvou
+    const dadosSessao = localStorage.getItem('usuarioLogado');
+
+    if (dadosSessao) {
+        const usuario = JSON.parse(dadosSessao);
+
+        // --- ATUALIZA A SIDEBAR (BARRA LATERAL) EM TODAS AS PÁGINAS ---
+        const sidebarNome = document.getElementById('display-user-name');
+        const sidebarAvatar = document.getElementById('user-initial');
+
+        if (sidebarNome) sidebarNome.textContent = usuario.nome;
+        if (sidebarAvatar) sidebarAvatar.textContent = usuario.nome.charAt(0).toUpperCase();
+
+        // --- ATUALIZA A PÁGINA DE CONFIGURAÇÕES (SE ESTIVER NELA) ---
+        const inputNome = document.getElementById('edit-nome');
+        const inputEmail = document.getElementById('edit-email');
+        const profileName = document.getElementById('profile-name');
+        const profileEmail = document.getElementById('profile-email');
+        const avatarGrande = document.getElementById('user-initial-large');
+
+        if (inputNome) inputNome.value = usuario.nome;
+        if (inputEmail) inputEmail.value = usuario.email;
+        if (profileName) profileName.textContent = usuario.nome;
+        if (profileEmail) profileEmail.textContent = usuario.email;
+        if (avatarGrande) avatarGrande.textContent = usuario.nome.charAt(0).toUpperCase();
+
+        // Marca os checkboxes de restrição nas configurações
+        if (usuario.restricoes) {
+            const checkboxes = document.querySelectorAll('.checkbox-grid-profile input');
+            checkboxes.forEach(cb => {
+                cb.checked = usuario.restricoes.includes(cb.value);
+            });
+        }
+    } else {
+        console.log("Nenhum usuário logado encontrado no localStorage.");
+    }
+}
+
+// Executa essa função toda vez que QUALQUER página abrir
+document.addEventListener('DOMContentLoaded', carregarPerfilLogado);
+
 /*======================================================
 // --- GESTÃO DE FAMÍLIA (VERSÃO FINAL UNIFICADA) ---
 ========================================================*/
@@ -491,17 +535,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
   //SIDE BAR
-document.addEventListener('DOMContentLoaded', () => {
-    const btnToggle = document.getElementById('sidebarToggle'); // Pega o botão pelo ID
-    const sidebar = document.getElementById('sidebar');         // Pega a barra lateral
-    const body = document.body;                                 // Pega o corpo da página
+  document.addEventListener('DOMContentLoaded', () => {
+    const btnToggle = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    const body = document.body;
 
-    if (btnToggle) {
+    if (btnToggle && sidebar) {
         btnToggle.addEventListener('click', () => {
-            // 1. O CSS que te mandei usa 'collapsed' para a sidebar
             sidebar.classList.toggle('collapsed');
-            
-            // 2. O CSS que te mandei usa 'sidebar-collapsed' para o body (ajustar margens)
             body.classList.toggle('sidebar-collapsed');
         });
     }

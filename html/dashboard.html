@@ -111,21 +111,18 @@
         </div>
     </main>
 
+    <script src="../js/controller.js"></script>
+
     <script>
-        // Recupera o nome salvo e coloca na tela
-        const nome = localStorage.getItem('nomeUsuario') || 'Usuário';
-        document.getElementById('display-user-name').innerText = nome;
-        document.getElementById('user-initial').innerText = nome.charAt(0).toUpperCase();
-    </script>
-    <script>
-        // Toggle da sidebar
         const toggle = document.getElementById('sidebarToggle');
         const sidebar = document.getElementById('sidebar');
-        toggle && toggle.addEventListener('click', () => {
-            const collapsed = sidebar.classList.toggle('collapsed');
-            // também alterna uma classe no body para ajustar margens e layout
-            document.body.classList.toggle('sidebar-collapsed', collapsed);
-        });
+        
+        if (toggle) {
+            toggle.addEventListener('click', () => {
+                const collapsed = sidebar.classList.toggle('collapsed');
+                document.body.classList.toggle('sidebar-collapsed', collapsed);
+            });
+        }
     </script>
     
 </body>
