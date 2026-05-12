@@ -170,13 +170,17 @@ function normalizarTexto(texto) {
 }
 
 // --- PLANEJAMENTO ---
+// --- PLANEJAMENTO COM PERSISTÊNCIA ---
 async function popularSeletores() {
     const tableRows = document.querySelectorAll("#planejamento tbody tr");
     if (tableRows.length === 0) return;
 
     const receitas = (await buscarItens()) || []; 
+    
+    // 1. Carrega o que está salvo no "banco" do navegador
+    const planejamentoSalvo = JSON.parse(localStorage.getItem('meuPlanejamento')) || {};
 
-    tableRows.forEach(row => {
+    tableRows.forEach((row, rowIndex) => {
         const tdCategoria = row.querySelector("td[data-categoria]");
         if (!tdCategoria) return;
 
@@ -188,8 +192,7 @@ async function popularSeletores() {
             return categoriaReceita === categoriaLinha || categoriaReceita.includes(categoriaLinha);
         });
 
-        selects.forEach(select => {
-            const valorAtual = select.value;
+        selects.forEach((select, selectIndex) => {
             select.innerHTML = '<option value="">-- Selecione --</option>';
             
             receitasFiltradas.forEach(r => {
@@ -199,9 +202,19 @@ async function popularSeletores() {
                 select.appendChild(opt);
             });
 
-            if (valorAtual && receitasFiltradas.find(r => r.nome === valorAtual)) {
-                select.value = valorAtual;
+            // 2. RECUPERAR: Verifica se existe um valor salvo para esta linha e este select específico
+            const chaveUnica = `linha-${rowIndex}-select-${selectIndex}`;
+            if (planejamentoSalvo[chaveUnica]) {
+                select.value = planejamentoSalvo[chaveUnica];
             }
+
+            // 3. SALVAR: Adiciona um evento para salvar sempre que o usuário mudar a opção
+            select.addEventListener('change', (e) => {
+                const novoPlanejamento = JSON.parse(localStorage.getItem('meuPlanejamento')) || {};
+                novoPlanejamento[chaveUnica] = e.target.value;
+                localStorage.setItem('meuPlanejamento', JSON.stringify(novoPlanejamento));
+                console.log("💾 Escolha salva no navegador!");
+            });
         });
     });
 }
@@ -212,8 +225,12 @@ if (btnSortear) {
         const receitas = (await buscarItens()) || [];
         const rows = document.querySelectorAll("#planejamento tbody tr");
         let sorteouAlguma = false;
+        
+        // 1. Criamos um objeto para guardar o que vai ser sorteado agora
+        // Pegamos o que já existe salvo para não apagar outras coisas
+        const planejamentoSalvo = JSON.parse(localStorage.getItem('meuPlanejamento')) || {};
 
-        rows.forEach(row => {
+        rows.forEach((row, rowIndex) => { // Pegamos o rowIndex aqui
             const tdCategoria = row.querySelector("td[data-categoria]");
             if (!tdCategoria) return;
 
@@ -226,15 +243,23 @@ if (btnSortear) {
             });
 
             if (receitasFiltradas.length > 0) {
-                selects.forEach(select => {
+                selects.forEach((select, selectIndex) => { // Pegamos o selectIndex aqui
                     const sorteada = receitasFiltradas[Math.floor(Math.random() * receitasFiltradas.length)];
                     select.value = sorteada.nome;
+                    
+                    // 2. SALVAMENTO: Criamos a mesma chave que a função popularSeletores usa
+                    const chaveUnica = `linha-${rowIndex}-select-${selectIndex}`;
+                    planejamentoSalvo[chaveUnica] = sorteada.nome;
+                    
                     sorteouAlguma = true;
                 });
             }
         });
         
         if (sorteouAlguma) {
+            // 3. GRAVA NO LOCALSTORAGE: Só agora salvamos tudo de uma vez
+            localStorage.setItem('meuPlanejamento', JSON.stringify(planejamentoSalvo));
+            
             mostrarNotificacao("Cardápio sorteado! 🎲", "var(--cor-media)");
         } else {
             mostrarNotificacao("Cadastre receitas de Café, Almoço, Lanche e Jantar primeiro!", "#d64545");
@@ -546,4 +571,16 @@ document.addEventListener("DOMContentLoaded", () => {
             body.classList.toggle('sidebar-collapsed');
         });
     }
+});
+
+// NO FINAL DO ARQUIVO controller.js
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("🚀 Página carregada! Aguardando banco de dados...");
+    
+    // Pequeno intervalo para garantir que o db.js abriu a conexão
+    setTimeout(() => {
+        popularSeletores()
+            .then(() => console.log("✅ Seletores preenchidos com sucesso!"))
+            .catch(err => console.error("❌ Erro ao popular seletores:", err));
+    }, 100); // 100ms é o suficiente para o IndexedDB acordar
 });

@@ -1,0 +1,39 @@
+// Diagrama do Banco de Dados - Sabor Semanal
+
+Table usuarios {
+  id integer [primary key, increment]
+  nome varchar [not null]
+  email varchar [unique, not null]
+  senha varchar [not null]
+  criado_em timestamp [default: `now()`]
+}
+
+Table receitas {
+  id integer [primary key, increment]
+  nome varchar [not null]
+  categoria varchar [note: 'carne, massa, vegano, etc']
+  dificuldade varchar
+  tempo_preparo varchar
+  modo_preparo text
+}
+
+Table planejamento_semanal {
+  id integer [primary key, increment]
+  usuario_id integer
+  receita_id integer
+  dia_semana varchar
+  refeicao varchar [note: 'almoco, jantar']
+}
+
+Table lista_compras {
+  id integer [primary key, increment]
+  usuario_id integer
+  item_nome varchar
+  categoria varchar [note: 'hortifruti, açougue, laticinios']
+  comprado boolean [default: false]
+}
+
+// Relacionamentos (Vínculos)
+Ref: planejamento_semanal.usuario_id > usuarios.id
+Ref: planejamento_semanal.receita_id > receitas.id
+Ref: lista_compras.usuario_id > usuarios.id
