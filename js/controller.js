@@ -74,57 +74,98 @@ async function adicionarReceitasPadrao() {
     }
 }
 
-// --- GESTÃO DE RECEITAS ---
-async function carregarReceitas() {
+// --- VARIÁVEIS GLOBAIS ---
+let categoriaAtual = "Todas";
+
+// --- FUNÇÃO PARA NORMALIZAR TEXTO ---
+function normalizarTexto(texto) {
+    if (!texto) return "";
+    return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+}
+
+// --- FUNÇÃO PRINCIPAL: CARREGAR RECEITAS ---
+async function renderizarReceitas(categoriaFiltrada = "Todas") {
+    categoriaAtual = categoriaFiltrada;
     const grid = document.getElementById("grid-receitas");
     if (!grid) return; 
 
-    const receitas = (await buscarItens()) || [];
-    grid.innerHTML = "";
+    const resultado = await buscarItens(); 
+    // Garante que receitas seja sempre uma lista (evita o erro do forEach)
+    const receitas = Array.isArray(resultado) ? resultado : (resultado ? [resultado] : []);
+    const favoritos = JSON.parse(localStorage.getItem('meusFavoritos')) || [];
 
-    if (receitas.length === 0) {
-        grid.innerHTML = "<p style='grid-column: 1 / -1; text-align: center;'>Nenhuma receita cadastrada ainda. Adicione uma acima!</p>";
+    grid.innerHTML = ""; 
+
+    const receitasParaExibir = categoriaFiltrada === "Todas" 
+        ? receitas 
+        : receitas.filter(r => r.categoria === categoriaFiltrada);
+
+    if (receitasParaExibir.length === 0) {
+        grid.innerHTML = "<p style='grid-column: 1/-1; text-align: center;'>Nenhuma receita encontrada.</p>";
         return;
     }
 
-    receitas.forEach(rec => {
+    receitasParaExibir.forEach(rec => {
+        const isFavorito = favoritos.includes(rec.id);
         const card = document.createElement("div");
         card.className = "receita-card";
         
-        const imagemPadrao = "https://images.unsplash.com/photo-1495195134817-a169d32d0391?q=80&w=500";
-        const fotoUrl = rec.foto ? rec.foto : imagemPadrao;
-        
-        // Estilos para centralizar e deixar clicável
-        card.style.display = "flex";
-        card.style.flexDirection = "column";
-        card.style.alignItems = "center";
-        card.style.cursor = "pointer";
-
         card.innerHTML = `
-            <img src="${fotoUrl}" class="receita-img" style="object-fit: cover; width: 130px; height: 130px; border-radius: 50%; border: 4px solid var(--cor-clara, #CFE0BC);">
-            <h4 style="margin-top: 10px; text-align: center;">${rec.nome}</h4>
-            
-            <div class="receita-detalhes" style="display: none; width: 100%; margin-top: 15px; padding-top: 15px; border-top: 1px solid #ccc; text-align: left;">
-                <p><small><strong>Categoria:</strong> ${rec.categoria}</small></p>
-                <p><strong>Ingredientes:</strong> ${rec.ingredientes}</p>
-                <p>${rec.gluten ? '🚫 Contém Glúten' : '✅ Sem Glúten'}</p>
-                <p>${rec.lactose ? '🚫 Contém Lactose' : '✅ Sem Lactose'}</p>
-                <button class="btn-excluir" style="width: 100%; margin-top: 10px;" onclick="removerReceita(${rec.id})">Excluir</button>
+            <div class="card-foto" style="background-image: url('${rec.foto || 'https://via.placeholder.com/150'}')">
+                <button class="btn-favorito" onclick="alternarFavorito(${rec.id}, event)">
+                    <i class="material-symbols-outlined">${isFavorito ? 'favorite' : 'favorite_border'}</i>
+                </button>
+            </div>
+            <div class="card-info">
+                <span class="badge-categoria">${rec.categoria}</span>
+                <h4>${rec.nome}</h4>
             </div>
         `;
         
-        // Ação de clicar na foto/nome para revelar os detalhes
-        card.onclick = (e) => {
-            if (e.target.tagName !== 'BUTTON') {
-                const detalhes = card.querySelector('.receita-detalhes');
-                detalhes.style.display = detalhes.style.display === 'block' ? 'none' : 'block';
-            }
-        };
-        
+        card.onclick = () => abrirModalReceita(rec);
         grid.appendChild(card);
     });
 }
 
+// Para manter compatibilidade se você chamar por outro nome
+async function carregarReceitas(cat) { return renderizarReceitas(cat); }
+
+// --- MODAL: ABRIR E FECHAR ---
+function abrirModalReceita(receita) {
+    const modal = document.getElementById("modal-receita");
+    if (!modal) return;
+
+    document.getElementById("modal-titulo").innerText = receita.nome;
+    
+    const campoMeta = document.getElementById("modal-meta");
+    if (campoMeta) {
+        campoMeta.innerHTML = `
+            <span>⏱️ ${receita.tempo || '15 min'}</span>
+            <span style="margin: 0 10px;">|</span>
+            <span>👨‍🍳 ${receita.dificuldade || 'Fácil'}</span>
+        `;
+    }
+
+    const lista = document.getElementById("modal-ingredientes");
+    const textoIng = receita.ingredientes || "";
+    const arrayIng = textoIng.split(',').filter(i => i.trim() !== "");
+    lista.innerHTML = arrayIng.map(i => `<li>${i.trim()}</li>`).join("");
+
+    document.getElementById("modal-passo").innerText = receita.passoAPasso || "Prepare com carinho! 👩‍🍳";
+
+    modal.style.display = "flex"; 
+}
+
+// Gerenciador de cliques para fechar o modal
+document.addEventListener('click', (e) => {
+    const modal = document.getElementById("modal-receita");
+    if (!modal) return;
+    if (e.target.id === 'fechar-modal' || e.target === modal || e.target.classList.contains('close-button')) {
+        modal.style.display = "none";
+    }
+});
+
+// --- SALVAR RECEITA ---
 const btnSalvar = document.getElementById("btn-salvar-receita");
 if (btnSalvar) {
     btnSalvar.addEventListener("click", async () => {
@@ -133,41 +174,51 @@ if (btnSalvar) {
             categoria: document.getElementById("rec-categoria").value,
             ingredientes: document.getElementById("rec-ingredientes").value.trim(),
             foto: document.getElementById("rec-foto").value.trim(),
+            tempo: document.getElementById("rec-tempo")?.value || "15 min",
+            dificuldade: document.getElementById("rec-dificuldade")?.value || "Fácil",
             gluten: document.getElementById("rec-gluten").checked,
             lactose: document.getElementById("rec-lactose").checked
         };
 
         if (!novaRec.nome || !novaRec.ingredientes) {
-            mostrarNotificacao("Preencha o nome e os ingredientes!", "#d64545");
+            alert("Preencha nome e ingredientes!");
             return;
         }
 
         await adicionarItem(novaRec);
-        
-        document.getElementById("rec-nome").value = "";
-        document.getElementById("rec-foto").value = "";
-        document.getElementById("rec-ingredientes").value = "";
-        document.getElementById("rec-gluten").checked = false;
-        document.getElementById("rec-lactose").checked = false;
-        
-        mostrarNotificacao("Receita cadastrada com sucesso! 🥗");
-        carregarReceitas();
+        alert("Receita salva!");
+        renderizarReceitas();
     });
 }
 
-async function removerReceita(id) {
-    if (confirm("Tem certeza que deseja apagar essa receita?")) {
-        await deletarItem(id);
-        mostrarNotificacao("Receita excluída!", "#d64545");
-        carregarReceitas();
-    }
+// --- FILTROS E FAVORITOS ---
+function filtrarPorCategoria(cat) {
+    document.querySelectorAll('.btn-filtro').forEach(btn => btn.classList.remove('active'));
+    if (event) event.target.classList.add('active');
+    renderizarReceitas(cat);
 }
 
-// --- FUNÇÃO PARA IGNORAR ACENTOS E MAIÚSCULAS ---
-function normalizarTexto(texto) {
-    if (!texto) return "";
-    return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+function alternarFavorito(id, event) {
+    event.stopPropagation();
+    let favoritos = JSON.parse(localStorage.getItem('meusFavoritos')) || [];
+    if (favoritos.includes(id)) {
+        favoritos = favoritos.filter(fId => fId !== id);
+    } else {
+        favoritos.push(id);
+    }
+    localStorage.setItem('meusFavoritos', JSON.stringify(favoritos));
+    renderizarReceitas(categoriaAtual);
 }
+
+// --- INICIALIZAÇÃO ---
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(async () => {
+        try {
+            if (typeof adicionarReceitasPadrao === "function") await adicionarReceitasPadrao();
+            await renderizarReceitas("Todas");
+        } catch (e) { console.error(e); }
+    }, 200);
+});
 
 // --- PLANEJAMENTO ---
 // --- PLANEJAMENTO COM PERSISTÊNCIA ---
@@ -583,4 +634,23 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(() => console.log("✅ Seletores preenchidos com sucesso!"))
             .catch(err => console.error("❌ Erro ao popular seletores:", err));
     }, 100); // 100ms é o suficiente para o IndexedDB acordar
+});
+
+
+
+// ESCUTADOR GLOBAL PARA FECHAR O MODAL
+// Função isolada para fechar o modal
+function fecharModal() {
+    const modal = document.getElementById("modal-receita");
+    if (modal) modal.style.display = "none";
+}
+
+// Escuta cliques no X e no fundo do modal
+document.addEventListener('click', (e) => {
+    const modal = document.getElementById("modal-receita");
+    if (!modal) return;
+
+    if (e.target.id === 'fechar-modal' || e.target === modal || e.target.classList.contains('close-button')) {
+        fecharModal();
+    }
 });
