@@ -1,7 +1,11 @@
-// controller.js
+// =========================================================================
+// 1. CONFIGURAÇÕES INICIAIS, VARIÁVEIS GLOBAIS E INICIALIZAÇÃO DO BANCO
+// =========================================================================
 
 let bancoPronto = false;
+let categoriaAtual = "Todas";
 
+// Inicialização Principal do Sistema
 document.addEventListener("DOMContentLoaded", async () => {
     try {
         await iniciarBanco();
@@ -15,11 +19,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         
         if (document.getElementById("planejamento")) {
             popularSeletores();
-        }
-
-        if (document.getElementById("planejamento")) {
-            popularSeletores();
-            destacarDiaAtual(); // <--- ADICIONE ESTA LINHA AQUI
+            destacarDiaAtual();
         }
 
         if (document.getElementById("lista-usuarios")) {
@@ -31,7 +31,39 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 });
 
-// --- SISTEMA DE NOTIFICAÇÕES ---
+// Inicialização Auxiliar (Garantia de carregamento de receitas e seletores)
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(async () => {
+        try {
+            if (typeof adicionarReceitasPadrao === "function") await adicionarReceitasPadrao();
+            await renderizarReceitas("Todas");
+        } catch (e) { 
+            console.error(e); 
+        }
+    }, 200);
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("🚀 Página carregada! Aguardando banco de dados...");
+    setTimeout(() => {
+        popularSeletores()
+            .then(() => console.log("✅ Seletores preenchidos com sucesso!"))
+            .catch(err => console.error("❌ Erro ao popular seletores:", err));
+    }, 100);
+});
+
+
+// =========================================================================
+// 2. FUNÇÕES UTILITÁRIAS / AUXILIARES
+// =========================================================================
+
+// Normaliza textos removendo acentos e espaços extras
+function normalizarTexto(texto) {
+    if (!texto) return "";
+    return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+}
+
+// Sistema de Notificações (Toast)
 function mostrarNotificacao(mensagem, corFundo = "var(--cor-media)") {
     let toast = document.getElementById("toast");
     if (!toast) {
@@ -45,9 +77,13 @@ function mostrarNotificacao(mensagem, corFundo = "var(--cor-media)") {
     setTimeout(() => { toast.className = toast.className.replace("mostrar", ""); }, 3000);
 }
 
-// --- FUNÇÃO PARA INJETAR RECEITAS PADRÃO ATUALIZADA ---
+
+// =========================================================================
+// 3. MÓDULO: RECEITAS (CARREGAMENTO, CADASTRO E FILTROS)
+// =========================================================================
+
+// Injeta as receitas iniciais no banco de dados caso esteja vazio
 async function adicionarReceitasPadrao() {
-    // A proteção || [] garante que nunca dê erro no forEach
     const receitasAtuais = (await buscarItens()) || [];
     
     if (receitasAtuais.length === 0) {
@@ -56,15 +92,13 @@ async function adicionarReceitasPadrao() {
             { nome: "Pão com Ovo", categoria: "Café", ingredientes: "Pão francês, 1 ovo, manteiga", foto: "https://media.istockphoto.com/id/943148622/pt/foto/bread-with-scrambled-egg-brazilian-pao-com-ovo.webp?a=1&b=1&s=612x612&w=0&k=20&c=r-fjqQYmHu7JR8GhPBrlY-MuIZyWQmDwIwQVZvIdOVg=", gluten: true, lactose: true },
             { nome: "Cuscuz com Manteiga", categoria: "Café", ingredientes: "Flocão de milho, água, sal, manteiga", foto: "https://media.istockphoto.com/id/1304749748/pt/foto/brazilian-couscous-on-wooden-background-brazilian-breakfast-concept.jpg?s=612x612&w=0&k=20&c=DkJBjeivl_M7QLwKLSD-CRYRDkv3e4i5_KFCZ1Uya68=", gluten: false, lactose: true },
             { nome: "Tapioca com Queijo", categoria: "Café", ingredientes: "Massa de tapioca, queijo coalho ou mussarela", foto: "https://media.istockphoto.com/id/1256543084/pt/foto/tapioca-for-breakfast.jpg?s=612x612&w=0&k=20&c=AU62YE1mgTrK5ePN8qkNy1Pgmupqyuh2VEj2vNd1Ts8=", gluten: false, lactose: true },
-            
             // ALMOÇO / JANTAR
             { nome: "Arroz, Feijão e Ovo", categoria: "Almoço", ingredientes: "Arroz branco, feijão carioca, 2 ovos fritos", foto: "https://media.istockphoto.com/id/491516552/pt/foto/arroz-e-feij%C3%B5es.jpg?s=612x612&w=0&k=20&c=1N4796xrpSpyXm_kTkbrRPqVlhdju8EhhwELpmHnbWs=", gluten: false, lactose: false },
             { nome: "Frango Grelhado com Arroz", categoria: "Almoço", ingredientes: "Peito de frango, arroz, salada de alface", foto: "https://media.istockphoto.com/id/2207230263/pt/foto/rice-beans-grilled-chicken-steak-salad-and-farofa.jpg?s=612x612&w=0&k=20&c=1uQOxbLjiZrLZU4gnoBX8xekTWORdQFNpvnKEjBmltA=", gluten: false, lactose: false },
             { nome: "Carne de Panela", categoria: "Jantar", ingredientes: "Acém ou músculo, batata, cenoura, molho de tomate", foto: "https://media.istockphoto.com/id/516816644/pt/foto/caseiras-lenta-cozinheiro-ca%C3%A7arola-com-carne-assada.jpg?s=612x612&w=0&k=20&c=MjBH3VKYVYOfNMDSj2OdoMiYbARIrxFZkVW8yJtAYrY=", gluten: false, lactose: false },
             { nome: "Macarrão com Carne Moída", categoria: "Jantar", ingredientes: "Macarrão espaguete, carne moída, molho", foto: "https://media.istockphoto.com/id/1215312647/pt/foto/pasta-fettuccine-with-beef-ragout-sauce-in-black-bowl-grey-background-close-up-top-view.jpg?s=612x612&w=0&k=20&c=EnfZd3RvJ7V8bWdekE9R714bMToUIi6O6i-hhh8YPfc=", gluten: true, lactose: false },
-            
             // LANCHE
-            { nome: "Fruta Picada", categoria: "Lanche", ingredientes: "Banana, maçã, mamão", foto: "https://media.istockphoto.com/id/501512015/pt/foto/fruta-fresca-de-mistura-de-salada.jpg?s=612x612&w=0&k=20&c=mmHCjiLl1kQD3NVksDZJAe1RNJDINxTnGPUf3fwowyg=", gluten: false, lactose: false },
+            { nome: "Fruta Picada", categoria: "Lanche", ingredientes: "Banana, maçã, mamão", foto: "https://media.istockphoto.com/id/501512015/pt/foto/fruta-fresca-de-mistura-de-salada.jpg?s=612x612&w=0&k=20&c=mmHCjiLl1kQD3NVksDZJDE1RNJDINxTnGPUf3fwowyg=", gluten: false, lactose: false },
             { nome: "Iogurte com Aveia", categoria: "Lanche", ingredientes: "Iogurte natural, aveia em flocos", foto: "https://media.istockphoto.com/id/1396570974/pt/foto/smoothie-bowl-topped-with-fresh-berries-and-granola.jpg?s=612x612&w=0&k=20&c=AthCJYjEiuRuJ3wMDjX0JxFeKAUS1juHsHRMkHgE47A=", gluten: true, lactose: true }
         ];
 
@@ -74,23 +108,13 @@ async function adicionarReceitasPadrao() {
     }
 }
 
-// --- VARIÁVEIS GLOBAIS ---
-let categoriaAtual = "Todas";
-
-// --- FUNÇÃO PARA NORMALIZAR TEXTO ---
-function normalizarTexto(texto) {
-    if (!texto) return "";
-    return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
-}
-
-// --- FUNÇÃO PRINCIPAL: CARREGAR RECEITAS ---
+// Renderiza os cards de receita na tela
 async function renderizarReceitas(categoriaFiltrada = "Todas") {
     categoriaAtual = categoriaFiltrada;
     const grid = document.getElementById("grid-receitas");
     if (!grid) return; 
 
     const resultado = await buscarItens(); 
-    // Garante que receitas seja sempre uma lista (evita o erro do forEach)
     const receitas = Array.isArray(resultado) ? resultado : (resultado ? [resultado] : []);
     const favoritos = JSON.parse(localStorage.getItem('meusFavoritos')) || [];
 
@@ -127,45 +151,19 @@ async function renderizarReceitas(categoriaFiltrada = "Todas") {
     });
 }
 
-// Para manter compatibilidade se você chamar por outro nome
-async function carregarReceitas(cat) { return renderizarReceitas(cat); }
-
-// --- MODAL: ABRIR E FECHAR ---
-function abrirModalReceita(receita) {
-    const modal = document.getElementById("modal-receita");
-    if (!modal) return;
-
-    document.getElementById("modal-titulo").innerText = receita.nome;
-    
-    const campoMeta = document.getElementById("modal-meta");
-    if (campoMeta) {
-        campoMeta.innerHTML = `
-            <span>⏱️ ${receita.tempo || '15 min'}</span>
-            <span style="margin: 0 10px;">|</span>
-            <span>👨‍🍳 ${receita.dificuldade || 'Fácil'}</span>
-        `;
-    }
-
-    const lista = document.getElementById("modal-ingredientes");
-    const textoIng = receita.ingredientes || "";
-    const arrayIng = textoIng.split(',').filter(i => i.trim() !== "");
-    lista.innerHTML = arrayIng.map(i => `<li>${i.trim()}</li>`).join("");
-
-    document.getElementById("modal-passo").innerText = receita.passoAPasso || "Prepare com carinho! 👩‍🍳";
-
-    modal.style.display = "flex"; 
+// Mantém compatibilidade de chamada alternativa
+async function carregarReceitas(cat) { 
+    return renderizarReceitas(cat); 
 }
 
-// Gerenciador de cliques para fechar o modal
-document.addEventListener('click', (e) => {
-    const modal = document.getElementById("modal-receita");
-    if (!modal) return;
-    if (e.target.id === 'fechar-modal' || e.target === modal || e.target.classList.contains('close-button')) {
-        modal.style.display = "none";
-    }
-});
+// Filtro de categorias por botões da interface
+function filtrarPorCategoria(cat) {
+    document.querySelectorAll('.btn-filtro').forEach(btn => btn.classList.remove('active'));
+    if (event) event.target.classList.add('active');
+    renderizarReceitas(cat);
+}
 
-// --- SALVAR RECEITA ---
+// Evento do botão para Cadastrar Nova Receita
 const btnSalvar = document.getElementById("btn-salvar-receita");
 if (btnSalvar) {
     btnSalvar.addEventListener("click", async () => {
@@ -191,44 +189,171 @@ if (btnSalvar) {
     });
 }
 
-// --- FILTROS E FAVORITOS ---
-function filtrarPorCategoria(cat) {
-    document.querySelectorAll('.btn-filtro').forEach(btn => btn.classList.remove('active'));
-    if (event) event.target.classList.add('active');
-    renderizarReceitas(cat);
-}
 
-function alternarFavorito(id, event) {
-    event.stopPropagation();
-    let favoritos = JSON.parse(localStorage.getItem('meusFavoritos')) || [];
-    if (favoritos.includes(id)) {
-        favoritos = favoritos.filter(fId => fId !== id);
-    } else {
-        favoritos.push(id);
+// =========================================================================
+// 4. MÓDULO: MODAL DETALHES DA RECEITA
+// =========================================================================
+
+function abrirModalReceita(receita) {
+    const modal = document.getElementById("modal-receita");
+    if (!modal) return;
+
+    document.getElementById("modal-titulo").innerText = receita.nome;
+    
+    const campoMeta = document.getElementById("modal-meta");
+    if (campoMeta) {
+        campoMeta.innerHTML = `
+            <span>⏱️ ${receita.tempo || '15 min'}</span>
+            <span style="margin: 0 10px;">|</span>
+            <span>👨‍🍳 ${receita.dificuldade || 'Fácil'}</span>
+        `;
     }
-    localStorage.setItem('meusFavoritos', JSON.stringify(favoritos));
-    renderizarReceitas(categoriaAtual);
+
+    const lista = document.getElementById("modal-ingredientes");
+    const textoIng = receita.ingredientes || "";
+    const arrayIng = textoIng.split(',').filter(i => i.trim() !== "");
+    lista.innerHTML = arrayIng.map(i => `<li>${i.trim()}</li>`).join("");
+
+    document.getElementById("modal-passo").innerText = receita.passoAPasso || "Prepare com carenho! 👩‍🍳";
+
+    modal.style.display = "flex"; 
 }
 
-// --- INICIALIZAÇÃO ---
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(async () => {
-        try {
-            if (typeof adicionarReceitasPadrao === "function") await adicionarReceitasPadrao();
-            await renderizarReceitas("Todas");
-        } catch (e) { console.error(e); }
-    }, 200);
+function fecharModal() {
+    const modal = document.getElementById("modal-receita");
+    if (modal) modal.style.display = "none";
+}
+
+// Escutador global único para fechar o Modal (clicando fora ou no botão de fechar)
+document.addEventListener('click', (e) => {
+    const modal = document.getElementById("modal-receita");
+    if (!modal) return;
+    if (e.target.id === 'fechar-modal' || e.target === modal || e.target.classList.contains('close-button')) {
+        fecharModal();
+    }
 });
 
-// --- PLANEJAMENTO ---
-// --- PLANEJAMENTO COM PERSISTÊNCIA ---
+
+// =========================================================================
+// 5. MÓDULO: FAVORITOS
+// =========================================================================
+
+// Alterna o estado de favorito nos cards principais (Com aviso na tela!)
+function alternarFavorito(id, event) {
+    if (event) event.stopPropagation();
+    
+    const idTratado = Number(id) || id;
+    let favoritos = JSON.parse(localStorage.getItem('meusFavoritos')) || [];
+    
+    if (favoritos.includes(idTratado)) {
+        // Se já existia, remove da lista
+        favoritos = favoritos.filter(fId => fId !== idTratado);
+        localStorage.setItem('meusFavoritos', JSON.stringify(favoritos));
+        
+        // NOVO: Alerta de remoção
+        alert("Receita removida dos favoritos! 💔");
+    } else {
+        // Se não existia, adiciona na lista
+        favoritos.push(idTratado);
+        localStorage.setItem('meusFavoritos', JSON.stringify(favoritos));
+        
+        // NOVO: Alerta de adição
+        alert("Receita adicionada aos favoritos! ❤️");
+    }
+    
+    // Atualiza a listagem de receitas comum, se a função existir na tela atual
+    if (typeof renderizarReceitas === "function") {
+        renderizarReceitas(categoriaAtual);
+    }
+    
+    // Atualiza a tela de favoritos caso o usuário esteja nela
+    if (typeof renderizarFavoritos === "function") {
+        renderizarFavoritos();
+    }
+}
+    
+
+// Remove o favorito diretamente pela tela de favoritos
+function removerFavorito(idReceita) {
+    const id = Number(idReceita) || idReceita;
+    let favoritos = JSON.parse(localStorage.getItem('meusFavoritos')) || [];
+    
+    favoritos = favoritos.filter(favId => favId !== id);
+    localStorage.setItem('meusFavoritos', JSON.stringify(favoritos));
+    
+    renderizarFavoritos();
+}
+
+// Renderiza as receitas do IndexedDB usando o design visual original do HTML
+async function renderizarFavoritos() {
+    const container = document.getElementById('lista-favoritos');
+    if (!container) return; // Só executa se o elemento existir na página
+
+    // 1. Busca os IDs favoritados no localStorage
+    const listaIdsFavoritos = JSON.parse(localStorage.getItem('meusFavoritos')) || [];
+
+    // 2. Busca todas as receitas guardadas no IndexedDB
+    const todasAsReceitas = (await buscarItens()) || [];
+
+    // 3. Filtra apenas os registros favoritados
+    const receitasFavoritadas = todasAsReceitas.filter(receita => {
+        const idReceita = Number(receita.id) || receita.id;
+        return listaIdsFavoritos.includes(idReceita);
+    });
+
+    // Estado Vazio: Mantém o layout alinhado se não houver itens
+    if (receitasFavoritadas.length === 0) {
+        container.innerHTML = `
+            <div class="empty-msg" style="text-align: center; padding: 40px 20px; grid-column: 1/-1; color: #777; font-family: 'Poppins', sans-serif;">
+                <span class="material-symbols-outlined" style="font-size: 48px; color: #ccc; margin-bottom: 10px;">heart_broken</span>
+                <p style="font-size: 16px; margin: 0;">Sua lista de favoritos está vazia.</p>
+                <a href="receitas.html" class="btn-primary" style="display:inline-block; margin-top:15px; padding: 8px 16px; border-radius: 6px; text-decoration:none; background-color: #ff6b6b; color: #fff; font-size: 14px; font-weight: 600;">Explorar Receitas</a>
+            </div>`;
+        return;
+    }
+
+    // 4. Constrói a estrutura injetando os dados reais com as suas classes CSS originais
+    container.innerHTML = '';
+    receitasFavoritadas.forEach(receita => {
+        const article = document.createElement('article');
+        article.className = 'recipe-card';
+        
+        article.innerHTML = `
+            <div class="recipe-img" style="background-image: url('${receita.foto}'); background-size: cover; background-position: center; display: block;">
+                <span class="material-symbols-outlined fav-badge" onclick="removerFavorito(${receita.id})" style="color: #ff6b6b; cursor: pointer; font-variation-settings: 'FILL' 1;" title="Remover dos favoritos">favorite</span>
+            </div>
+            <div class="recipe-content">
+                <span class="recipe-category">${receita.categoria}</span>
+                <h3 class="recipe-title">${receita.nome}</h3>
+                <div class="recipe-meta">
+                    <span><i class="material-symbols-outlined">schedule</i> 25 min</span>
+                    <span><i class="material-symbols-outlined">signal_cellular_alt</i> Fácil</span>
+                </div>
+                <div class="recipe-footer">
+                    <button class="btn-view" onclick="alert('Ingredientes necessários:\\n\\n${receita.ingredientes}')">Ver Receita</button>
+                    <button class="btn-icon-action" title="Adicionar ao Planejamento">
+                        <i class="material-symbols-outlined">calendar_add_on</i>
+                    </button>
+                </div>
+            </div>
+        `;
+        container.appendChild(article);
+    });
+}
+
+// Monitora o carregamento da página para exibir os dados automaticamente
+document.addEventListener('DOMContentLoaded', renderizarFavoritos);
+
+// =========================================================================
+// 6. MÓDULO: PLANEJAMENTO SEMANAL E SORTEIO
+// =========================================================================
+
+// Popula os seletores de refeição baseado nas receitas salvas
 async function popularSeletores() {
     const tableRows = document.querySelectorAll("#planejamento tbody tr");
     if (tableRows.length === 0) return;
 
     const receitas = (await buscarItens()) || []; 
-    
-    // 1. Carrega o que está salvo no "banco" do navegador
     const planejamentoSalvo = JSON.parse(localStorage.getItem('meuPlanejamento')) || {};
 
     tableRows.forEach((row, rowIndex) => {
@@ -253,13 +378,11 @@ async function popularSeletores() {
                 select.appendChild(opt);
             });
 
-            // 2. RECUPERAR: Verifica se existe um valor salvo para esta linha e este select específico
             const chaveUnica = `linha-${rowIndex}-select-${selectIndex}`;
             if (planejamentoSalvo[chaveUnica]) {
                 select.value = planejamentoSalvo[chaveUnica];
             }
 
-            // 3. SALVAR: Adiciona um evento para salvar sempre que o usuário mudar a opção
             select.addEventListener('change', (e) => {
                 const novoPlanejamento = JSON.parse(localStorage.getItem('meuPlanejamento')) || {};
                 novoPlanejamento[chaveUnica] = e.target.value;
@@ -270,18 +393,16 @@ async function popularSeletores() {
     });
 }
 
+// Botão de Sorteio Automático de Cardápio
 const btnSortear = document.getElementById("btn-sortear");
 if (btnSortear) {
     btnSortear.addEventListener("click", async () => {
         const receitas = (await buscarItens()) || [];
         const rows = document.querySelectorAll("#planejamento tbody tr");
         let sorteouAlguma = false;
-        
-        // 1. Criamos um objeto para guardar o que vai ser sorteado agora
-        // Pegamos o que já existe salvo para não apagar outras coisas
         const planejamentoSalvo = JSON.parse(localStorage.getItem('meuPlanejamento')) || {};
 
-        rows.forEach((row, rowIndex) => { // Pegamos o rowIndex aqui
+        rows.forEach((row, rowIndex) => {
             const tdCategoria = row.querySelector("td[data-categoria]");
             if (!tdCategoria) return;
 
@@ -294,11 +415,10 @@ if (btnSortear) {
             });
 
             if (receitasFiltradas.length > 0) {
-                selects.forEach((select, selectIndex) => { // Pegamos o selectIndex aqui
+                selects.forEach((select, selectIndex) => {
                     const sorteada = receitasFiltradas[Math.floor(Math.random() * receitasFiltradas.length)];
                     select.value = sorteada.nome;
                     
-                    // 2. SALVAMENTO: Criamos a mesma chave que a função popularSeletores usa
                     const chaveUnica = `linha-${rowIndex}-select-${selectIndex}`;
                     planejamentoSalvo[chaveUnica] = sorteada.nome;
                     
@@ -308,9 +428,7 @@ if (btnSortear) {
         });
         
         if (sorteouAlguma) {
-            // 3. GRAVA NO LOCALSTORAGE: Só agora salvamos tudo de uma vez
             localStorage.setItem('meuPlanejamento', JSON.stringify(planejamentoSalvo));
-            
             mostrarNotificacao("Cardápio sorteado! 🎲", "var(--cor-media)");
         } else {
             mostrarNotificacao("Cadastre receitas de Café, Almoço, Lanche e Jantar primeiro!", "#d64545");
@@ -318,23 +436,161 @@ if (btnSortear) {
     });
 }
 
-/*=====================USUARIOS==========================*/
-// --- FUNÇÃO PARA CARREGAR OS DADOS DO USUÁRIO LOGADO ---
+// Destaca visualmente a coluna do dia atual na tabela de cronograma
+function destacarDiaAtual() {
+    const tabela = document.querySelector("#planejamento table");
+    if (!tabela) return;
+
+    const diaJS = new Date().getDay();
+    const colunasDaTabela = [7, 1, 2, 3, 4, 5, 6]; 
+    const colunaAtual = colunasDaTabela[diaJS];
+
+    const ths = tabela.querySelectorAll("thead th");
+    if (ths[colunaAtual]) {
+        ths[colunaAtual].style.backgroundColor = "var(--cor-escura, #2A361A)";
+        ths[colunaAtual].style.color = "#FFF";
+    }
+
+    const linhas = tabela.querySelectorAll("tbody tr");
+    linhas.forEach(linha => {
+        const tds = perimeter = linha.querySelectorAll("td");
+        if (tds[colunaAtual]) {
+            tds[colunaAtual].style.backgroundColor = "rgba(42, 54, 26, 0.1)";
+        }
+    });
+}
+
+
+// =========================================================================
+// 7. MÓDULO: LISTA DE COMPRAS (INTEGRAÇÃO COM O PLANEJAMENTO)
+// =========================================================================
+
+// Salva as refeições em texto limpo para o gerador de compras usar
+function salvarCardapioNaMemoria() {
+    const selects = document.querySelectorAll("#planejamento tbody select");
+    if (selects.length > 0) {
+        const selecionados = Array.from(selects).map(s => s.value).filter(v => v !== "");
+        localStorage.setItem("cardapioSalvo", JSON.stringify(selecionados));
+    }
+}
+
+// Escutadores para disparar o salvamento em memória
+document.addEventListener("change", (e) => {
+    if (e.target.matches("#planejamento select")) {
+        salvarCardapioNaMemoria();
+    }
+});
+
+document.addEventListener("click", (e) => {
+    if (e.target.id === "btn-sortear") {
+        setTimeout(salvarCardapioNaMemoria, 300);
+    }
+});
+
+// Evento para processar e estruturar a lista de compras na tela
+document.addEventListener("DOMContentLoaded", () => {
+    const btnGerarCompras = document.getElementById("btn-gerar-compras");
+    const containerLista = document.getElementById("conteudo-lista-compras");
+
+    if (btnGerarCompras && containerLista) {
+        btnGerarCompras.addEventListener("click", async () => {
+            const comidasSelecionadas = JSON.parse(localStorage.getItem("cardapioSalvo")) || [];
+            const receitasNoBanco = (await buscarItens()) || [];
+            let ingredientesParaComprar = [];
+
+            comidasSelecionadas.forEach(nomeReceita => {
+                const receita = receitasNoBanco.find(r => r.nome === nomeReceita);
+                if (receita && receita.ingredientes) {
+                    const itens = receita.ingredientes.split(",").map(i => i.trim());
+                    ingredientesParaComprar = ingredientesParaComprar.concat(itens);
+                }
+            });
+
+            if (ingredientesParaComprar.length === 0) {
+                containerLista.innerHTML = "<p style='color: #d64545; font-weight: bold;'>Nenhuma receita selecionada no Planejamento. Escolha os pratos lá primeiro!</p>";
+                return;
+            }
+
+            const listaSemRepeticao = [...new Set(ingredientesParaComprar.filter(i => i !== ""))];
+            const ul = document.createElement("ul");
+            ul.style.listStyle = "none";
+            ul.style.padding = "0";
+
+            listaSemRepeticao.forEach(item => {
+                const li = document.createElement("li");
+                li.style.padding = "12px";
+                li.style.borderBottom = "1px solid #eee";
+                li.style.display = "flex";
+                li.style.alignItems = "center";
+                li.style.gap = "10px";
+                li.style.cursor = "pointer";
+
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.style.width = "18px";
+                checkbox.style.height = "18px";
+                checkbox.style.cursor = "pointer";
+
+                const span = document.createElement("span");
+                span.textContent = item;
+                span.style.fontSize = "16px";
+
+                const alternarMarcacao = () => {
+                    if (checkbox.checked) {
+                        span.style.textDecoration = "line-through";
+                        span.style.color = "#888";
+                        li.style.backgroundColor = "#f9f9f9";
+                    } else {
+                        span.style.textDecoration = "none";
+                        span.style.color = "#333";
+                        li.style.backgroundColor = "transparent";
+                    }
+                };
+
+                checkbox.addEventListener("change", alternarMarcacao);
+                
+                li.onclick = (e) => {
+                    if (e.target !== checkbox) {
+                        checkbox.checked = !checkbox.checked;
+                        alternarMarcacao();
+                    }
+                };
+
+                li.appendChild(checkbox);
+                li.appendChild(span);
+                ul.appendChild(li);
+            });
+            
+            containerLista.innerHTML = ""; 
+            containerLista.appendChild(ul); 
+            
+            if (typeof mostrarNotificacao === "function") {
+                mostrarNotificacao("Lista de ingredientes gerada!", "var(--cor-media)");
+            }
+        });
+    }
+});
+
+
+// =========================================================================
+// 8. MÓDULO: PERFIL, GESTÃO DE USUÁRIOS E FAMÍLIA
+// =========================================================================
+
+// Carrega os dados salvos em login para a sidebar e configurações
 function carregarPerfilLogado() {
-    // 1. Pega o "pacote" que o login salvou
     const dadosSessao = localStorage.getItem('usuarioLogado');
 
     if (dadosSessao) {
         const usuario = JSON.parse(dadosSessao);
 
-        // --- ATUALIZA A SIDEBAR (BARRA LATERAL) EM TODAS AS PÁGINAS ---
+        // Atualização Sidebar
         const sidebarNome = document.getElementById('display-user-name');
         const sidebarAvatar = document.getElementById('user-initial');
 
         if (sidebarNome) sidebarNome.textContent = usuario.nome;
         if (sidebarAvatar) sidebarAvatar.textContent = usuario.nome.charAt(0).toUpperCase();
 
-        // --- ATUALIZA A PÁGINA DE CONFIGURAÇÕES (SE ESTIVER NELA) ---
+        // Atualização Tela de Perfil/Configurações
         const inputNome = document.getElementById('edit-nome');
         const inputEmail = document.getElementById('edit-email');
         const profileName = document.getElementById('profile-name');
@@ -347,7 +603,6 @@ function carregarPerfilLogado() {
         if (profileEmail) profileEmail.textContent = usuario.email;
         if (avatarGrande) avatarGrande.textContent = usuario.nome.charAt(0).toUpperCase();
 
-        // Marca os checkboxes de restrição nas configurações
         if (usuario.restricoes) {
             const checkboxes = document.querySelectorAll('.checkbox-grid-profile input');
             checkboxes.forEach(cb => {
@@ -359,18 +614,14 @@ function carregarPerfilLogado() {
     }
 }
 
-// Executa essa função toda vez que QUALQUER página abrir
+// Escuta automática do perfil logado
 document.addEventListener('DOMContentLoaded', carregarPerfilLogado);
 
-/*======================================================
-// --- GESTÃO DE FAMÍLIA (VERSÃO FINAL UNIFICADA) ---
-========================================================*/
-
+// Carrega a listagem de membros familiares do banco de dados
 async function carregarUsuarios() {
     const lista = document.getElementById("lista-membros-ui");
     if (!lista) return;
 
-    // Busca do banco de dados (IndexedDB via db.js)
     const usuariosDoBanco = (await buscarUsuarios()) || [];
     lista.innerHTML = "";
 
@@ -379,14 +630,12 @@ async function carregarUsuarios() {
         return;
     }
 
-    // Ordena: Admin primeiro
     usuariosDoBanco.sort((a, b) => (a.perfil === 'admin' ? -1 : 1));
 
     usuariosDoBanco.forEach(user => {
         const item = document.createElement("li");
         item.className = "member-item-list"; 
 
-        // Gera as tags de restrição para cada pessoa
         const tagsHTML = user.restricoes && user.restricoes.length > 0 
             ? user.restricoes.map(r => `<span class="tag-restricao">${r}</span>`).join('')
             : '<span class="tag-nenhuma">Sem restrições</span>';
@@ -413,14 +662,13 @@ async function carregarUsuarios() {
     });
 }
 
-// Evento de clique para Adicionar Membro
+// Dispara o salvamento de um novo membro familiar no banco
 document.addEventListener("click", async (e) => {
     if (e.target.id === "btn-convidar") {
         const nomeInput = document.getElementById("nome_convite");
         const emailInput = document.getElementById("email_convite");
         const perfilInput = document.getElementById("perfil_convite");
         
-        // Captura quais restrições foram marcadas para essa pessoa
         const checkboxes = document.querySelectorAll("#restricoes-membro-novo input:checked");
         const restricoesSelecionadas = Array.from(checkboxes).map(cb => cb.value);
 
@@ -429,7 +677,6 @@ document.addEventListener("click", async (e) => {
             return;
         }
 
-        // Validação básica de e-mail
         if (emailInput.value && !emailInput.value.includes('@')) {
             alert("Por favor, insira um e-mail válido.");
             return;
@@ -439,179 +686,32 @@ document.addEventListener("click", async (e) => {
             nome: nomeInput.value.trim(),
             email: emailInput.value.trim(),
             perfil: perfilInput.value,
-            restricoes: restricoesSelecionadas // Salvando o array de restrições
+            restricoes: restricoesSelecionadas
         };
 
-        // Salva no banco de dados
         await adicionarUsuario(novoMembro);
         
-        // Feedback visual
         if(typeof mostrarNotificacao === "function") {
             mostrarNotificacao(`✅ ${nomeInput.value} adicionado!`);
         }
 
-        // Limpa o formulário
         nomeInput.value = "";
         if(emailInput) emailInput.value = "";
         checkboxes.forEach(cb => cb.checked = false);
         
-        // Recarrega a lista atualizada
         carregarUsuarios();
     }
 });
 
-// Inicializa a lista ao carregar a página
-document.addEventListener("DOMContentLoaded", carregarUsuarios);  
+// Escuta automática dos usuários familiares
+document.addEventListener("DOMContentLoaded", carregarUsuarios);
 
 
-// --- FUNÇÃO PARA DESTACAR O DIA ATUAL NO CRONOGRAMA ---
-function destacarDiaAtual() {
-    const tabela = document.querySelector("#planejamento table");
-    if (!tabela) return;
+// =========================================================================
+// 9. MÓDULO: SIDEBAR (INTERFACE E COMPORTAMENTO VISUAL)
+// =========================================================================
 
-    // Pega o dia de hoje (0 = Domingo, 1 = Segunda, etc.)
-    const diaJS = new Date().getDay();
-    
-    // Mapeia o dia para a coluna da nossa tabela 
-    // Nossa tabela é: 0(Refeição), 1(Segunda), 2(Terça)... 7(Domingo)
-    const colunasDaTabela = [7, 1, 2, 3, 4, 5, 6]; 
-    const colunaAtual = colunasDaTabela[diaJS];
-
-    // Escurece o cabeçalho (Segunda, Terça, etc)
-    const ths = tabela.querySelectorAll("thead th");
-    if (ths[colunaAtual]) {
-        ths[colunaAtual].style.backgroundColor = "var(--cor-escura, #2A361A)";
-        ths[colunaAtual].style.color = "#FFF";
-    }
-
-    // Escurece o fundo das opções de comida daquele dia
-    const linhas = tabela.querySelectorAll("tbody tr");
-    linhas.forEach(linha => {
-        const tds = linha.querySelectorAll("td");
-        if (tds[colunaAtual]) {
-            tds[colunaAtual].style.backgroundColor = "rgba(42, 54, 26, 0.1)"; // Um tom escuro bem transparente
-        }
-    });
-}
-
-// ==========================================
-// --- COMUNICAÇÃO ENTRE AS PÁGINAS E LISTA DE COMPRAS ---
-// ==========================================
-
-// 1. SALVAR AS ESCOLHAS: Toda vez que você mudar algo no planejamento, ele salva na memória
-function salvarCardapioNaMemoria() {
-    const selects = document.querySelectorAll("#planejamento tbody select");
-    if (selects.length > 0) {
-        const selecionados = Array.from(selects).map(s => s.value).filter(v => v !== "");
-        localStorage.setItem("cardapioSalvo", JSON.stringify(selecionados));
-    }
-}
-
-// Escuta quando você escolhe uma comida manualmente na tabela
-document.addEventListener("change", (e) => {
-    if (e.target.matches("#planejamento select")) {
-        salvarCardapioNaMemoria();
-    }
-});
-
-// Escuta quando você clica no botão de Sortear
-document.addEventListener("click", (e) => {
-    if (e.target.id === "btn-sortear") {
-        setTimeout(salvarCardapioNaMemoria, 300);
-    }
-});
-
-// 2. GERAR A LISTA NA PÁGINA DE COMPRAS
-document.addEventListener("DOMContentLoaded", () => {
-    const btnGerarCompras = document.getElementById("btn-gerar-compras");
-    const containerLista = document.getElementById("conteudo-lista-compras");
-
-    if (btnGerarCompras && containerLista) {
-        btnGerarCompras.addEventListener("click", async () => {
-            const comidasSelecionadas = JSON.parse(localStorage.getItem("cardapioSalvo")) || [];
-            const receitasNoBanco = (await buscarItens()) || [];
-            let ingredientesParaComprar = [];
-
-            comidasSelecionadas.forEach(nomeReceita => {
-                const receita = receitasNoBanco.find(r => r.nome === nomeReceita);
-                if (receita && receita.ingredientes) {
-                    const itens = receita.ingredientes.split(",").map(i => i.trim());
-                    ingredientesParaComprar = ingredientesParaComprar.concat(itens);
-                }
-            });
-
-            if (ingredientesParaComprar.length === 0) {
-                containerLista.innerHTML = "<p style='color: #d64545; font-weight: bold;'>Nenhuma receita selecionada no Planejamento. Escolha os pratos lá primeiro!</p>";
-                return;
-            }
-
-            const listaSemRepeticao = [...new Set(ingredientesParaComprar.filter(i => i !== ""))];
-
-            const ul = document.createElement("ul");
-            ul.style.listStyle = "none";
-            ul.style.padding = "0";
-
-           // Escreve os ingredientes na tela com checkbox para marcar
-            listaSemRepeticao.forEach(item => {
-                const li = document.createElement("li");
-                li.style.padding = "12px";
-                li.style.borderBottom = "1px solid #eee";
-                li.style.display = "flex";
-                li.style.alignItems = "center";
-                li.style.gap = "10px";
-                li.style.cursor = "pointer";
-
-                // Cria o Checkbox
-                const checkbox = document.createElement("input");
-                checkbox.type = "checkbox";
-                checkbox.style.width = "18px";
-                checkbox.style.height = "18px";
-                checkbox.style.cursor = "pointer";
-
-                // Texto do ingrediente
-                const span = document.createElement("span");
-                span.textContent = item;
-                span.style.fontSize = "16px";
-
-                // Evento para riscar o texto quando marcar o checkbox
-                const alternarMarcacao = () => {
-                    if (checkbox.checked) {
-                        span.style.textDecoration = "line-through";
-                        span.style.color = "#888";
-                        li.style.backgroundColor = "#f9f9f9";
-                    } else {
-                        span.style.textDecoration = "none";
-                        span.style.color = "#333";
-                        li.style.backgroundColor = "transparent";
-                    }
-                };
-
-                checkbox.addEventListener("change", alternarMarcacao);
-                
-                // Permite clicar na linha inteira para marcar
-                li.onclick = (e) => {
-                    if (e.target !== checkbox) {
-                        checkbox.checked = !checkbox.checked;
-                        alternarMarcacao();
-                    }
-                };
-
-                li.appendChild(checkbox);
-                li.appendChild(span);
-                ul.appendChild(li);
-            });
-            
-            containerLista.innerHTML = ""; 
-            containerLista.appendChild(ul); 
-            
-            if (typeof mostrarNotificacao === "function") {
-                mostrarNotificacao("Lista de ingredientes gerada!", "var(--cor-media)");
-            }
-        });
-    }
-});
-  //SIDE BAR
-  document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
     const btnToggle = document.getElementById('sidebarToggle');
     const sidebar = document.getElementById('sidebar');
     const body = document.body;
@@ -621,36 +721,5 @@ document.addEventListener("DOMContentLoaded", () => {
             sidebar.classList.toggle('collapsed');
             body.classList.toggle('sidebar-collapsed');
         });
-    }
-});
-
-// NO FINAL DO ARQUIVO controller.js
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("🚀 Página carregada! Aguardando banco de dados...");
-    
-    // Pequeno intervalo para garantir que o db.js abriu a conexão
-    setTimeout(() => {
-        popularSeletores()
-            .then(() => console.log("✅ Seletores preenchidos com sucesso!"))
-            .catch(err => console.error("❌ Erro ao popular seletores:", err));
-    }, 100); // 100ms é o suficiente para o IndexedDB acordar
-});
-
-
-
-// ESCUTADOR GLOBAL PARA FECHAR O MODAL
-// Função isolada para fechar o modal
-function fecharModal() {
-    const modal = document.getElementById("modal-receita");
-    if (modal) modal.style.display = "none";
-}
-
-// Escuta cliques no X e no fundo do modal
-document.addEventListener('click', (e) => {
-    const modal = document.getElementById("modal-receita");
-    if (!modal) return;
-
-    if (e.target.id === 'fechar-modal' || e.target === modal || e.target.classList.contains('close-button')) {
-        fecharModal();
     }
 });
