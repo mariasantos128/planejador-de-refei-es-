@@ -17,7 +17,9 @@ function entrarComoConvidado() {
     };
     localStorage.setItem('usuarioLogado', JSON.stringify(usuario));
     alert("Entrando como convidado...");
-    window.location.href = 'html/dashboard.html';
+    
+    // CORRIGIDO: Agora vai direto para o arquivo na mesma pasta
+    window.location.href = 'dashboard.html';
 }
 
 // LÓGICA DE LOGIN
@@ -27,18 +29,19 @@ document.getElementById('form-login').addEventListener('submit', (e) => {
     const email = document.getElementById('login-email').value;
     
     // Tenta buscar se esse usuário existe no sistema (simulação ou banco)
-    // Por enquanto, vamos criar um objeto baseado no e-mail para o login funcionar
     const nomeExtraido = email.split('@')[0];
     
     const usuario = {
-        nome: nomeExtraido.charAt(0).toUpperCase() + nomeExtraido.slice(1), // Nome com 1ª letra maiúscula
+        nome: nomeExtraido.charAt(0).toUpperCase() + nomeExtraido.slice(1), 
         email: email,
         restricoes: []
     };
 
     localStorage.setItem('usuarioLogado', JSON.stringify(usuario));
     alert("Login realizado!");
-    window.location.href = 'html/dashboard.html';
+    
+    // CORRIGIDO: Agora vai direto para o arquivo na mesma pasta
+    window.location.href = 'dashboard.html';
 });
 
 // LÓGICA DE CADASTRO (Capturando os dados reais)
@@ -63,5 +66,7 @@ document.getElementById('form-cadastro').addEventListener('submit', (e) => {
     localStorage.setItem('usuarioLogado', JSON.stringify(novoUsuario));
     
     alert("Conta criada com sucesso! Redirecionando...");
-    window.location.href = 'html/dashboard.html';
+    
+    // CORRIGIDO: Agora vai direto para o arquivo na mesma pasta
+    window.location.href = 'dashboard.html';
 });
