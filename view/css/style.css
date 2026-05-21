@@ -222,103 +222,198 @@ tbody tr:hover {
     background: var(--cor-media);
 }
 
-/* =========================================
-   LIVRO DE RECEITAS - LAYOUT QUADRADO
-   ========================================= */
+/* =========================================================================
+   LIVRO DE RECEITAS & FAVORITOS - LAYOUT UNIFICADO
+   ========================================================================= */
 
 #receitas {
-    background-color: #ffffff; /* Fundo branco para limpar a tela */
+    background-color: #ffffff;
     padding: 20px;
 }
 
-/* Grade de Receitas */
-.receitas-grid {
+/* Grade de Receitas (Atualizada para usar o mesmo padrão visual) */
+.receitas-grid, .fav-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 30px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
     margin-top: 30px;
 }
 
-/* O Card - Estilo Limpo */
-.receita-card {
-    background: #ffffff;
-    border-radius: 12px;
+/* O Card Unificado */
+.recipe-card {
+    background: white;
+    border-radius: 18px;
     overflow: hidden;
-    cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 1px solid #eeeeee;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.04);
+    border: 1px solid #f0f2ef;
     display: flex;
     flex-direction: column;
-    position: relative; /* Para o coração fixo */
+    position: relative;
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), 
+                box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), 
+                border-color 0.4s ease;
 }
 
-.receita-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 10px 25px rgba(127, 166, 83, 0.15); /* Sombra no verde do site */
-    border-color: #7fa653;
+/* Efeito Hover do Card (Sombra suave baseada no verde do seu site) */
+.recipe-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 35px rgba(127, 166, 83, 0.15);
+    border-color: #7fa653; /* Borda verde do site no hover */
 }
 
-/* Área da Foto - ESSA PARTE DEIXA A IMAGEM QUADRADA */
-.card-foto {
+/* Área da Foto com Efeito de Zoom Lento */
+.recipe-img {
     width: 100%;
-    /* Truque do aspect-ratio para manter quadrado em qualquer tela */
-    aspect-ratio: 1 / 1; 
-    background-size: cover;
+    height: 180px;
+    background-color: #f4f7f1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background-size: 100%;
     background-position: center;
     background-repeat: no-repeat;
-    border-bottom: 1px solid #eeeeee;
+    transition: background-size 0.4s ease;
 }
 
-/* Botão de Coração Pequeno no Canto Direito */
-.btn-favorito {
+/* Aplica o Zoom na foto ao passar o mouse no card */
+.recipe-card:hover .recipe-img {
+    background-size: 110% !important;
+}
+
+/* Ícone de espaço reservado caso não tenha foto */
+.icon-placeholder {
+    font-size: 50px !important;
+    color: #cbd5c0;
+}
+
+/* --- BOTÃO DE CORAÇÃO COM FUNDO ROSA (HOVER E ATIVO) --- */
+.fav-badge {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    background: rgba(255, 255, 255, 0.8);
-    border: none;
-    color: #ff4b2b;
+    top: 12px;
+    right: 12px;
+    background: rgba(255, 255, 255, 0.9); /* Fundo padrão do coração */
+    color: #ff4757;
+    padding: 6px;
     border-radius: 50%;
-    width: 35px;
-    height: 35px;
+    font-size: 20px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    backdrop-filter: blur(4px);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
     z-index: 10;
 }
 
-.btn-favorito i {
-    font-size: 22px !important;
+/* Quando passa o mouse (Efeito hover rosa claro) */
+.fav-badge:hover {
+    transform: scale(1.15);
+    background-color: #fff0f2 !important; 
+    box-shadow: 0 4px 12px rgba(255, 71, 87, 0.2);
 }
 
-/* Informações do Card */
-.card-info {
-    padding: 15px;
-    text-align: center; /* Centraliza o nome e categoria */
+/* Se a receita já estiver favoritada (Fundo rosa fixo automático) */
+.fav-badge[style*="'FILL' 1"], 
+.fav-badge[style*="font-variation-settings: 'FILL' 1"],
+.fav-badge[style*="font-variation-settings: 'FILL' 1;"] {
+    background-color: #ffe3e8 !important; 
 }
 
-.card-info h4 {
-    margin: 5px 0 10px 0;
-    color: #333333 !important; /* Força cor escura */
-    font-size: 1.1rem;
-    font-weight: 600;
+/* No momento do clique */
+.fav-badge:active {
+    transform: scale(0.85) !important;
+    background-color: #ffcbd4 !important;
 }
 
-.badge-categoria {
-    display: inline-block;
-    background: #7fa65311; /* Verde clarinho */
-    color: #7fa653; /* Verde do site */
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 0.7rem;
-    font-weight: bold;
+/* Conteúdo do Card */
+.recipe-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.recipe-category {
+    font-size: 11px;
     text-transform: uppercase;
+    font-weight: 800;
+    color: #7fa653; /* Verde do seu site */
+    letter-spacing: 1px;
+    margin-bottom: 4px;
 }
 
-/* =========================================
-   MODAL (A JANELA QUE ABRE) - CORREÇÃO VISUAL
-   ========================================= */
+.recipe-title {
+    font-size: 19px;
+    font-weight: 600;
+    color: #2d3436;
+    margin: 4px 0 10px 0;
+}
+
+.recipe-meta {
+    display: flex;
+    gap: 15px;
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 15px;
+}
+
+.recipe-meta span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.recipe-meta i { 
+    font-size: 16px !important; 
+}
+
+/* Rodapé do Card com os botões */
+.recipe-footer {
+    margin-top: auto; /* Força o rodapé a ficar sempre embaixo */
+    padding-top: 15px;
+    border-top: 1px solid #f5f5f5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn-view {
+    background: #7fa653; /* Verde do seu site */
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-view:hover {
+    background: #6a8e45;
+}
+
+.btn-icon-action {
+    background: #f0f4eb;
+    color: #7fa653;
+    border: none;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-icon-action:hover {
+    background: #7fa653;
+    color: white;
+}
+
+/* =========================================================================
+   MODAL, FILTROS E NOTIFICAÇÃO CENTRAL (TOAST)
+   ========================================================================= */
 
 .modal {
     display: none; 
@@ -326,15 +421,15 @@ tbody tr:hover {
     z-index: 9999;
     left: 0; top: 0;
     width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Fundo escuro leve */
-    backdrop-filter: blur(8px); /* Desfoque dos lados */
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
     justify-content: center;
     align-items: center;
 }
 
 .modal-content {
     background-color: #ffffff;
-    color: #333333; /* Texto escuro */
+    color: #333333;
     padding: 30px;
     border-radius: 20px;
     width: 90%;
@@ -353,126 +448,75 @@ tbody tr:hover {
     color: #999;
 }
 
-.close-button:hover { color: #ff4b2b; }
+.close-button:hover { color: #ff4757; }
 
-.modal-header { margin-bottom: 20px; text-align: center; }
-
-.badge-modal {
-    color: #7fa653;
-    font-weight: bold;
-    font-size: 0.9rem;
-}
-
-.modal-body ul { padding-left: 20px; color: #555; }
-.modal-body p { line-height: 1.6; color: #666; }
-
-/* --- ESTILO DOS BOTÕES DE CATEGORIA (VERDE SITE) --- */
 .filtros-categoria {
     display: flex;
     gap: 12px;
     margin: 25px 0;
     overflow-x: auto;
     padding: 10px 5px;
-    scrollbar-width: none; /* Esconde barra no Firefox */
+    scrollbar-width: none;
 }
-
-.filtros-categoria::-webkit-scrollbar {
-    display: none; /* Esconde barra no Chrome */
-}
+.filtros-categoria::-webkit-scrollbar { display: none; }
 
 .btn-filtro {
     padding: 12px 24px;
-    border-radius: 50px; /* Formato pílula arredondado */
-    border: 2px solid #7fa653; /* Verde do seu site */
+    border-radius: 50px;
+    border: 2px solid #7fa653;
     background-color: #ffffff;
     color: #7fa653;
     font-weight: 700;
     font-size: 0.85rem;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     white-space: nowrap;
 }
 
-/* Efeito quando passa o mouse */
 .btn-filtro:hover {
     background-color: #f0f7e9; 
     transform: translateY(-2px);
 }
 
-/* Estilo do Botão quando está SELECIONADO */
 .btn-filtro.active {
-    background-color: #7fa653 !important; /* Força o fundo verde */
-    color: #ffffff !important; /* Força o texto branco */
+    background-color: #7fa653 !important;
+    color: #ffffff !important;
     box-shadow: 0 6px 15px rgba(127, 166, 83, 0.3);
 }
 
-/* Ajuste rápido nos cards para não sumirem no fundo branco */
-.receita-card {
-    background-color: #fcfcfc !important; /* Um "quase branco" para dar contraste */
-    border: 1px solid #eeeeee !important;
-}
-
-/* Estilo para o Tempo e Dificuldade dentro do Modal */
-#modal-meta {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
-    background: #f0f7e9; /* Verde bem clarinho */
-    color: #7fa653;      /* Verde do site */
-    padding: 10px;
-    border-radius: 12px;
-    margin: 10px 0 20px 0;
-    font-weight: 600;
-    font-size: 0.9rem;
-}
-
-/* Se quiser um detalhe sutil no CARD (opcional) */
-.card-info {
-    position: relative;
-}
-
-/* Adicionando um subtexto no card se quiser que apareça antes de clicar */
-.card-tempo-preview {
-    font-size: 0.75rem;
-    color: #888;
-    display: block;
-    margin-top: 5px;
-}
-
-/* =========================================
-   TOAST DE NOTIFICAÇÃO
-   ========================================= */
-#toast {
-    visibility: hidden;
-    min-width: 250px;
-    background-color: var(--cor-media);
-    color: #fff;
-    text-align: center;
-    border-radius: 8px;
-    padding: 16px;
+/* Notificação Toast Central */
+.toast-favorito {
     position: fixed;
-    z-index: 1000;
+    top: 50%;
     left: 50%;
-    bottom: 30px;
-    transform: translateX(-50%);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transform: translate(-50%, -50%) scale(0.9);
+    background: rgba(255, 255, 255, 0.95);
+    color: #2d3436;
+    padding: 18px 36px;
+    border-radius: 16px;
+    font-family: 'Poppins', sans-serif;
     font-size: 16px;
-    font-weight: bold;
+    font-weight: 700;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 10000;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
     opacity: 0;
-    transition: opacity 0.5s, bottom 0.5s;
+    pointer-events: none;
+    animation: avisoCentralizado 2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
-#toast.mostrar {
-    visibility: visible;
-    opacity: 1;
-    bottom: 50px;
+@keyframes avisoCentralizado {
+    0% { transform: translate(-50%, -30%) scale(0.8); opacity: 0; }
+    15% { transform: translate(-50%, -50%) scale(1.05); opacity: 1; }
+    25% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    100% { transform: translate(-50%, -70%) scale(0.9); opacity: 0; }
 }
-
-
 /* =========================================
    ESTILOS EXCLUSIVOS DA TELA DE LOGIN
    ========================================= */
@@ -1464,18 +1508,6 @@ body.sidebar-collapsed .dashboard-grid {
     color: #cbd5c0;
 }
 
-.fav-badge {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    background: white;
-    color: #ff4757;
-    padding: 6px;
-    border-radius: 50%;
-    font-size: 20px !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    font-variation-settings: 'FILL' 1; /* Preenche o coração */
-}
 
 /* Conteúdo do Card */
 .recipe-content {

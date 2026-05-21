@@ -22,51 +22,57 @@ function entrarComoConvidado() {
     window.location.href = 'dashboard.html';
 }
 
-// LÓGICA DE LOGIN
-document.getElementById('form-login').addEventListener('submit', (e) => {
-    e.preventDefault();
-    
-    const email = document.getElementById('login-email').value;
-    
-    // Tenta buscar se esse usuário existe no sistema (simulação ou banco)
-    const nomeExtraido = email.split('@')[0];
-    
-    const usuario = {
-        nome: nomeExtraido.charAt(0).toUpperCase() + nomeExtraido.slice(1), 
-        email: email,
-        restricoes: []
-    };
+// LÓGICA DE LOGIN (Protegida com IF)
+const formLogin = document.getElementById('form-login');
+if (formLogin) {
+    formLogin.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const email = document.getElementById('login-email').value;
+        
+        // Tenta buscar se esse usuário existe no sistema (simulação ou banco)
+        const nomeExtraido = email.split('@')[0];
+        
+        const usuario = {
+            nome: nomeExtraido.charAt(0).toUpperCase() + nomeExtraido.slice(1), 
+            email: email,
+            restricoes: []
+        };
 
-    localStorage.setItem('usuarioLogado', JSON.stringify(usuario));
-    alert("Login realizado!");
-    
-    // CORRIGIDO: Agora vai direto para o arquivo na mesma pasta
-    window.location.href = 'dashboard.html';
-});
+        localStorage.setItem('usuarioLogado', JSON.stringify(usuario));
+        alert("Login realizado!");
+        
+        // CORRIGIDO: Agora vai direto para o arquivo na mesma pasta
+        window.location.href = 'dashboard.html';
+    });
+}
 
-// LÓGICA DE CADASTRO (Capturando os dados reais)
-document.getElementById('form-cadastro').addEventListener('submit', (e) => {
-    e.preventDefault();
-    
-    const nome = document.getElementById('cad-nome').value;
-    const email = document.getElementById('cad-email').value;
-    
-    // Captura as restrições marcadas no cadastro
-    const checkboxes = document.querySelectorAll('.restricao:checked');
-    const restricoes = Array.from(checkboxes).map(cb => cb.value);
+// LÓGICA DE CADASTRO (Protegida com IF)
+const formCadastro = document.getElementById('form-cadastro');
+if (formCadastro) {
+    formCadastro.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const nome = document.getElementById('cad-nome').value;
+        const email = document.getElementById('cad-email').value;
+        
+        // Captura as restrições marcadas no cadastro
+        const checkboxes = document.querySelectorAll('.restricao:checked');
+        const restricoes = Array.from(checkboxes).map(cb => cb.value);
 
-    // Cria o objeto do usuário
-    const novoUsuario = {
-        nome: nome,
-        email: email,
-        restricoes: restricoes
-    };
+        // Cria o objeto do usuário
+        const novoUsuario = {
+            nome: nome,
+            email: email,
+            restricoes: restricoes
+        };
 
-    // Salva no localStorage para simular que a conta foi criada e está ativa
-    localStorage.setItem('usuarioLogado', JSON.stringify(novoUsuario));
-    
-    alert("Conta criada com sucesso! Redirecionando...");
-    
-    // CORRIGIDO: Agora vai direto para o arquivo na mesma pasta
-    window.location.href = 'dashboard.html';
-});
+        // Salva no localStorage para simular que a conta foi criada e está ativa
+        localStorage.setItem('usuarioLogado', JSON.stringify(novoUsuario));
+        
+        alert("Conta criada com sucesso! Redirecionando...");
+        
+        // CORRIGIDO: Agora vai direto para o arquivo na mesma pasta
+        window.location.href = 'dashboard.html';
+    });
+}

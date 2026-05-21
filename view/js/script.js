@@ -280,33 +280,6 @@ function atualizarSelectsCronograma() {
     });
 }
 
-/* ==========================================================
-   3.5. SISTEMA DE SORTEIO DE REFEIÇÕES (ALEATÓRIO)
-   ========================================================== */
-const btnSortear = document.getElementById('btn-sortear');
-if (btnSortear) {
-    btnSortear.addEventListener('click', () => {
-        const linhasTabela = document.querySelectorAll('#planejamento tbody tr');
-        
-        if(receitasDb.length === 0) {
-            alert('Você precisa cadastrar algumas receitas primeiro para poder sortear!');
-            return;
-        }
-
-        linhasTabela.forEach((linha, index) => {
-            const selects = linha.querySelectorAll('select');
-            let catAlvo = linha.querySelector('td').getAttribute('data-categoria');
-            let opcoesDisponiveis = receitasDb.filter(r => r.categoria === catAlvo || r.categoria === 'Lanche');
-            
-            if (opcoesDisponiveis.length > 0) {
-                selects.forEach(select => {
-                    const indiceAleatorio = Math.floor(Math.random() * opcoesDisponiveis.length);
-                    select.value = opcoesDisponiveis[indiceAleatorio].nome;
-                });
-            }
-        });
-    });
-}
 
 /* ==========================================================
    4. LISTA DE COMPRAS

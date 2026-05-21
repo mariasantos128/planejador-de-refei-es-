@@ -79,7 +79,7 @@ function mostrarNotificacao(mensagem, corFundo = "var(--cor-media)") {
 
 
 // =========================================================================
-// 3. MÓDULO: RECEITAS (CARREGAMENTO, CADASTRO E FILTROS)
+// 3. MÓDULO: RECEITAS (CARREGAMENTO, CADASTRO E FILTROS) - VERSÃO PREMIUN UNIFICADA
 // =========================================================================
 
 // Injeta as receitas iniciais no banco de dados caso esteja vazio
@@ -98,7 +98,7 @@ async function adicionarReceitasPadrao() {
             { nome: "Carne de Panela", categoria: "Jantar", ingredientes: "Acém ou músculo, batata, cenoura, molho de tomate", foto: "https://media.istockphoto.com/id/516816644/pt/foto/caseiras-lenta-cozinheiro-ca%C3%A7arola-com-carne-assada.jpg?s=612x612&w=0&k=20&c=MjBH3VKYVYOfNMDSj2OdoMiYbARIrxFZkVW8yJtAYrY=", gluten: false, lactose: false },
             { nome: "Macarrão com Carne Moída", categoria: "Jantar", ingredientes: "Macarrão espaguete, carne moída, molho", foto: "https://media.istockphoto.com/id/1215312647/pt/foto/pasta-fettuccine-with-beef-ragout-sauce-in-black-bowl-grey-background-close-up-top-view.jpg?s=612x612&w=0&k=20&c=EnfZd3RvJ7V8bWdekE9R714bMToUIi6O6i-hhh8YPfc=", gluten: true, lactose: false },
             // LANCHE
-            { nome: "Fruta Picada", categoria: "Lanche", ingredientes: "Banana, maçã, mamão", foto: "https://media.istockphoto.com/id/501512015/pt/foto/fruta-fresca-de-mistura-de-salada.jpg?s=612x612&w=0&k=20&c=mmHCjiLl1kQD3NVksDZJDE1RNJDINxTnGPUf3fwowyg=", gluten: false, lactose: false },
+            { nome: "Fruta Picada", categoria: "Lanche", ingredientes: "Banana, maçã, mamão", foto: "https://images.unsplash.com/photo-1519996529931-28324d5a630e?w=500&q=80", gluten: false, lactose: false },
             { nome: "Iogurte com Aveia", categoria: "Lanche", ingredientes: "Iogurte natural, aveia em flocos", foto: "https://media.istockphoto.com/id/1396570974/pt/foto/smoothie-bowl-topped-with-fresh-berries-and-granola.jpg?s=612x612&w=0&k=20&c=AthCJYjEiuRuJ3wMDjX0JxFeKAUS1juHsHRMkHgE47A=", gluten: true, lactose: true }
         ];
 
@@ -108,7 +108,7 @@ async function adicionarReceitasPadrao() {
     }
 }
 
-// Renderiza os cards de receita na tela
+// Renderiza os cards de receita na tela utilizando a estrutura idêntica aos Favoritos
 async function renderizarReceitas(categoriaFiltrada = "Todas") {
     categoriaAtual = categoriaFiltrada;
     const grid = document.getElementById("grid-receitas");
@@ -125,29 +125,54 @@ async function renderizarReceitas(categoriaFiltrada = "Todas") {
         : receitas.filter(r => r.categoria === categoriaFiltrada);
 
     if (receitasParaExibir.length === 0) {
-        grid.innerHTML = "<p style='grid-column: 1/-1; text-align: center;'>Nenhuma receita encontrada.</p>";
+        grid.innerHTML = "<p style='grid-column: 1/-1; text-align: center; font-family: \"Poppins\", sans-serif; color: #777;'>Nenhuma receita encontrada.</p>";
         return;
     }
 
     receitasParaExibir.forEach(rec => {
-        const isFavorito = favoritos.includes(rec.id);
-        const card = document.createElement("div");
-        card.className = "receita-card";
+        const idTratado = Number(rec.id) || rec.id;
+        const isFavorito = favoritos.includes(idTratado);
         
-        card.innerHTML = `
-            <div class="card-foto" style="background-image: url('${rec.foto || 'https://via.placeholder.com/150'}')">
-                <button class="btn-favorito" onclick="alternarFavorito(${rec.id}, event)">
-                    <i class="material-symbols-outlined">${isFavorito ? 'favorite' : 'favorite_border'}</i>
-                </button>
-            </div>
-            <div class="card-info">
-                <span class="badge-categoria">${rec.categoria}</span>
-                <h4>${rec.nome}</h4>
+        // Define se o coração inicia preenchido ou vazio na tela com base no localStorage
+        const estiloCoracao = isFavorito ? "font-variation-settings: 'FILL' 1;" : "font-variation-settings: 'FILL' 0;";
+
+        const article = document.createElement("article");
+        article.className = "recipe-card"; // Nova classe unificada
+        
+        // Estrutura premium: foto de fundo com zoom lento, metadados, botão ver receita e botão cronograma
+        article.innerHTML = `
+            <div class="recipe-img" style="background-image: url('${rec.foto || 'https://via.placeholder.com/150'}'); background-size: 100%; background-position: center; transition: background-size 0.4s ease;">
+    <span class="material-symbols-outlined fav-badge ${isFavorito ? 'active-fav' : ''}" onclick="alternarFavorito(${rec.id}, event)" title="Favoritar">favorite</span>
+</div>
+            <div class="recipe-content">
+                <span class="recipe-category">${rec.categoria}</span>
+                <h3 class="recipe-title">${rec.nome}</h3>
+                <div class="recipe-meta">
+                    <span><i class="material-symbols-outlined">schedule</i> ${rec.tempo || '25 min'}</span>
+                    <span><i class="material-symbols-outlined">signal_cellular_alt</i> ${rec.dificuldade || 'Fácil'}</span>
+                </div>
+                <div class="recipe-footer">
+                    <button class="btn-view" id="btn-ver-${rec.id}">Ver Receita</button>
+                    <button class="btn-icon-action" title="Adicionar ao Planejamento">
+                        <i class="material-symbols-outlined">calendar_add_on</i>
+                    </button>
+                </div>
             </div>
         `;
         
-        card.onclick = () => abrirModalReceita(rec);
-        grid.appendChild(card);
+        // Vincula o clique do botão "Ver Receita" para abrir o modal sem bugar
+        const btnView = article.querySelector(`#btn-ver-${rec.id}`);
+        if (btnView) {
+            btnView.addEventListener("click", (e) => {
+                e.stopPropagation(); // Evita dupla execução
+                abrirModalReceita(rec);
+            });
+        }
+        
+        // Permitir que o clique em qualquer área livre do card também abra o modal
+        article.onclick = () => abrirModalReceita(rec);
+        
+        grid.appendChild(article);
     });
 }
 
@@ -159,7 +184,9 @@ async function carregarReceitas(cat) {
 // Filtro de categorias por botões da interface
 function filtrarPorCategoria(cat) {
     document.querySelectorAll('.btn-filtro').forEach(btn => btn.classList.remove('active'));
-    if (event) event.target.classList.add('active');
+    if (window.event && window.event.target) {
+        window.event.target.classList.add('active');
+    }
     renderizarReceitas(cat);
 }
 
@@ -188,7 +215,6 @@ if (btnSalvar) {
         renderizarReceitas();
     });
 }
-
 
 // =========================================================================
 // 4. MÓDULO: MODAL DETALHES DA RECEITA
@@ -238,7 +264,20 @@ document.addEventListener('click', (e) => {
 // 5. MÓDULO: FAVORITOS
 // =========================================================================
 
-// Alterna o estado de favorito nos cards principais (Com aviso na tela!)
+// Função auxiliar para criar o aviso animado na tela
+function mostrarAvisoToast(mensagem) {
+    const toast = document.createElement('div');
+    toast.className = 'toast-favorito';
+    toast.innerHTML = mensagem;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 2000); // Some em 2 segundos
+}
+
+// Alterna o estado de favorito nos cards principais com feedback animado
 function alternarFavorito(id, event) {
     if (event) event.stopPropagation();
     
@@ -246,27 +285,23 @@ function alternarFavorito(id, event) {
     let favoritos = JSON.parse(localStorage.getItem('meusFavoritos')) || [];
     
     if (favoritos.includes(idTratado)) {
-        // Se já existia, remove da lista
         favoritos = favoritos.filter(fId => fId !== idTratado);
         localStorage.setItem('meusFavoritos', JSON.stringify(favoritos));
         
-        // NOVO: Alerta de remoção
-        alert("Receita removida dos favoritos! 💔");
+        // Em vez de alert, chama a animação CSS
+        mostrarAvisoToast("Receita removida dos favoritos! 💔");
     } else {
-        // Se não existia, adiciona na lista
         favoritos.push(idTratado);
         localStorage.setItem('meusFavoritos', JSON.stringify(favoritos));
         
-        // NOVO: Alerta de adição
-        alert("Receita adicionada aos favoritos! ❤️");
+        // Em vez de alert, chama a animação CSS
+        mostrarAvisoToast("Receita adicionada aos favoritos! ❤️");
     }
     
-    // Atualiza a listagem de receitas comum, se a função existir na tela atual
+    // Atualiza as telas se as funções de renderização existirem
     if (typeof renderizarReceitas === "function") {
         renderizarReceitas(categoriaAtual);
     }
-    
-    // Atualiza a tela de favoritos caso o usuário esteja nela
     if (typeof renderizarFavoritos === "function") {
         renderizarFavoritos();
     }
@@ -318,25 +353,26 @@ async function renderizarFavoritos() {
         const article = document.createElement('article');
         article.className = 'recipe-card';
         
-        article.innerHTML = `
-            <div class="recipe-img" style="background-image: url('${receita.foto}'); background-size: cover; background-position: center; display: block;">
-                <span class="material-symbols-outlined fav-badge" onclick="removerFavorito(${receita.id})" style="color: #ff6b6b; cursor: pointer; font-variation-settings: 'FILL' 1;" title="Remover dos favoritos">favorite</span>
+        
+    article.innerHTML = `
+        <div class="recipe-img" style="background-image: url('${receita.foto}'); background-size: 100%; background-position: center; transition: background-size 0.4s ease;">
+    <span class="material-symbols-outlined fav-badge active-fav" onclick="removerFavorito(${receita.id})" title="Remover dos favoritos">favorite</span>
+</div>
+        <div class="recipe-content">
+            <span class="recipe-category">${receita.categoria}</span>
+            <h3 class="recipe-title">${receita.nome}</h3>
+            <div class="recipe-meta">
+                <span><i class="material-symbols-outlined">schedule</i> 25 min</span>
+                <span><i class="material-symbols-outlined">signal_cellular_alt</i> Fácil</span>
             </div>
-            <div class="recipe-content">
-                <span class="recipe-category">${receita.categoria}</span>
-                <h3 class="recipe-title">${receita.nome}</h3>
-                <div class="recipe-meta">
-                    <span><i class="material-symbols-outlined">schedule</i> 25 min</span>
-                    <span><i class="material-symbols-outlined">signal_cellular_alt</i> Fácil</span>
-                </div>
-                <div class="recipe-footer">
-                    <button class="btn-view" onclick="alert('Ingredientes necessários:\\n\\n${receita.ingredientes}')">Ver Receita</button>
-                    <button class="btn-icon-action" title="Adicionar ao Planejamento">
-                        <i class="material-symbols-outlined">calendar_add_on</i>
-                    </button>
-                </div>
+            <div class="recipe-footer">
+                <button class="btn-view" onclick="alert('Ingredientes necessários:\\n\\n${receita.ingredientes}')">Ver Receita</button>
+                <button class="btn-icon-action" title="Adicionar ao Planejamento">
+                    <i class="material-symbols-outlined">calendar_add_on</i>
+                </button>
             </div>
-        `;
+        </div>
+    `;
         container.appendChild(article);
     });
 }
