@@ -1586,3 +1586,35 @@ body.sidebar-collapsed .dashboard-grid {
     }
     .btn-add-new { width: 100%; justify-content: center; }
 }
+/* --- O ÍCONE DO CORAÇÃO (FAV-BADGE) --- */
+.fav-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #ff4757; /* Cor vermelha/rosa do coração */
+    padding: 6px;
+    border-radius: 50%;
+    font-size: 20px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 10;
+    
+    /* Configuração padrão: Coração Vazio */
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Quando passa o mouse no coração */
+.fav-badge:hover {
+    transform: scale(1.1);
+    background-color: #ffffff;
+}
+
+/* CLASSE ATIVA: Quando estiver favoritado, o coração fica preenchido! */
+.fav-badge.favoritado {
+    font-variation-settings: 'FILL' 1 !important; /* Preenche o ícone */
+}

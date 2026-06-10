@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sabor Semanal - Favoritos</title>
+    <link rel="icon" href="data:,">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <link rel="stylesheet" href="../css/style.css">
@@ -34,7 +35,7 @@
         </div>
     </nav>
 
-    <main class="main-content">
+    <main class="main-content" id="receitas">
         <header class="dash-header">
             <h2>Suas Receitas Favoritas</h2>
             <p>As melhores experiências culinárias da sua família em um só lugar.</p>
@@ -43,20 +44,228 @@
         <section class="fav-header-actions">
             <div class="search-bar">
                 <span class="material-symbols-outlined">search</span>
-                <input type="text" placeholder="Buscar entre seus favoritos...">
+                <input type="text" id="busca-favoritos" placeholder="Buscar entre seus favoritos...">
             </div>
-            <button class="btn-add-new">
+            <button class="btn-add-new" onclick="window.location.href='receitas.html'">
                 <i class="material-symbols-outlined">add</i> Novo Favorito
             </button>
         </section>
 
-        <div id="lista-favoritos" class="fav-grid">
+        <div id="lista-favoritos" class="receitas-grid fav-grid">
             </div>
     </main>
+
+    <div id="modal-receita" class="modal">
+        <div class="modal-content" style="font-family: 'Poppins', sans-serif;">
+            <span class="close-button" id="fechar-modal">&times;</span>
+            <div class="modal-header">
+                <h2 id="modal-titulo" style="font-weight: 700; color: #2d3436; margin-bottom: 5px;"></h2>
+                <div id="modal-meta"></div>
+            </div>
+            <div class="modal-body">
+                <h3 style="font-size: 16px; font-weight: 600; color: #2d3436; margin-top: 15px;">🛒 Ingredientes:</h3>
+                <ul id="modal-ingredientes" style="padding-left: 20px; line-height: 1.6;"></ul>
+                
+                <h3 style="font-size: 16px; font-weight: 600; color: #2d3436; margin-top: 15px;">👩‍🍳 Modo de Preparo:</h3>
+                <p id="modal-passo" style="line-height: 1.6; color: #555;">Misture os ingredientes listados e prepare a refeição de forma simples e rápida.</p>
+            </div>
+            <button id="btn-add-compras" class="btn-view" style="width: 100%; margin-top: 20px; padding: 12px; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                Adicionar à Lista de Compras 🛒
+            </button>
+        </div>
+    </div>
 
     <script src="../js/db.js"></script>
     <script src="../js/controller.js"></script>
     <script src="../js/login-controller.js"></script>
     <script src="../js/script.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Sincroniza dados rápidos do menu de usuário lateral
+            const dadosUsuario = localStorage.getItem('usuarioLogado');
+            const displayNome = document.getElementById("display-user-name");
+            const avatar = document.getElementById("user-initial");
+
+            if (dadosUsuario) {
+                const usuario = JSON.parse(dadosUsuario);
+                let nomeExibir = usuario.nome || "Usuário";
+                if (displayNome) displayNome.textContent = nomeExibir;
+                if (avatar) avatar.textContent = nomeExibir.charAt(0).toUpperCase();
+            }
+
+            // Aguarda o carregamento do IndexedDB em memória
+            setTimeout(async () => {
+                const container = document.getElementById("lista-favoritos");
+                if (!container) return;
+
+                let receitasGerais = [];
+                if (typeof buscarItens === "function") {
+                    receitasGerais = (await buscarItens()) || [];
+                }
+
+                function renderizarTelaFavoritos(filtroTexto = "") {
+                    container.innerHTML = "";
+                    const listIdsFavoritos = JSON.parse(localStorage.getItem('meusFavoritos')) || [];
+                    
+                    // Filtra receitas favoritadas do banco
+                    let receitasFavoritas = receitasGerais.filter(r => listIdsFavoritos.includes(Number(r.id) || r.id));
+
+                    // Aplica busca em tempo real caso o usuário digite algo
+                    if (filtroTexto) {
+                        const t = filtroTexto.toLowerCase();
+                        receitasFavoritas = receitasFavoritas.filter(r => 
+                            r.nome.toLowerCase().includes(t) || 
+                            r.categoria.toLowerCase().includes(t) ||
+                            r.ingredientes.toLowerCase().includes(t)
+                        );
+                    }
+
+                    if (receitasFavoritas.length === 0) {
+                        container.innerHTML = `
+                            <p style="grid-column: 1/-1; text-align: center; color: #777; font-family: 'Poppins', sans-serif; font-size: 1.1rem; margin-top: 40px;">
+                                ${filtroTexto ? 'Nenhum favorito corresponde à sua busca.' : 'Sua lista de favoritos está vazia.'}
+                            </p>`;
+                        return;
+                    }
+
+                    receitasFavoritas.forEach(receita => {
+                        const card = document.createElement("div");
+                        card.className = "recipe-card";
+                        // Garante que o card consiga posicionar o coração no topo direito dele
+                        card.style.position = "relative";
+
+                        const imgUrl = receita.foto || 'https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=400&q=80';
+
+                        // Estrutura do card alinhada ao padrão de receitas (badge posicionada via CSS)
+                        card.innerHTML = `
+                            <div class="recipe-img" style="background-image: url('${imgUrl}'); background-size: 100%; width: 100%; height: 160px; background-position: center; background-repeat: no-repeat;">
+                                <span class="material-symbols-outlined fav-badge favoritado" data-id="${receita.id}" style="font-variation-settings: 'FILL' 1;">favorite</span>
+                            </div>
+                            <div class="recipe-content">
+                                <span class="recipe-category">${receita.categoria}</span>
+                                <h3 class="recipe-title">${receita.nome}</h3>
+                                <div class="recipe-meta">
+                                    <span><i class="material-symbols-outlined">schedule</i> ${receita.tempo || '20 min'}</span>
+                                    <span><i class="material-symbols-outlined">signal_cellular_alt</i> ${receita.dificuldade || 'Fácil'}</span>
+                                </div>
+                                <div class="recipe-footer">
+                                    <button class="btn-view btn-ver-detalhes-fav" data-id="${receita.id}">Ver Receita</button>
+                                    <button class="btn-icon-action btn-compras-direto-fav" data-ingredientes="${receita.ingredientes}">
+                                        <i class="material-symbols-outlined">shopping_cart</i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        container.appendChild(card);
+                    });
+
+                    // Gerencia o clique no coração para desfavoritar: troca FILL para 0 e remove card após 200ms
+                    document.querySelectorAll(".fav-badge").forEach(badge => {
+                        badge.addEventListener("click", (e) => {
+                            e.stopPropagation();
+                            const target = e.currentTarget;
+                            const recId = target.getAttribute("data-id");
+                            let atuaisFavs = JSON.parse(localStorage.getItem('meusFavoritos')) || [];
+
+                            const isFilled = target.classList.contains('favoritado') || (getComputedStyle(target).getPropertyValue('font-variation-settings') || '').includes("'FILL' 1");
+                            if (isFilled) {
+                                // Esvazia o ícone imediatamente
+                                target.style.fontVariationSettings = "'FILL' 0";
+                                target.classList.remove('favoritado');
+                                target.style.color = '#888';
+
+                                // Atualiza localStorage removendo o id
+                                atuaisFavs = atuaisFavs.filter(id => String(id) !== String(recId));
+                                localStorage.setItem('meusFavoritos', JSON.stringify(atuaisFavs));
+
+                                // Remove o card da UI após um pequeno delay para permitir ver a transição
+                                const card = target.closest('.recipe-card');
+                                setTimeout(() => {
+                                    if (card && card.parentNode) card.parentNode.removeChild(card);
+                                }, 200);
+                            } else {
+                                // Caso queira re-adicionar (opcional)
+                                target.style.fontVariationSettings = "'FILL' 1";
+                                target.classList.add('favoritado');
+                                target.style.color = '#ff4757';
+                                if (!atuaisFavs.includes(recId)) {
+                                    atuaisFavs.push(recId);
+                                    localStorage.setItem('meusFavoritos', JSON.stringify(atuaisFavs));
+                                }
+                            }
+                        });
+                    });
+
+                    // Abrir detalhes da receita no modal
+                    document.querySelectorAll(".btn-ver-detalhes-fav").forEach(btn => {
+                        btn.addEventListener("click", (e) => {
+                            const recId = Number(e.target.getAttribute("data-id"));
+                            const receita = receitasGerais.find(r => (Number(r.id) || r.id) === recId);
+                            
+                            if (receita) {
+                                document.getElementById("modal-titulo").textContent = receita.nome;
+                                
+                                const glutenTag = receita.gluten ? '<span style="background:#fff0f2; color:#ff4757; padding:3px 8px; border-radius:4px; font-size:12px; font-weight:600; margin-right:5px;">Contém Glúten</span>' : '<span style="background:#f0f7e9; color:#7fa653; padding:3px 8px; border-radius:4px; font-size:12px; font-weight:600; margin-right:5px;">Sem Glúten</span>';
+                                const lactoseTag = receita.lactose ? '<span style="background:#fff0f2; color:#ff4757; padding:3px 8px; border-radius:4px; font-size:12px; font-weight:600;">Contém Lactose</span>' : '<span style="background:#f0f7e9; color:#7fa653; padding:3px 8px; border-radius:4px; font-size:12px; font-weight:600;">Sem Lactose</span>';
+                                
+                                document.getElementById("modal-meta").innerHTML = `
+                                    <div style="display:flex; gap:15px; font-size:14px; color:#666; margin: 8px 0;">
+                                        <span>⏱️ ${receita.tempo || '20 min'}</span>
+                                        <span>📊 ${receita.dificuldade || 'Fácil'}</span>
+                                    </div>
+                                    <div style="margin-top:5px;">${glutenTag} ${lactoseTag}</div>
+                                `;
+
+                                const listaIng = document.getElementById("modal-ingredientes");
+                                listaIng.innerHTML = "";
+                                receita.ingredientes.split(",").forEach(ing => {
+                                    const li = document.createElement("li");
+                                    li.textContent = ing.trim();
+                                    listaIng.appendChild(li);
+                                });
+
+                                document.getElementById("modal-receita").style.display = "flex";
+                            }
+                        });
+                    });
+
+                    // Botão do mini carrinho rápido
+                    document.querySelectorAll(".btn-compras-direto-fav").forEach(btn => {
+                        btn.addEventListener("click", (e) => {
+                            const ingsStr = e.currentTarget.getAttribute("data-ingredientes");
+                            if (ingsStr) {
+                                ingsStr.split(",").forEach(ing => {
+                                    localStorage.removeItem(`dash_comprado_${ing.trim()}`);
+                                });
+                                alert("Ingredientes enviados para a lista de compras!");
+                            }
+                        });
+                    });
+                }
+
+                // Configura a barra de busca dinâmica em tempo real
+                const campoBusca = document.getElementById("busca-favoritos");
+                if (campoBusca) {
+                    campoBusca.addEventListener("input", (e) => {
+                        renderizarTelaFavoritos(e.target.value);
+                    });
+                }
+
+                // Fechamento básico do Modal
+                document.getElementById("fechar-modal").addEventListener("click", () => {
+                    document.getElementById("modal-receita").style.display = "none";
+                });
+                window.addEventListener("click", (e) => {
+                    if (e.target === document.getElementById("modal-receita")) {
+                        document.getElementById("modal-receita").style.display = "none";
+                    }
+                });
+
+                // Inicializa a renderização oficial
+                renderizarTelaFavoritos();
+            }, 300);
+        });
+    </script>
 </body>
 </html>

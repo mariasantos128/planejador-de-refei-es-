@@ -282,46 +282,76 @@ function atualizarSelectsCronograma() {
 
 
 /* ==========================================================
-   4. LISTA DE COMPRAS
+   4. LISTA DE COMPRAS (INTEGRAÇÃO E SINCRONIZAÇÃO TOTAL)
    ========================================================== */
-const btnGerarCompras = document.getElementById('btn-gerar-compras');
-if (btnGerarCompras) {
-    btnGerarCompras.addEventListener('click', () => {
-        const listaFinal = new Set();
+function inicializarListaCompras() {
+    const containerLista = document.getElementById('conteudo-lista-compras');
+    if (!containerLista) return; 
+
+    const listaFinal = new Set();
+    const planejamentoSalvo = JSON.parse(localStorage.getItem('meuPlanejamento')) || {};
+    const receitasLocais = typeof receitasDb !== 'undefined' ? receitasDb : [];
+    
+    // Coleta ingredientes salvos do cronograma
+    Object.values(planejamentoSalvo).forEach(pratoNome => {
+        if (pratoNome) {
+            const receita = receitasLocais.find(r => r.nome === pratoNome);
+            if (receita && receita.ingredientes) {
+                receita.ingredientes.split(',').forEach(ing => listaFinal.add(ing.trim()));
+            }
+        }
+    });
+
+    if(listaFinal.size === 0) {
+        containerLista.innerHTML = '<p style="color: #777; text-align: center;">Monte seu cronograma primeiro para gerar a lista!</p>';
+        return;
+    }
+
+    let html = '<ul style="text-align: left; display: inline-block; list-style: none; padding: 0; width: 100%;">';
+    listaFinal.forEach(item => {
+        // LER EXATAMENTE A MESMA CHAVE DO DASHBOARD
+        const jaComprado = localStorage.getItem(`dash_comprado_${item}`) === "true";
         
-        document.querySelectorAll('#planejamento select').forEach(select => {
-            const pratoNome = select.value;
-            if (pratoNome) {
-                const receita = receitasDb.find(r => r.nome === pratoNome);
-                if(receita) {
-                    let ings = receita.ingredientes.split(',');
-                    ings.forEach(ing => listaFinal.add(ing.trim()));
+        html += `
+            <li style="margin-bottom: 12px; font-size: 1.1rem; display: flex; align-items: center; gap: 10px;">
+                <input type="checkbox" id="compra-${item}" class="page-compras-item" data-ingrediente="${item}" ${jaComprado ? 'checked' : ''} style="width: 18px; height: 18px; cursor: pointer;"> 
+                <label for="compra-${item}" style="text-decoration: ${jaComprado ? 'line-through' : 'none'}; color: ${jaComprado ? '#aaa' : '#333'}; cursor: pointer;">
+                    ${item}
+                </label>
+            </li>`;
+    });
+    html += '</ul>';
+    containerLista.innerHTML = html;
+
+    // Escuta cliques na página de compras
+    document.querySelectorAll('.page-compras-item').forEach(checkbox => {
+        checkbox.addEventListener('change', (e) => {
+            const ingrediente = e.target.getAttribute('data-ingrediente');
+            const label = e.target.nextElementSibling;
+            
+            if (e.target.checked) {
+                localStorage.setItem(`dash_comprado_${ingrediente}`, "true");
+                if (label) {
+                    label.style.textDecoration = "line-through";
+                    label.style.color = "#aaa";
+                }
+            } else {
+                // Remove ou define como falso para o Dashboard saber que foi desmarcado
+                localStorage.setItem(`dash_comprado_${ingrediente}`, "false");
+                if (label) {
+                    label.style.textDecoration = "none";
+                    label.style.color = "#333";
                 }
             }
         });
-
-        const containerLista = document.getElementById('conteudo-lista-compras');
-        if (!containerLista) return;
-
-        if(listaFinal.size === 0) {
-            containerLista.innerHTML = '<p style="color: red;">Selecione pratos no cronograma primeiro!</p>';
-            return;
-        }
-
-        let html = '<ul style="text-align: left; display: inline-block;">';
-        listaFinal.forEach(item => {
-            html += `<li><input type="checkbox"> <label>${item}</label></li>`;
-        });
-        html += '</ul>';
-        containerLista.innerHTML = html;
-
-        document.querySelectorAll('#conteudo-lista-compras li').forEach(li => {
-            const checkbox = li.querySelector('input');
-            const label = li.querySelector('label');
-            checkbox.addEventListener('change', () => {
-                label.style.textDecoration = checkbox.checked ? "line-through" : "none";
-                label.style.color = checkbox.checked ? "#aaa" : "#333";
-            });
-        });
     });
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(inicializarListaCompras, 200);
+
+    const btnGerarCompras = document.getElementById('btn-gerar-compras');
+    if (btnGerarCompras) {
+        btnGerarCompras.addEventListener('click', inicializarListaCompras);
+    }
+});

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sabor Semanal - Dashboard</title>
+    <link rel="icon" href="data:,">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <link rel="stylesheet" href="../css/style.css">
 </head>
@@ -102,10 +103,8 @@
     </script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", async () => {
-            // ==========================================================
-            // 1. CONTROLAR NOME DO USUÁRIO
-            // ==========================================================
+        document.addEventListener("DOMContentLoaded", () => {
+            // 1. CARREGAR PERFIL DO USUÁRIO
             const dadosUsuario = localStorage.getItem('usuarioLogado');
             const displayNome = document.getElementById("display-user-name");
             const avatar = document.getElementById("user-initial");
@@ -117,70 +116,59 @@
                 if (avatar) avatar.textContent = nomeExibir.charAt(0).toUpperCase();
             }
 
-            // Aguarda um instante para garantir que o banco IndexedDB (db.js) carregou as receitas
+            // Aguarda o banco IndexedDB carregar na memória
             setTimeout(async () => {
                 let receitasGerais = [];
                 if (typeof buscarItens === "function") {
                     receitasGerais = (await buscarItens()) || [];
                 }
 
-                // ==========================================================
-                // 2. PUXAR O CRONOGRAMA REAL DO LOCALSTORAGE
-                // ==========================================================
-                // Seu controller.js salva chaves como: "linha-0-select-0" (Linha = refeição, Select = dia da semana)
-                // Vamos mapear os dias e as refeições com base na estrutura que seu app usa
+                // 2. CRONOGRAMA REAL (Linha 1 = Almoço, Linha 3 = Jantar)
                 const planejamentoSalvo = JSON.parse(localStorage.getItem('meuPlanejamento')) || {};
                 const diasSemana = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
-                const tiposRefeicao = ["Café", "Almoço", "Jantar"]; // Depende da ordem das linhas da sua tabela
-
                 const cronogramaContainer = document.getElementById("dash-cronograma-container");
+                
                 let refeicoesFaltando = false;
                 let primeiraRefeicaoEncontrada = null;
 
                 if (cronogramaContainer) {
                     cronogramaContainer.innerHTML = "";
                     
-                    // Vamos exibir apenas Hoje e Amanhã para o resumo não ficar gigante
-                    const diasParaExibir = [0, 1]; // 0 = Hoje/Segunda (exemplo), 1 = Amanhã
-                    
-                    // Para deixar perfeito, vamos listar os dias que possuem dados
                     diasSemana.forEach((dia, diaIndex) => {
-                        // Varre as linhas (refeições) para esse dia
-                        // Nota: no seu popularSeletores, selectIndex é o dia (coluna) e rowIndex é a refeição (linha)
-                        let almoço = planejamentoSalvo[`linha-1-select-${diaIndex}`] || "";
-                        let jantar = planejamentoSalvo[`linha-2-select-${diaIndex}`] || "";
+                        let almoco = planejamentoSalvo[`linha-1-select-${diaIndex}`] || "";
+                        let jantar = planejamentoSalvo[`linha-3-select-${diaIndex}`] || "";
 
-                        if (!almoço || !jantar) refeicoesFaltando = true;
+                        if (!almoco || !jantar) {
+                            refeicoesFaltando = true;
+                        }
 
-                        // Mostra apenas os 3 primeiros dias no resumo do painel para ficar clean
+                        // Renderiza os 3 primeiros dias no painel inicial
                         if (diaIndex < 3) {
                             const diaRow = document.createElement("div");
                             diaRow.className = "day-row";
                             diaRow.innerHTML = `
                                 <span class="day-name">${dia}</span>
                                 <div class="meals">
-                                    <span class="tag ${almoço ? 'tag-green' : 'tag-empty'}">Almoço: ${almoço || 'Não planejado'}</span>
+                                    <span class="tag ${almoco ? 'tag-green' : 'tag-empty'}">Almoço: ${almoco || 'Não planejado'}</span>
                                     <span class="tag ${jantar ? 'tag-green' : 'tag-empty'}">Jantar: ${jantar || 'Não planejado'}</span>
                                 </div>
                             `;
                             cronogramaContainer.appendChild(diaRow);
                         }
 
-                        if (!primeiraRefeicaoEncontrada && almoço) {
-                            primeiraRefeicaoEncontrada = { nome: almoço, momento: `Almoço • ${dia}` };
+                        if (!primeiraRefeicaoEncontrada && almoco) {
+                            primeiraRefeicaoEncontrada = { nome: almoco, momento: `Almoço • ${dia}` };
                         }
                     });
                 }
 
-                // Esconde ou mostra o card de alerta se faltar planejamento
+                // Alerta de pendência
                 const alertaCard = document.getElementById("dash-alerta-planejamento");
                 if (alertaCard) {
                     alertaCard.style.display = refeicoesFaltando ? "block" : "none";
                 }
 
-                // ==========================================================
-                // 3. ATUALIZAR CARD "PRÓXIMA REFEIÇÃO" REAL
-                // ==========================================================
+                // 3. PRÓXIMA REFEIÇÃO
                 const proximaRefeicaoContainer = document.getElementById("dash-proxima-refeicao");
                 if (proximaRefeicaoContainer && primeiraRefeicaoEncontrada) {
                     proximaRefeicaoContainer.innerHTML = `
@@ -189,69 +177,106 @@
                     `;
                 }
 
-                // ==========================================================
-                // 4. GERAR LISTA DE COMPRAS REAL COM BASE NOS INGREDIENTES
-                // ==========================================================
+                // 4. LISTA DE COMPRAS SINCRONIZADA E PERSISTENTE
                 const listaComprasContainer = document.getElementById("dash-lista-compras");
                 if (listaComprasContainer) {
-                    listaComprasContainer.innerHTML = "";
                     const ingredientesSet = new Set();
 
-                    // Percorre todo o planejamento para buscar os pratos escolhidos
+                    // Pega todos os ingredientes dos pratos escolhidos
                     Object.values(planejamentoSalvo).forEach(pratoNome => {
                         if (pratoNome) {
                             const receita = receitasGerais.find(r => r.nome === pratoNome);
                             if (receita && receita.ingredientes) {
-                                // Separa os ingredientes por vírgula
                                 receita.ingredientes.split(',').forEach(ing => ingredientesSet.add(ing.trim()));
                             }
                         }
                     });
 
-                    const arrayIngredientes = Array.from(ingredientesSet).slice(0, 4); // Pega os 4 primeiros para o resumo
+                    const todosIngredientes = Array.from(ingredientesSet);
 
-                    if (arrayIngredientes.length === 0) {
-                        listaComprasContainer.innerHTML = "<li><span style='color:#777'>Nenhum ingrediente. Monte seu cronograma!</span></li>";
-                    } else {
-                        arrayIngredientes.forEach((ingrediente, index) => {
+                    function renderizarListaCompras() {
+                        listaComprasContainer.innerHTML = "";
+                        
+                        // Filtra mostrando apenas os que NÃO estão salvos como "true" (ou seja, não comprados)
+                        const ingredientesFaltando = todosIngredientes.filter(ing => {
+                            return localStorage.getItem(`dash_comprado_${ing}`) !== "true";
+                        });
+
+                        const itensParaExibir = ingredientesFaltando.slice(0, 5);
+
+                        if (todosIngredientes.length === 0) {
+                            listaComprasContainer.innerHTML = "<li><span style='color:#777'>Nenhum ingrediente. Monte seu cronograma!</span></li>";
+                            return;
+                        }
+
+                        if (ingredientesFaltando.length === 0) {
+                            listaComprasContainer.innerHTML = "<li><span style='color:#2e7d32; font-weight: bold;'>✓ Tudo comprado por aqui!</span></li>";
+                            atualizarBarraProgressoGeral();
+                            return;
+                        }
+
+                        itensParaExibir.forEach(ingrediente => {
                             const li = document.createElement("li");
-                            li.innerHTML = `<label><input type="checkbox" class="check-item-dash"> <span>${ingrediente}</span></label>`;
+                            li.innerHTML = `
+                                <label>
+                                    <input type="checkbox" class="check-item-dash" data-ingrediente="${ingrediente}"> 
+                                    <span>${ingrediente}</span>
+                                </label>
+                            `;
                             listaComprasContainer.appendChild(li);
                         });
+
+                        // Configura eventos de clique para riscar, salvar e atualizar a lista descendo itens
+                        const checkboxes = document.querySelectorAll(".check-item-dash");
+                        checkboxes.forEach(checkbox => {
+                            checkbox.addEventListener("change", (e) => {
+                                const ingNome = e.target.getAttribute("data-ingrediente");
+                                const span = e.target.nextElementSibling;
+                                
+                                if (e.target.checked) {
+                                    localStorage.setItem(`dash_comprado_${ingNome}`, "true");
+                                    if (span) {
+                                        span.style.textDecoration = "line-through";
+                                        span.style.opacity = "0.5";
+                                    }
+                                    
+                                    setTimeout(() => {
+                                        renderizarListaCompras();
+                                    }, 300);
+                                }
+                            });
+                        });
+
+                        atualizarBarraProgressoGeral();
                     }
 
-                    // Ativa o funcionamento dos Checkboxes da lista de compras gerada
-                    const checkboxes = document.querySelectorAll(".check-item-dash");
-                    const progressFill = document.querySelector(".progress-fill");
-                    const progressText = document.querySelector(".progress-text");
+                    function atualizarBarraProgressoGeral() {
+                        const progressFill = document.querySelector(".progress-fill");
+                        const progressText = document.querySelector(".progress-text");
+                        
+                        const totalGeral = todosIngredientes.length;
+                        const totalComprados = todosIngredientes.filter(ing => localStorage.getItem(`dash_comprado_${ing}`) === "true").length;
+                        const porcentagem = totalGeral > 0 ? (totalComprados / totalGeral) * 100 : 0;
 
-                    function atualizarBarraProgresso() {
-                        const total = checkboxes.length;
-                        const marcados = document.querySelectorAll(".check-item-dash:checked").length;
-                        const porcentagem = total > 0 ? (marcados / total) * 100 : 0;
                         if (progressFill) progressFill.style.width = `${porcentagem}%`;
-                        if (progressText) progressText.textContent = `${marcados} de ${total} itens comprados`;
+                        if (progressText) progressText.textContent = `${totalComprados} de ${totalGeral} itens comprados`;
                     }
 
-                    checkboxes.forEach((checkbox, index) => {
-                        checkbox.addEventListener("change", atualizarBarraProgresso);
-                    });
-                    atualizarBarraProgresso();
-                }
+                    // Chamar a função para fazer a lista aparecer de verdade!
+                    renderizarListaCompras();
+                } // Fim do bloco de compras
 
-                // ==========================================================
-                // 5. CARREGAR OS FAVORITOS REAIS DO USUÁRIO
-                // ==========================================================
+                // 5. LISTAR FAVORITOS REAIS (Agora fora da função anterior!)
                 const favoritosContainer = document.getElementById("dash-favoritos-resumo");
                 if (favoritosContainer) {
                     favoritosContainer.innerHTML = "";
-                    const listaIdsFavoritos = JSON.parse(localStorage.getItem('meusFavoritos')) || [];
-                    const receitasFavoritadas = receitasGerais.filter(r => listaIdsFavoritos.includes(Number(r.id) || r.id));
+                    const listIdsFavoritos = JSON.parse(localStorage.getItem('meusFavoritos')) || [];
+                    const receitasFavoritadas = receitasGerais.filter(r => listIdsFavoritos.includes(Number(r.id) || r.id));
 
                     if (receitasFavoritadas.length === 0) {
                         favoritosContainer.innerHTML = "<li><span style='color:#777'>Nenhuma receita favoritada.</span></li>";
                     } else {
-                        receitasFavoritadas.slice(0, 3).forEach(rec => { // Mostra até 3 favoritos no resumo
+                        receitasFavoritadas.slice(0, 3).forEach(rec => {
                             const li = document.createElement("li");
                             li.innerHTML = `
                                 <span>${rec.nome}</span>
@@ -262,9 +287,9 @@
                     }
                 }
 
-            }, 300); // 300ms é o tempo seguro para o banco IndexedDB responder
+            }, 300);
 
-            // Limpeza de sessão ao Sair
+            // Logout
             const btnSair = document.querySelector(".logout-link");
             if (btnSair) {
                 btnSair.addEventListener("click", () => {
