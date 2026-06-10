@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sabor Semanal - Login</title>
+    <link class="search" rel="stylesheet" href="view/css/style.css">
+</head>
+<body class="login-page">
+
+    <div class="login-card">
+        <h1>Sabor Semanal 👨‍🍳</h1>
+
+        <div id="box-login">
+            <form id="form-login">
+                <div class="input-group">
+                    <input type="email" id="login-email" placeholder="E-mail" required>
+                    <input type="password" id="login-senha" placeholder="Senha" required>
+                </div>
+                
+                <button type="submit" class="btn-primary">Entrar</button>
+                <button type="button" class="btn-guest" onclick="entrarComoConvidado()">Entrar como convidado</button>
+            </form>
+            <p class="switch-text">Não tem uma conta? <a href="#" onclick="mostrarCadastro()">Criar uma</a></p>
+        </div>
+
+        <div id="box-cadastro" style="display: none;">
+            <form id="form-cadastro">
+                <div class="input-group">
+                    <input type="text" id="cad-nome" placeholder="Nome completo" required>
+                    <input type="email" id="cad-email" placeholder="E-mail" required>
+                    <input type="password" id="cad-senha" placeholder="Senha" required>
+                </div>
+
+                <div class="optional-section">
+                    <p>Restrições (Opcional):</p>
+                    <div class="checkbox-grid">
+                        <label><input type="checkbox" class="restricao" value="Glúten"> Glúten</label>
+                        <label><input type="checkbox" class="restricao" value="Lactose"> Lactose</label>
+                        <label><input type="checkbox" class="restricao" value="Vegano"> Vegano</label>
+                        <label><input type="checkbox" class="restricao" value="Açúcar"> Açúcar</label>
+                    </div>
+                </div>
+
+                <div class="optional-section">
+                    <input type="text" id="cad-familia" placeholder="Código da Família (Opcional)">
+                </div>
+
+                <button type="submit" class="btn-primary">Criar Conta</button>
+            </form>
+            <p class="switch-text">Já tem uma conta? <a href="#" onclick="mostrarLogin()">Voltar ao entrar</a></p>
+        </div>
+    </div>
+
+<script src="view/js/db.js"></script>
+<script src="view/js/login-controller.js"></script>
+<script src="view/js/controller.js"></script>
+<script src="view/js/script.js"></script>
+
+</body>
+</html>

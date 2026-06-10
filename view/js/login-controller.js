@@ -18,8 +18,7 @@ function entrarComoConvidado() {
     localStorage.setItem('usuarioLogado', JSON.stringify(usuario));
     alert("Entrando como convidado...");
     
-    // CORRIGIDO: Agora vai direto para o arquivo na mesma pasta
-    window.location.href = 'dashboard.html';
+    window.location.href = 'view/html/dashboard.html';
 }
 
 // LÓGICA DE LOGIN (Protegida com IF)
@@ -42,8 +41,7 @@ if (formLogin) {
         localStorage.setItem('usuarioLogado', JSON.stringify(usuario));
         alert("Login realizado!");
         
-        // CORRIGIDO: Agora vai direto para o arquivo na mesma pasta
-        window.location.href = 'dashboard.html';
+        window.location.href = 'view/html/dashboard.html';
     });
 }
 
@@ -72,7 +70,6 @@ if (formCadastro) {
         
         alert("Conta criada com sucesso! Redirecionando...");
         
-        // CORRIGIDO: Agora vai direto para o arquivo na mesma pasta
-        window.location.href = 'dashboard.html';
+        window.location.href = 'view/html/dashboard.html';
     });
 }
