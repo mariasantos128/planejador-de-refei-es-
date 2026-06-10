@@ -18,7 +18,8 @@ function entrarComoConvidado() {
     localStorage.setItem('usuarioLogado', JSON.stringify(usuario));
     alert("Entrando como convidado...");
     
-    window.location.href = '/view/html/dashboard.html';
+    // CORRIGIDO: Removida a barra inicial para funcionar no GitHub Pages
+    window.location.href = 'view/html/dashboard.html';
 }
 
 // LÓGICA DE LOGIN (Protegida com IF)
@@ -41,7 +42,8 @@ if (formLogin) {
         localStorage.setItem('usuarioLogado', JSON.stringify(usuario));
         alert("Login realizado!");
         
-        window.location.href = '/view/html/dashboard.html';
+        // CORRIGIDO: Removida a barra inicial para funcionar no GitHub Pages
+        window.location.href = 'view/html/dashboard.html';
     });
 }
 
@@ -70,6 +72,7 @@ if (formCadastro) {
         
         alert("Conta criada com sucesso! Redirecionando...");
         
-        window.location.href = '/view/html/dashboard.html';
+        // CORRIGIDO: Removida a barra inicial para funcionar no GitHub Pages
+        window.location.href = 'view/html/dashboard.html';
     });
 }
