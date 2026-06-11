@@ -18,8 +18,8 @@ function entrarComoConvidado() {
     localStorage.setItem('usuarioLogado', JSON.stringify(usuario));
     alert("Entrando como convidado...");
     
-    // CORRIGIDO: Como o login já está em view/html/, basta chamar o arquivo direto
-    window.location.href = 'dashboard.html';
+    // CORRIGIDO: Avança da raiz (index.html) para dentro de view/html/
+    window.location.href = 'view/html/dashboard.html';
 }
 
 // =======================================================
@@ -45,8 +45,8 @@ if (formLogin) {
                 localStorage.setItem('usuarioLogado', JSON.stringify(usuarioEncontrado));
                 alert(`Login realizado! Bem-vindo(a), ${usuarioEncontrado.nome}!`);
                 
-                // CORRIGIDO: Redirecionamento direto sem duplicar pastas
-                window.location.href = 'dashboard.html';
+                // CORRIGIDO: Avança da raiz (index.html) para dentro de view/html/
+                window.location.href = 'view/html/dashboard.html';
             } else {
                 alert("E-mail ou senha incorretos! Verifique seus dados ou crie uma nova conta.");
             }
@@ -94,8 +94,8 @@ if (formCadastro) {
             
             alert("Conta criada com sucesso! Redirecionando...");
             
-            // CORRIGIDO: Redirecionamento direto sem duplicar pastas
-            window.location.href = 'dashboard.html';
+            // CORRIGIDO: Avança da raiz (index.html) para dentro de view/html/
+            window.location.href = 'view/html/dashboard.html';
             
         } catch (error) {
             console.error("Erro ao realizar cadastro:", error);
