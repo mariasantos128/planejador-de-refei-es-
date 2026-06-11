@@ -5,52 +5,39 @@
 let bancoPronto = false;
 let categoriaAtual = "Todas";
 
-// Inicialização Principal do Sistema
+// Inicialização Principal Unificada do Sistema
 document.addEventListener("DOMContentLoaded", async () => {
     try {
+        // 1. Garante que o banco de dados IndexedDB iniciou primeiro
         await iniciarBanco();
         bancoPronto = true;
+        console.log("✅ Banco de dados IndexedDB pronto!");
         
+        // 2. Injeta receitas padrão se o banco estiver vazio
         await adicionarReceitasPadrao();
         
+        // 3. Executa a lógica de Receitas APENAS se estiver na página de receitas
         if (document.getElementById("grid-receitas")) {
-            carregarReceitas();
+            await renderizarReceitas("Todas");
         }
         
+        // 4. Executa a lógica do Planejamento APENAS se a tabela existir na página
         if (document.getElementById("planejamento")) {
-            popularSeletores();
+            await popularSeletores();
             destacarDiaAtual();
+            console.log("✅ Cronograma e seletores carregados com sucesso!");
         }
 
-        if (document.getElementById("lista-usuarios")) {
-            carregarUsuarios();
+        // 5. Executa a listagem da família apenas na página correta
+        if (document.getElementById("lista-membros-ui")) {
+            await carregarUsuarios();
         }
 
     } catch (err) {
-        console.error("Erro ao iniciar a aplicação:", err);
+        console.error("❌ Erro crítico ao iniciar a aplicação:", err);
     }
 });
 
-// Inicialização Auxiliar (Garantia de carregamento de receitas e seletores)
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(async () => {
-        try {
-            if (typeof adicionarReceitasPadrao === "function") await adicionarReceitasPadrao();
-            await renderizarReceitas("Todas");
-        } catch (e) { 
-            console.error(e); 
-        }
-    }, 200);
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("🚀 Página carregada! Aguardando banco de dados...");
-    setTimeout(() => {
-        popularSeletores()
-            .then(() => console.log("✅ Seletores preenchidos com sucesso!"))
-            .catch(err => console.error("❌ Erro ao popular seletores:", err));
-    }, 100);
-});
 
 
 // =========================================================================
@@ -71,7 +58,7 @@ function mostrarNotificacao(mensagem, corFundo = "var(--cor-media)") {
         toast.id = "toast";
         document.body.appendChild(toast);
     }
-    toast.textContent = mensagem;
+    toast.textContent = message = mensagem;
     toast.style.backgroundColor = corFundo;
     toast.className = "mostrar";
     setTimeout(() => { toast.className = toast.className.replace("mostrar", ""); }, 3000);
@@ -132,18 +119,14 @@ async function renderizarReceitas(categoriaFiltrada = "Todas") {
     receitasParaExibir.forEach(rec => {
         const idTratado = Number(rec.id) || rec.id;
         const isFavorito = favoritos.includes(idTratado);
-        
-        // Define se o coração inicia preenchido ou vazio na tela com base no localStorage
-        const estiloCoracao = isFavorito ? "font-variation-settings: 'FILL' 1;" : "font-variation-settings: 'FILL' 0;";
 
         const article = document.createElement("article");
-        article.className = "recipe-card"; // Nova classe unificada
+        article.className = "recipe-card";
         
-        // Estrutura premium: foto de fundo com zoom lento, metadados, botão ver receita e botão cronograma
         article.innerHTML = `
             <div class="recipe-img" style="background-image: url('${rec.foto || 'https://via.placeholder.com/150'}'); background-size: 100%; background-position: center; transition: background-size 0.4s ease;">
-    <span class="material-symbols-outlined fav-badge ${isFavorito ? 'active-fav' : ''}" onclick="alternarFavorito(${rec.id}, event)" title="Favoritar">favorite</span>
-</div>
+                <span class="material-symbols-outlined fav-badge ${isFavorito ? 'active-fav' : ''}" onclick="alternarFavorito(${rec.id}, event)" title="Favoritar">favorite</span>
+            </div>
             <div class="recipe-content">
                 <span class="recipe-category">${rec.categoria}</span>
                 <h3 class="recipe-title">${rec.nome}</h3>
@@ -160,28 +143,23 @@ async function renderizarReceitas(categoriaFiltrada = "Todas") {
             </div>
         `;
         
-        // Vincula o clique do botão "Ver Receita" para abrir o modal sem bugar
         const btnView = article.querySelector(`#btn-ver-${rec.id}`);
         if (btnView) {
             btnView.addEventListener("click", (e) => {
-                e.stopPropagation(); // Evita dupla execução
+                e.stopPropagation(); 
                 abrirModalReceita(rec);
             });
         }
         
-        // Permitir que o clique em qualquer área livre do card também abra o modal
         article.onclick = () => abrirModalReceita(rec);
-        
         grid.appendChild(article);
     });
 }
 
-// Mantém compatibilidade de chamada alternativa
 async function carregarReceitas(cat) { 
     return renderizarReceitas(cat); 
 }
 
-// Filtro de categorias por botões da interface
 function filtrarPorCategoria(cat) {
     document.querySelectorAll('.btn-filtro').forEach(btn => btn.classList.remove('active'));
     if (window.event && window.event.target) {
@@ -190,7 +168,6 @@ function filtrarPorCategoria(cat) {
     renderizarReceitas(cat);
 }
 
-// Evento do botão para Cadastrar Nova Receita
 const btnSalvar = document.getElementById("btn-salvar-receita");
 if (btnSalvar) {
     btnSalvar.addEventListener("click", async () => {
@@ -240,7 +217,7 @@ function abrirModalReceita(receita) {
     const arrayIng = textoIng.split(',').filter(i => i.trim() !== "");
     lista.innerHTML = arrayIng.map(i => `<li>${i.trim()}</li>`).join("");
 
-    document.getElementById("modal-passo").innerText = receita.passoAPasso || "Prepare com carenho! 👩‍🍳";
+    document.getElementById("modal-passo").innerText = receita.passoAPasso || "Prepare com carinho! 👩‍🍳";
 
     modal.style.display = "flex"; 
 }
@@ -250,7 +227,6 @@ function fecharModal() {
     if (modal) modal.style.display = "none";
 }
 
-// Escutador global único para fechar o Modal (clicando fora ou no botão de fechar)
 document.addEventListener('click', (e) => {
     const modal = document.getElementById("modal-receita");
     if (!modal) return;
@@ -264,50 +240,86 @@ document.addEventListener('click', (e) => {
 // 5. MÓDULO: FAVORITOS
 // =========================================================================
 
-// Função auxiliar para criar o aviso animado na tela
-function mostrarAvisoToast(mensagem) {
-    const toast = document.createElement('div');
-    toast.className = 'toast-favorito';
-    toast.innerHTML = mensagem;
-    
-    document.body.appendChild(toast);
-    
+// =========================================================================
+// 5. MÓDULO: FAVORITOS (VERSÃO DIRETA NO CENTRO DA TELA)
+// =========================================================================
+
+// Cria uma mensagem simples bem no centro da tela, sem barras coloridas na lateral
+function mensagemRapidaCentro(texto) {
+    // Se já tiver uma mensagem na tela, remove para não acumular
+    const avisoExistente = document.getElementById("aviso-centro-rapido");
+    if (avisoExistente) avisoExistente.remove();
+
+    const aviso = document.createElement("div");
+    aviso.id = "aviso-centro-rapido";
+    aviso.textContent = texto;
+
+    // Estilização minimalista bem no centro da tela
+    Object.assign(aviso.style, {
+        position: "fixed",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        backgroundColor: "rgba(0, 0, 0, 0.75)",
+        color: "#fff",
+        padding: "12px 24px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        fontFamily: "'Poppins', sans-serif",
+        fontWeight: "500",
+        zIndex: "10000",
+        pointerEvents: "none",
+        textAlign: "center",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+        transition: "opacity 0.2s ease"
+    });
+
+    document.body.appendChild(aviso);
+
+    // Some rápido após 1.5 segundos
     setTimeout(() => {
-        toast.remove();
-    }, 2000); // Some em 2 segundos
+        aviso.style.opacity = "0";
+        setTimeout(() => aviso.remove(), 200);
+    }, 1500);
 }
 
-// Alterna o estado de favorito nos cards principais com feedback animado
+// Alterna o estado de favorito de forma direta e sem recarregar a página inteira
 function alternarFavorito(id, event) {
-    if (event) event.stopPropagation();
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
     
     const idTratado = Number(id) || id;
     let favoritos = JSON.parse(localStorage.getItem('meusFavoritos')) || [];
+    
+    const botaoCoracao = event ? event.target : null;
     
     if (favoritos.includes(idTratado)) {
         favoritos = favoritos.filter(fId => fId !== idTratado);
         localStorage.setItem('meusFavoritos', JSON.stringify(favoritos));
         
-        // Em vez de alert, chama a animação CSS
-        mostrarAvisoToast("Receita removida dos favoritos! 💔");
+        if (botaoCoracao) {
+            botaoCoracao.classList.remove('active-fav');
+            botaoCoracao.style.fontVariationSettings = "'FILL' 0";
+        }
+        mensagemRapidaCentro("Removido dos favoritos 💔");
     } else {
         favoritos.push(idTratado);
         localStorage.setItem('meusFavoritos', JSON.stringify(favoritos));
         
-        // Em vez de alert, chama a animação CSS
-        mostrarAvisoToast("Receita adicionada aos favoritos! ❤️");
+        if (botaoCoracao) {
+            botaoCoracao.classList.add('active-fav');
+            botaoCoracao.style.fontVariationSettings = "'FILL' 1";
+        }
+        mensagemRapidaCentro("Adicionado aos favoritos ❤️");
     }
     
-    // Atualiza as telas se as funções de renderização existirem
-    if (typeof renderizarReceitas === "function") {
-        renderizarReceitas(categoriaAtual);
-    }
-    if (typeof renderizarFavoritos === "function") {
+    if (document.getElementById("lista-favoritos")) {
         renderizarFavoritos();
     }
 }
     
-
 // Remove o favorito diretamente pela tela de favoritos
 function removerFavorito(idReceita) {
     const id = Number(idReceita) || idReceita;
@@ -316,75 +328,13 @@ function removerFavorito(idReceita) {
     favoritos = favoritos.filter(favId => favId !== id);
     localStorage.setItem('meusFavoritos', JSON.stringify(favoritos));
     
+    mensagemRapidaCentro("Removido 💔");
     renderizarFavoritos();
 }
-
-// Renderiza as receitas do IndexedDB usando o design visual original do HTML
-async function renderizarFavoritos() {
-    const container = document.getElementById('lista-favoritos');
-    if (!container) return; // Só executa se o elemento existir na página
-
-    // 1. Busca os IDs favoritados no localStorage
-    const listaIdsFavoritos = JSON.parse(localStorage.getItem('meusFavoritos')) || [];
-
-    // 2. Busca todas as receitas guardadas no IndexedDB
-    const todasAsReceitas = (await buscarItens()) || [];
-
-    // 3. Filtra apenas os registros favoritados
-    const receitasFavoritadas = todasAsReceitas.filter(receita => {
-        const idReceita = Number(receita.id) || receita.id;
-        return listaIdsFavoritos.includes(idReceita);
-    });
-
-    // Estado Vazio: Mantém o layout alinhado se não houver itens
-    if (receitasFavoritadas.length === 0) {
-        container.innerHTML = `
-            <div class="empty-msg" style="text-align: center; padding: 40px 20px; grid-column: 1/-1; color: #777; font-family: 'Poppins', sans-serif;">
-                <span class="material-symbols-outlined" style="font-size: 48px; color: #ccc; margin-bottom: 10px;">heart_broken</span>
-                <p style="font-size: 16px; margin: 0;">Sua lista de favoritos está vazia.</p>
-                <a href="receitas.html" class="btn-primary" style="display:inline-block; margin-top:15px; padding: 8px 16px; border-radius: 6px; text-decoration:none; background-color: #ff6b6b; color: #fff; font-size: 14px; font-weight: 600;">Explorar Receitas</a>
-            </div>`;
-        return;
-    }
-
-    // 4. Constrói a estrutura injetando os dados reais com as suas classes CSS originais
-    container.innerHTML = '';
-    receitasFavoritadas.forEach(receita => {
-        const article = document.createElement('article');
-        article.className = 'recipe-card';
-        
-        
-    article.innerHTML = `
-        <div class="recipe-img" style="background-image: url('${receita.foto}'); background-size: 100%; background-position: center; transition: background-size 0.4s ease;">
-    <span class="material-symbols-outlined fav-badge active-fav" onclick="removerFavorito(${receita.id})" title="Remover dos favoritos">favorite</span>
-</div>
-        <div class="recipe-content">
-            <span class="recipe-category">${receita.categoria}</span>
-            <h3 class="recipe-title">${receita.nome}</h3>
-            <div class="recipe-meta">
-                <span><i class="material-symbols-outlined">schedule</i> 25 min</span>
-                <span><i class="material-symbols-outlined">signal_cellular_alt</i> Fácil</span>
-            </div>
-            <div class="recipe-footer">
-                <button class="btn-view" onclick="alert('Ingredientes necessários:\\n\\n${receita.ingredientes}')">Ver Receita</button>
-                <button class="btn-icon-action" title="Adicionar ao Planejamento">
-                    <i class="material-symbols-outlined">calendar_add_on</i>
-                </button>
-            </div>
-        </div>
-    `;
-        container.appendChild(article);
-    });
-}
-
-// Monitora o carregamento da página para exibir os dados automaticamente
-document.addEventListener('DOMContentLoaded', renderizarFavoritos);
-
 // =========================================================================
 // 6. MÓDULO: PLANEJAMENTO SEMANAL E SORTEIO
 // =========================================================================
 
-// Popula os seletores de refeição baseado nas receitas salvas
 async function popularSeletores() {
     const tableRows = document.querySelectorAll("#planejamento tbody tr");
     if (tableRows.length === 0) return;
@@ -429,7 +379,6 @@ async function popularSeletores() {
     });
 }
 
-// Botão de Sorteio Automático de Cardápio
 const btnSortear = document.getElementById("btn-sortear");
 if (btnSortear) {
     btnSortear.addEventListener("click", async () => {
@@ -472,7 +421,6 @@ if (btnSortear) {
     });
 }
 
-// Destaca visualmente a coluna do dia atual na tabela de cronograma
 function destacarDiaAtual() {
     const tabela = document.querySelector("#planejamento table");
     if (!tabela) return;
@@ -489,7 +437,7 @@ function destacarDiaAtual() {
 
     const linhas = tabela.querySelectorAll("tbody tr");
     linhas.forEach(linha => {
-        const tds = perimeter = linha.querySelectorAll("td");
+        const tds = linha.querySelectorAll("td");
         if (tds[colunaAtual]) {
             tds[colunaAtual].style.backgroundColor = "rgba(42, 54, 26, 0.1)";
         }
@@ -501,7 +449,6 @@ function destacarDiaAtual() {
 // 7. MÓDULO: LISTA DE COMPRAS (INTEGRAÇÃO COM O PLANEJAMENTO)
 // =========================================================================
 
-// Salva as refeições em texto limpo para o gerador de compras usar
 function salvarCardapioNaMemoria() {
     const selects = document.querySelectorAll("#planejamento tbody select");
     if (selects.length > 0) {
@@ -510,7 +457,6 @@ function salvarCardapioNaMemoria() {
     }
 }
 
-// Escutadores para disparar o salvamento em memória
 document.addEventListener("change", (e) => {
     if (e.target.matches("#planejamento select")) {
         salvarCardapioNaMemoria();
@@ -523,7 +469,6 @@ document.addEventListener("click", (e) => {
     }
 });
 
-// Evento para processar e estruturar a lista de compras na tela
 document.addEventListener("DOMContentLoaded", () => {
     const btnGerarCompras = document.getElementById("btn-gerar-compras");
     const containerLista = document.getElementById("conteudo-lista-compras");
@@ -609,51 +554,121 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 // =========================================================================
-// 8. MÓDULO: PERFIL, GESTÃO DE USUÁRIOS E FAMÍLIA
+// 8. MÓDULO: SIDEBAR (INTERFACE E COMPORTAMENTO VISUAL)
 // =========================================================================
 
-// Carrega os dados salvos em login para a sidebar e configurações
-function carregarPerfilLogado() {
-    const dadosSessao = localStorage.getItem('usuarioLogado');
+document.addEventListener('DOMContentLoaded', () => {
+    const btnToggle = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    const body = document.body;
 
-    if (dadosSessao) {
-        const usuario = JSON.parse(dadosSessao);
-
-        // Atualização Sidebar
-        const sidebarNome = document.getElementById('display-user-name');
-        const sidebarAvatar = document.getElementById('user-initial');
-
-        if (sidebarNome) sidebarNome.textContent = usuario.nome;
-        if (sidebarAvatar) sidebarAvatar.textContent = usuario.nome.charAt(0).toUpperCase();
-
-        // Atualização Tela de Perfil/Configurações
-        const inputNome = document.getElementById('edit-nome');
-        const inputEmail = document.getElementById('edit-email');
-        const profileName = document.getElementById('profile-name');
-        const profileEmail = document.getElementById('profile-email');
-        const avatarGrande = document.getElementById('user-initial-large');
-
-        if (inputNome) inputNome.value = usuario.nome;
-        if (inputEmail) inputEmail.value = usuario.email;
-        if (profileName) profileName.textContent = usuario.nome;
-        if (profileEmail) profileEmail.textContent = usuario.email;
-        if (avatarGrande) avatarGrande.textContent = usuario.nome.charAt(0).toUpperCase();
-
-        if (usuario.restricoes) {
-            const checkboxes = document.querySelectorAll('.checkbox-grid-profile input');
-            checkboxes.forEach(cb => {
-                cb.checked = usuario.restricoes.includes(cb.value);
-            });
-        }
-    } else {
-        console.log("Nenhum usuário logado encontrado no localStorage.");
+    if (btnToggle && sidebar) {
+        btnToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            body.classList.toggle('sidebar-collapsed');
+        });
     }
-}
+});
 
-// Escuta automática do perfil logado
-document.addEventListener('DOMContentLoaded', carregarPerfilLogado);
 
-// Carrega a listagem de membros familiares do banco de dados
+// =========================================================================
+// 9. MÓDULO: CONFIGURAÇÕES, GESTÃO DE USUÁRIOS E PERFIL REFEITO
+// =========================================================================
+
+document.addEventListener("DOMContentLoaded", async () => {
+    const dadosSessao = localStorage.getItem('usuarioLogado');
+    if (!dadosSessao) {
+        console.log("Nenhum usuário logado encontrado no localStorage.");
+        return;
+    }
+
+    const usuarioSessao = JSON.parse(dadosSessao);
+
+    const sidebarNome = document.getElementById('display-user-name');
+    const sidebarAvatar = document.getElementById('user-initial');
+    if (sidebarNome) sidebarNome.textContent = usuarioSessao.nome;
+    if (sidebarAvatar) sidebarAvatar.textContent = usuarioSessao.nome.charAt(0).toUpperCase();
+
+    const formEditar = document.getElementById("form-editar-perfil");
+    if (!formEditar) return; 
+
+    if (usuarioSessao.email === "convidado@teste.com" || usuarioSessao.tipo === "visitante") {
+        formEditar.querySelectorAll("input, button").forEach(el => el.disabled = true);
+        const aviso = document.createElement("p");
+        aviso.style.color = "red";
+        aviso.style.marginTop = "15px";
+        aviso.style.fontWeight = "bold";
+        aviso.innerText = "Contas de convidado não podem alterar configurações do banco.";
+        formEditar.appendChild(aviso);
+        return;
+    }
+
+    try {
+        const todosUsuarios = await buscarUsuarios();
+        const usuarioAtual = todosUsuarios.find(u => u.email.toLowerCase() === usuarioSessao.email.toLowerCase());
+
+        if (usuarioAtual) {
+            document.getElementById('edit-nome').value = usuarioAtual.nome;
+            document.getElementById('edit-email').value = usuarioAtual.email;
+            document.getElementById('profile-name').textContent = usuarioAtual.nome;
+            document.getElementById('profile-email').textContent = usuarioAtual.email;
+            
+            const avatarGrande = document.getElementById('user-initial-large');
+            if (avatarGrande) avatarGrande.textContent = usuarioAtual.nome.charAt(0).toUpperCase();
+
+            if (usuarioAtual.restricoes) {
+                const checkboxes = formEditar.querySelectorAll('.restricao');
+                checkboxes.forEach(cb => {
+                    cb.checked = usuarioAtual.restricoes.includes(cb.value);
+                });
+            }
+        }
+
+        formEditar.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const novoNome = document.getElementById("edit-nome").value.trim();
+            const novoEmail = document.getElementById("edit-email").value.trim();
+            const novaSenha = document.getElementById("edit-senha").value;
+
+            const checkboxesMarcados = formEditar.querySelectorAll(".restricao:checked");
+            const novasRestricoes = Array.from(checkboxesMarcados).map(cb => cb.value);
+
+            const senhaFinal = novaSenha !== "" ? novaSenha : (usuarioAtual ? usuarioAtual.senha : usuarioSessao.senha);
+
+            const usuarioAtualizado = {
+                id: usuarioAtual ? usuarioAtual.id : usuarioSessao.id,
+                nome: novoNome,
+                email: novoEmail,
+                senha: senhaFinal,
+                restricoes: novasRestricoes
+            };
+
+            if (typeof atualizarUsuarioNoBanco === "function") {
+                await atualizarUsuarioNoBanco(usuarioAtualizado);
+            } else {
+                const transaction = db.transaction(["usuarios"], "readwrite");
+                await new Promise((resolve) => {
+                    const request = transaction.objectStore("usuarios").put(usuarioAtualizado);
+                    request.onsuccess = () => resolve();
+                });
+            }
+
+            localStorage.setItem("usuarioLogado", JSON.stringify(usuarioAtualizado));
+
+            alert("Configurações salvas e senha atualizada com sucesso!");
+            window.location.reload();
+        });
+
+    } catch (error) {
+        console.error("Falha ao sincronizar painel de controle de conta:", error);
+    }
+});
+
+// =========================================================================
+// 10. GESTÃO DA FAMÍLIA (Membros adicionais)
+// =========================================================================
+
 async function carregarUsuarios() {
     const lista = document.getElementById("lista-membros-ui");
     if (!lista) return;
@@ -698,7 +713,6 @@ async function carregarUsuarios() {
     });
 }
 
-// Dispara o salvamento de um novo membro familiar no banco
 document.addEventListener("click", async (e) => {
     if (e.target.id === "btn-convidar") {
         const nomeInput = document.getElementById("nome_convite");
@@ -739,120 +753,4 @@ document.addEventListener("click", async (e) => {
     }
 });
 
-// Escuta automática dos usuários familiares
 document.addEventListener("DOMContentLoaded", carregarUsuarios);
-
-
-// =========================================================================
-// 9. MÓDULO: SIDEBAR (INTERFACE E COMPORTAMENTO VISUAL)
-// =========================================================================
-
-document.addEventListener('DOMContentLoaded', () => {
-    const btnToggle = document.getElementById('sidebarToggle');
-    const sidebar = document.getElementById('sidebar');
-    const body = document.body;
-
-    if (btnToggle && sidebar) {
-        btnToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('collapsed');
-            body.classList.toggle('sidebar-collapsed');
-        });
-    }
-});
-
-
-// ==========================================
-// MÓDULO: CONFIGURAÇÕES E EDIÇÃO DE PERFIL
-// ==========================================
-
-document.addEventListener("DOMContentLoaded", async () => {
-    const formEditar = document.getElementById("form-editar-perfil");
-    if (!formEditar) return; // Só roda se estiver na página de configurações
-
-    // 1. Recupera o usuário atualmente logado na sessão
-    const usuarioSessao = JSON.parse(localStorage.getItem("usuarioLogado"));
-
-    if (!usuarioSessao) {
-        alert("Sessão expirada. Faça login novamente.");
-        window.location.href = "index.html";
-        return;
-    }
-
-    // Se for convidado, bloqueia a edição por segurança
-    if (usuarioSessao.email === "convidado@teste.com") {
-        formEditar.querySelectorAll("input, button").forEach(el => el.disabled = true);
-        const aviso = document.createElement("p");
-        aviso.style.color = "red";
-        aviso.innerText = "Contas de convidado não podem alterar configurações.";
-        formEditar.appendChild(aviso);
-        return;
-    }
-
-    // 2. Preenche os campos do HTML com os dados atuais do banco
-    try {
-        const todosUsuarios = await buscarUsuarios();
-        // Busca o usuário atualizado direto do IndexedDB para garantir dados reais
-        const usuarioAtual = todosUsuarios.find(u => u.email.toLowerCase() === usuarioSessao.email.toLowerCase());
-
-        if (usuarioAtual) {
-            document.getElementById("edit-nome").value = usuarioAtual.nome;
-            document.getElementById("edit-email").value = usuarioAtual.email;
-            
-            // Atualiza os textos do cabeçalho do perfil
-            document.getElementById("profile-name").innerText = usuarioAtual.nome;
-            document.getElementById("profile-email").innerText = usuarioAtual.email;
-            if (document.getElementById("user-initial-large")) {
-                document.getElementById("user-initial-large").innerText = usuarioAtual.nome.charAt(0).toUpperCase();
-            }
-
-            // Marcar as caixinhas de restrições salvas
-            if (usuarioAtual.restricoes) {
-                const checkboxes = formEditar.querySelectorAll(".checkbox-grid-profile input[type='checkbox']");
-                checkboxes.forEach(cb => {
-                    if (usuarioAtual.restricoes.includes(cb.value)) {
-                        cb.checked = true;
-                    }
-                });
-            }
-        }
-
-        // 3. Escuta o envio do formulário para Salvar as Alterações
-        formEditar.addEventListener("submit", async (e) => {
-            e.preventDefault();
-
-            const novoNome = document.getElementById("edit-nome").value.trim();
-            const novoEmail = document.getElementById("edit-email").value.trim();
-            const novaSenha = document.getElementById("edit-senha").value;
-
-            // Captura as restrições alimentares selecionadas
-            const checkboxesMarcados = formEditar.querySelectorAll(".checkbox-grid-profile input[type='checkbox']:checked");
-            const novasRestricoes = Array.from(checkboxesMarcados).map(cb => cb.value);
-
-            // Se o campo de senha estiver em branco, mantém a senha antiga
-            const senhaFinal = novaSenha !== "" ? novaSenha : usuarioAtual.senha;
-
-            // Monta o objeto atualizado mantendo o mesmo ID do IndexedDB
-            const usuarioAtualizado = {
-                id: usuarioAtual.id, // Essencial para o IndexedDB saber quem atualizar
-                nome: novoNome,
-                email: novoEmail,
-                senha: senhaFinal,
-                restricoes: novasRestricoes
-            };
-
-            // Salva no IndexedDB
-            await atualizarUsuarioNoBanco(usuarioAtualizado);
-
-            // Atualiza a sessão no localStorage para refletir no menu/sidebar imediatamente
-            localStorage.setItem("usuarioLogado", JSON.stringify(usuarioAtualizado));
-
-            alert("Perfil e senha atualizados com sucesso!");
-            
-            // Recarrega a página para atualizar todos os elementos visuais
-            window.location.reload();
-        });
-
-    } catch (error) {
-        console.error("Erro ao carregar ou salvar configurações:", error);
-    }
-});

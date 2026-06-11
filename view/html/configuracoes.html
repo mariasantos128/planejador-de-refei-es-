@@ -10,7 +10,28 @@
 <body class="dash-body">
 
     <nav class="sidebar" id="sidebar">
-        </nav>
+        <div class="user-profile">
+            <div class="avatar" id="user-initial">U</div>
+            <div class="user-info">
+                <h3 id="display-user-name">Usuário</h3>
+                <p>Seja bem-vindo(a)!</p>
+            </div>
+        </div>
+        
+        <ul class="nav-links">
+            <li><a href="dashboard.html"><i class="material-symbols-outlined">home</i> <span class="label">Início</span></a></li>
+            <li><a href="planejamento.html"><i class="material-symbols-outlined">calendar_month</i> <span class="label">Cronograma</span></a></li>
+            <li><a href="compras.html"><i class="material-symbols-outlined">shopping_cart</i> <span class="label">Lista de Compras</span></a></li>
+            <li><a href="receitas.html"><i class="material-symbols-outlined">soup_kitchen</i> <span class="label">Receitas</span></a></li>
+            <li><a href="favoritos.html"><i class="material-symbols-outlined">star</i> <span class="label">Favoritos</span></a></li>
+            <li><a href="familia.html"><i class="material-symbols-outlined">diversity_1</i> <span class="label">Família</span></a></li>
+            <li><a href="configuracoes.html"><i class="material-symbols-outlined">settings</i> <span class="label">Configurações</span></a></li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <a href="/index.html" class="logout-link"><i class="material-symbols-outlined">logout</i> <span class="label">Sair da conta</span></a>
+        </div>
+    </nav>
 
     <main class="main-content">
         <header class="dash-header">
@@ -40,12 +61,12 @@
                     <div class="form-grid-2">
                         <div class="input-group">
                             <label for="edit-nome">Nome Completo</label>
-                            <input type="text" id="edit-nome" placeholder="Seu nome" value="Nome do Usuário">
+                            <input type="text" id="edit-nome" placeholder="Seu nome" value="">
                         </div>
 
                         <div class="input-group">
                             <label for="edit-email">E-mail</label>
-                            <input type="email" id="edit-email" placeholder="Seu e-mail" value="usuario@email.com">
+                            <input type="email" id="edit-email" placeholder="Seu e-mail" value="">
                         </div>
                     </div>
 
@@ -63,16 +84,16 @@
                         <p class="section-label">Restrições Alimentares:</p>
                         <div class="checkbox-grid-profile">
                             <label class="custom-checkbox">
-                                <input type="checkbox" value="Glúten"> <span>Sem Glúten</span>
+                                <input type="checkbox" class="restricao" value="Glúten"> <span>Sem Glúten</span>
                             </label>
                             <label class="custom-checkbox">
-                                <input type="checkbox" value="Lactose"> <span>Sem Lactose</span>
+                                <input type="checkbox" class="restricao" value="Lactose"> <span>Sem Lactose</span>
                             </label>
                             <label class="custom-checkbox">
-                                <input type="checkbox" value="Vegano"> <span>Vegano</span>
+                                <input type="checkbox" class="restricao" value="Vegano"> <span>Vegano</span>
                             </label>
                             <label class="custom-checkbox">
-                                <input type="checkbox" value="Açúcar"> <span>Zero Açúcar</span>
+                                <input type="checkbox" class="restricao" value="Açúcar"> <span>Zero Açúcar</span>
                             </label>
                         </div>
                     </div>
@@ -101,32 +122,6 @@
                 </ul>
             </div>
 
-
-            <nav class="sidebar" id="sidebar">
-    <div class="user-profile">
-        <div class="avatar" id="user-initial">U</div>
-        <div class="user-info">
-            <h3 id="display-user-name">Usuário</h3>
-            <p>Seja bem-vindo(a)!</p>
-        </div>
-    </div>
-    
-    <ul class="nav-links">
-    <li><a href="dashboard.html"><i class="material-symbols-outlined">home</i> <span class="label">Início</span></a></li>
-    <li><a href="planejamento.html"><i class="material-symbols-outlined">calendar_month</i> <span class="label">Cronograma</span></a></li>
-    <li><a href="compras.html"><i class="material-symbols-outlined">shopping_cart</i> <span class="label">Lista de Compras</span></a></li>
-    <li><a href="receitas.html"><i class="material-symbols-outlined">soup_kitchen</i> <span class="label">Receitas</span></a></li>
-    <li><a href="favoritos.html"><i class="material-symbols-outlined">star</i> <span class="label">Favoritos</span></a></li>
-    <li><a href="familia.html"><i class="material-symbols-outlined">diversity_1</i> <span class="label">Família</span></a></li>
-    <li><a href="configuracoes.html"><i class="material-symbols-outlined">settings</i> <span class="label">Configurações</span></a></li>
-</ul>
-
-    <div class="sidebar-footer">
-        <a href="index.html" class="logout-link"><i class="material-symbols-outlined">logout</i> <span class="label">Sair da conta</span></a>
-    </div>
-</nav>
-
-
             <div class="card">
                 <div class="card-header">
                     <h3>Suporte</h3>
@@ -139,8 +134,8 @@
     </main>
 
     <script src="../js/db.js"></script>
-<script src="../js/controller.js"></script>
-<script src="../js/login-controller.js"></script>
-<script src="../js/script.js"></script>
+    <script src="../js/controller.js"></script>
+    <script src="../js/login-controller.js"></script>
+    <script src="../js/script.js"></script>
 </body>
 </html>
