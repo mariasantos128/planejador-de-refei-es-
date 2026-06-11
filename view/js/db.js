@@ -126,3 +126,17 @@ async function removerUsuario(id) {
 
 // Inicializa o banco de dados assim que o arquivo db.js for lido
 iniciarBanco();
+
+// Atualiza um usuário existente no IndexedDB
+async function atualizarUsuarioNoBanco(usuario) {
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([TABELA_USUARIOS], "readwrite");
+        const store = transaction.objectStore(TABELA_USUARIOS);
+        
+        // O método .put() adiciona se não existir ou atualiza se o ID já existir
+        const request = store.put(usuario);
+
+        request.onsuccess = () => resolve("Usuário atualizado com sucesso!");
+        request.onerror = (event) => reject(event.target.error);
+    });
+}

@@ -18,61 +18,88 @@ function entrarComoConvidado() {
     localStorage.setItem('usuarioLogado', JSON.stringify(usuario));
     alert("Entrando como convidado...");
     
-    // CORRIGIDO: Removida a barra inicial para funcionar no GitHub Pages
-    window.location.href = 'view/html/dashboard.html';
+    // CORRIGIDO: Como o login já está em view/html/, basta chamar o arquivo direto
+    window.location.href = 'dashboard.html';
 }
 
-// LÓGICA DE LOGIN (Protegida com IF)
+// =======================================================
+// LÓGICA DE LOGIN REAL (Integrada com IndexedDB)
+// =======================================================
 const formLogin = document.getElementById('form-login');
 if (formLogin) {
-    formLogin.addEventListener('submit', (e) => {
+    formLogin.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        const email = document.getElementById('login-email').value;
+        const email = document.getElementById('login-email').value.trim();
+        const campoSenha = document.getElementById('login-senha');
+        const senha = campoSenha ? campoSenha.value : '';
         
-        // Tenta buscar se esse usuário existe no sistema (simulação ou banco)
-        const nomeExtraido = email.split('@')[0];
-        
-        const usuario = {
-            nome: nomeExtraido.charAt(0).toUpperCase() + nomeExtraido.slice(1), 
-            email: email,
-            restricoes: []
-        };
+        try {
+            const usuariosCadastrados = await buscarUsuarios();
+            
+            const usuarioEncontrado = usuariosCadastrados.find(
+                u => u.email.toLowerCase() === email.toLowerCase() && u.senha === senha
+            );
 
-        localStorage.setItem('usuarioLogado', JSON.stringify(usuario));
-        alert("Login realizado!");
-        
-        // CORRIGIDO: Removida a barra inicial para funcionar no GitHub Pages
-        window.location.href = 'view/html/dashboard.html';
+            if (usuarioEncontrado) {
+                localStorage.setItem('usuarioLogado', JSON.stringify(usuarioEncontrado));
+                alert(`Login realizado! Bem-vindo(a), ${usuarioEncontrado.nome}!`);
+                
+                // CORRIGIDO: Redirecionamento direto sem duplicar pastas
+                window.location.href = 'dashboard.html';
+            } else {
+                alert("E-mail ou senha incorretos! Verifique seus dados ou crie uma nova conta.");
+            }
+        } catch (error) {
+            console.error("Erro ao validar login:", error);
+            alert("Ocorreu um erro ao conectar com o banco de dados.");
+        }
     });
 }
 
-// LÓGICA DE CADASTRO (Protegida com IF)
+// =======================================================
+// LÓGICA DE CADASTRO REAL (Integrada com IndexedDB)
+// =======================================================
 const formCadastro = document.getElementById('form-cadastro');
 if (formCadastro) {
-    formCadastro.addEventListener('submit', (e) => {
+    formCadastro.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        const nome = document.getElementById('cad-nome').value;
-        const email = document.getElementById('cad-email').value;
+        const nome = document.getElementById('cad-nome').value.trim();
+        const email = document.getElementById('cad-email').value.trim();
+        const campoSenhaCadastro = document.getElementById('cad-senha');
+        const senha = campoSenhaCadastro ? campoSenhaCadastro.value : '';
         
-        // Captura as restrições marcadas no cadastro
         const checkboxes = document.querySelectorAll('.restricao:checked');
         const restricoes = Array.from(checkboxes).map(cb => cb.value);
 
-        // Cria o objeto do usuário
         const novoUsuario = {
             nome: nome,
             email: email,
+            senha: senha,
             restricoes: restricoes
         };
 
-        // Salva no localStorage para simular que a conta foi criada e está ativa
-        localStorage.setItem('usuarioLogado', JSON.stringify(novoUsuario));
-        
-        alert("Conta criada com sucesso! Redirecionando...");
-        
-        // CORRIGIDO: Removida a barra inicial para funcionar no GitHub Pages
-        window.location.href = 'view/html/dashboard.html';
+        try {
+            const usuariosExistentes = await buscarUsuarios();
+            const emailJaExiste = usuariosExistentes.some(u => u.email.toLowerCase() === email.toLowerCase());
+
+            if (emailJaExiste) {
+                alert("Este e-mail já está cadastrado por outro usuário!");
+                return;
+            }
+
+            await adicionarUsuario(novoUsuario);
+            localStorage.setItem('usuarioLogado', JSON.stringify(novoUsuario));
+            
+            alert("Conta criada com sucesso! Redirecionando...");
+            
+            // CORRIGIDO: Redirecionamento direto sem duplicar pastas
+            window.location.href = 'dashboard.html';
+            
+        } catch (error) {
+            console.error("Erro ao realizar cadastro:", error);
+            alert("Erro ao tentar salvar os dados no banco de dados.");
+        }
     });
 }

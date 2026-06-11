@@ -759,3 +759,100 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+
+// ==========================================
+// MÓDULO: CONFIGURAÇÕES E EDIÇÃO DE PERFIL
+// ==========================================
+
+document.addEventListener("DOMContentLoaded", async () => {
+    const formEditar = document.getElementById("form-editar-perfil");
+    if (!formEditar) return; // Só roda se estiver na página de configurações
+
+    // 1. Recupera o usuário atualmente logado na sessão
+    const usuarioSessao = JSON.parse(localStorage.getItem("usuarioLogado"));
+
+    if (!usuarioSessao) {
+        alert("Sessão expirada. Faça login novamente.");
+        window.location.href = "index.html";
+        return;
+    }
+
+    // Se for convidado, bloqueia a edição por segurança
+    if (usuarioSessao.email === "convidado@teste.com") {
+        formEditar.querySelectorAll("input, button").forEach(el => el.disabled = true);
+        const aviso = document.createElement("p");
+        aviso.style.color = "red";
+        aviso.innerText = "Contas de convidado não podem alterar configurações.";
+        formEditar.appendChild(aviso);
+        return;
+    }
+
+    // 2. Preenche os campos do HTML com os dados atuais do banco
+    try {
+        const todosUsuarios = await buscarUsuarios();
+        // Busca o usuário atualizado direto do IndexedDB para garantir dados reais
+        const usuarioAtual = todosUsuarios.find(u => u.email.toLowerCase() === usuarioSessao.email.toLowerCase());
+
+        if (usuarioAtual) {
+            document.getElementById("edit-nome").value = usuarioAtual.nome;
+            document.getElementById("edit-email").value = usuarioAtual.email;
+            
+            // Atualiza os textos do cabeçalho do perfil
+            document.getElementById("profile-name").innerText = usuarioAtual.nome;
+            document.getElementById("profile-email").innerText = usuarioAtual.email;
+            if (document.getElementById("user-initial-large")) {
+                document.getElementById("user-initial-large").innerText = usuarioAtual.nome.charAt(0).toUpperCase();
+            }
+
+            // Marcar as caixinhas de restrições salvas
+            if (usuarioAtual.restricoes) {
+                const checkboxes = formEditar.querySelectorAll(".checkbox-grid-profile input[type='checkbox']");
+                checkboxes.forEach(cb => {
+                    if (usuarioAtual.restricoes.includes(cb.value)) {
+                        cb.checked = true;
+                    }
+                });
+            }
+        }
+
+        // 3. Escuta o envio do formulário para Salvar as Alterações
+        formEditar.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const novoNome = document.getElementById("edit-nome").value.trim();
+            const novoEmail = document.getElementById("edit-email").value.trim();
+            const novaSenha = document.getElementById("edit-senha").value;
+
+            // Captura as restrições alimentares selecionadas
+            const checkboxesMarcados = formEditar.querySelectorAll(".checkbox-grid-profile input[type='checkbox']:checked");
+            const novasRestricoes = Array.from(checkboxesMarcados).map(cb => cb.value);
+
+            // Se o campo de senha estiver em branco, mantém a senha antiga
+            const senhaFinal = novaSenha !== "" ? novaSenha : usuarioAtual.senha;
+
+            // Monta o objeto atualizado mantendo o mesmo ID do IndexedDB
+            const usuarioAtualizado = {
+                id: usuarioAtual.id, // Essencial para o IndexedDB saber quem atualizar
+                nome: novoNome,
+                email: novoEmail,
+                senha: senhaFinal,
+                restricoes: novasRestricoes
+            };
+
+            // Salva no IndexedDB
+            await atualizarUsuarioNoBanco(usuarioAtualizado);
+
+            // Atualiza a sessão no localStorage para refletir no menu/sidebar imediatamente
+            localStorage.setItem("usuarioLogado", JSON.stringify(usuarioAtualizado));
+
+            alert("Perfil e senha atualizados com sucesso!");
+            
+            // Recarrega a página para atualizar todos os elementos visuais
+            window.location.reload();
+        });
+
+    } catch (error) {
+        console.error("Erro ao carregar ou salvar configurações:", error);
+    }
+});
