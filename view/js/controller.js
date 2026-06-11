@@ -5,8 +5,40 @@
 let bancoPronto = false;
 let categoriaAtual = "Todas";
 
+// Função Global e Imediata para Sincronizar a Sidebar (Roda antes de tudo)
+function sincronizarSidebarImediato() {
+    const dadosSessao = localStorage.getItem('usuarioLogado');
+    if (!dadosSessao) {
+        console.log("⚠️ Nenhuma sessão de usuário ativa encontrada no LocalStorage.");
+        return;
+    }
+
+    try {
+        const usuarioSessao = JSON.parse(dadosSessao);
+        
+        // Captura os elementos da Sidebar pelo ID original do seu projeto
+        const sidebarNome = document.getElementById('display-user-name');
+        const sidebarAvatar = document.getElementById('user-initial');
+
+        // Se os elementos existirem na tela atual, injeta os dados na velocidade da luz
+        if (sidebarNome && usuarioSessao.nome) {
+            sidebarNome.textContent = usuarioSessao.nome;
+        }
+        if (sidebarAvatar && usuarioSessao.nome) {
+            sidebarAvatar.textContent = usuarioSessao.nome.charAt(0).toUpperCase();
+        }
+        
+        console.log("👤 Sidebar sincronizada com sucesso para: " + usuarioSessao.nome);
+    } catch (e) {
+        console.error("❌ Erro ao decodificar dados da sessão para a Sidebar:", e);
+    }
+}
+
 // Inicialização Principal Unificada do Sistema
 document.addEventListener("DOMContentLoaded", async () => {
+    // 0. Executa a sincronização da barra lateral imediatamente no carregamento da árvore HTML
+    sincronizarSidebarImediato();
+
     try {
         // 1. Garante que o banco de dados IndexedDB iniciou primeiro
         await iniciarBanco();
@@ -39,7 +71,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 
-
 // =========================================================================
 // 2. FUNÇÕES UTILITÁRIAS / AUXILIARES
 // =========================================================================
@@ -58,7 +89,7 @@ function mostrarNotificacao(mensagem, corFundo = "var(--cor-media)") {
         toast.id = "toast";
         document.body.appendChild(toast);
     }
-    toast.textContent = message = mensagem;
+    toast.textContent = mensagem;
     toast.style.backgroundColor = corFundo;
     toast.className = "mostrar";
     setTimeout(() => { toast.className = toast.className.replace("mostrar", ""); }, 3000);
@@ -66,7 +97,7 @@ function mostrarNotificacao(mensagem, corFundo = "var(--cor-media)") {
 
 
 // =========================================================================
-// 3. MÓDULO: RECEITAS (CARREGAMENTO, CADASTRO E FILTROS) - VERSÃO PREMIUN UNIFICADA
+// 3. MÓDULO: RECEITAS (CARREGAMENTO, CADASTRO E FILTROS)
 // =========================================================================
 
 // Injeta as receitas iniciais no banco de dados caso esteja vazio
@@ -193,6 +224,7 @@ if (btnSalvar) {
     });
 }
 
+
 // =========================================================================
 // 4. MÓDULO: MODAL DETALHES DA RECEITA
 // =========================================================================
@@ -237,16 +269,10 @@ document.addEventListener('click', (e) => {
 
 
 // =========================================================================
-// 5. MÓDULO: FAVORITOS
-// =========================================================================
-
-// =========================================================================
 // 5. MÓDULO: FAVORITOS (VERSÃO DIRETA NO CENTRO DA TELA)
 // =========================================================================
 
-// Cria uma mensagem simples bem no centro da tela, sem barras coloridas na lateral
 function mensagemRapidaCentro(texto) {
-    // Se já tiver uma mensagem na tela, remove para não acumular
     const avisoExistente = document.getElementById("aviso-centro-rapido");
     if (avisoExistente) avisoExistente.remove();
 
@@ -254,7 +280,6 @@ function mensagemRapidaCentro(texto) {
     aviso.id = "aviso-centro-rapido";
     aviso.textContent = texto;
 
-    // Estilização minimalista bem no centro da tela
     Object.assign(aviso.style, {
         position: "fixed",
         top: "50%",
@@ -276,14 +301,12 @@ function mensagemRapidaCentro(texto) {
 
     document.body.appendChild(aviso);
 
-    // Some rápido após 1.5 segundos
     setTimeout(() => {
         aviso.style.opacity = "0";
         setTimeout(() => aviso.remove(), 200);
     }, 1500);
 }
 
-// Alterna o estado de favorito de forma direta e sem recarregar a página inteira
 function alternarFavorito(id, event) {
     if (event) {
         event.stopPropagation();
@@ -320,7 +343,6 @@ function alternarFavorito(id, event) {
     }
 }
     
-// Remove o favorito diretamente pela tela de favoritos
 function removerFavorito(idReceita) {
     const id = Number(idReceita) || idReceita;
     let favoritos = JSON.parse(localStorage.getItem('meusFavoritos')) || [];
@@ -331,6 +353,8 @@ function removerFavorito(idReceita) {
     mensagemRapidaCentro("Removido 💔");
     renderizarFavoritos();
 }
+
+
 // =========================================================================
 // 6. MÓDULO: PLANEJAMENTO SEMANAL E SORTEIO
 // =========================================================================
@@ -437,7 +461,7 @@ function destacarDiaAtual() {
 
     const linhas = tabela.querySelectorAll("tbody tr");
     linhas.forEach(linha => {
-        const tds = linha.querySelectorAll("td");
+        const tds = inlineTds = linha.querySelectorAll("td");
         if (tds[colunaAtual]) {
             tds[colunaAtual].style.backgroundColor = "rgba(42, 54, 26, 0.1)";
         }
@@ -572,25 +596,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 // =========================================================================
-// 9. MÓDULO: CONFIGURAÇÕES, GESTÃO DE USUÁRIOS E PERFIL REFEITO
+// 9. MÓDULO: CONFIGURAÇÕES, GESTÃO DE USUÁRIOS E PERFIL REFEITO e BLINDADO
 // =========================================================================
 
 document.addEventListener("DOMContentLoaded", async () => {
+    const formEditar = document.getElementById("form-editar-perfil");
+    if (!formEditar) return; 
+
+    console.log("⚙️ Inicializando tela di configurações...");
+
     const dadosSessao = localStorage.getItem('usuarioLogado');
     if (!dadosSessao) {
-        console.log("Nenhum usuário logado encontrado no localStorage.");
+        console.error("❌ Nenhum usuário logado encontrado no localStorage.");
         return;
     }
 
     const usuarioSessao = JSON.parse(dadosSessao);
-
-    const sidebarNome = document.getElementById('display-user-name');
-    const sidebarAvatar = document.getElementById('user-initial');
-    if (sidebarNome) sidebarNome.textContent = usuarioSessao.nome;
-    if (sidebarAvatar) sidebarAvatar.textContent = usuarioSessao.nome.charAt(0).toUpperCase();
-
-    const formEditar = document.getElementById("form-editar-perfil");
-    if (!formEditar) return; 
 
     if (usuarioSessao.email === "convidado@teste.com" || usuarioSessao.tipo === "visitante") {
         formEditar.querySelectorAll("input, button").forEach(el => el.disabled = true);
@@ -604,22 +625,34 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     try {
-        const todosUsuarios = await buscarUsuarios();
-        const usuarioAtual = todosUsuarios.find(u => u.email.toLowerCase() === usuarioSessao.email.toLowerCase());
+        const todosUsuarios = (await buscarUsuarios()) || [];
+        console.log("👥 Usuários cadastrados no banco:", todosUsuarios);
 
-        if (usuarioAtual) {
-            document.getElementById('edit-nome').value = usuarioAtual.nome;
-            document.getElementById('edit-email').value = usuarioAtual.email;
-            document.getElementById('profile-name').textContent = usuarioAtual.nome;
-            document.getElementById('profile-email').textContent = usuarioAtual.email;
-            
+        const usuarioAtual = todosUsuarios.find(u => u && u.email && u.email.toLowerCase() === usuarioSessao.email.toLowerCase());
+        const dadosFinais = usuarioAtual || usuarioSessao;
+
+        if (dadosFinais) {
+            console.log("✅ Dados do usuário encontrados para preenchimento:", dadosFinais);
+
+            const inputNome = document.getElementById('edit-nome');
+            const inputEmail = document.getElementById('edit-email');
+            const txtProfileName = document.getElementById('profile-name');
+            const txtProfileEmail = document.getElementById('profile-email');
             const avatarGrande = document.getElementById('user-initial-large');
-            if (avatarGrande) avatarGrande.textContent = usuarioAtual.nome.charAt(0).toUpperCase();
 
-            if (usuarioAtual.restricoes) {
+            if (inputNome) inputNome.value = dadosFinais.nome || "";
+            if (inputEmail) inputEmail.value = dadosFinais.email || "";
+            if (txtProfileName) txtProfileName.textContent = dadosFinais.nome || "Usuário";
+            if (txtProfileEmail) txtProfileEmail.textContent = dadosFinais.email || "";
+            
+            if (avatarGrande && dadosFinais.nome) {
+                avatarGrande.textContent = dadosFinais.nome.charAt(0).toUpperCase();
+            }
+
+            if (dadosFinais.restricoes) {
                 const checkboxes = formEditar.querySelectorAll('.restricao');
                 checkboxes.forEach(cb => {
-                    cb.checked = usuarioAtual.restricoes.includes(cb.value);
+                    cb.checked = dadosFinais.restricoes.includes(cb.value);
                 });
             }
         }
@@ -627,9 +660,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         formEditar.addEventListener("submit", async (e) => {
             e.preventDefault();
 
-            const novoNome = document.getElementById("edit-nome").value.trim();
-            const novoEmail = document.getElementById("edit-email").value.trim();
-            const novaSenha = document.getElementById("edit-senha").value;
+            const novoNome = document.getElementById("edit-nome")?.value.trim() || "";
+            const novoEmail = document.getElementById("edit-email")?.value.trim() || "";
+            const novaSenha = document.getElementById("edit-senha")?.value || "";
 
             const checkboxesMarcados = formEditar.querySelectorAll(".restricao:checked");
             const novasRestricoes = Array.from(checkboxesMarcados).map(cb => cb.value);
@@ -641,29 +674,36 @@ document.addEventListener("DOMContentLoaded", async () => {
                 nome: novoNome,
                 email: novoEmail,
                 senha: senhaFinal,
-                restricoes: novasRestricoes
+                restricoes: novasRestricoes,
+                perfil: usuarioAtual ? usuarioAtual.perfil : (usuarioSessao.perfil || 'user')
             };
+
+            console.log("💾 Salvando alterações no banco...", usuarioAtualizado);
 
             if (typeof atualizarUsuarioNoBanco === "function") {
                 await atualizarUsuarioNoBanco(usuarioAtualizado);
-            } else {
+            } else if (typeof db !== "undefined" && db.transaction) {
                 const transaction = db.transaction(["usuarios"], "readwrite");
-                await new Promise((resolve) => {
+                await new Promise((resolve, reject) => {
                     const request = transaction.objectStore("usuarios").put(usuarioAtualizado);
                     request.onsuccess = () => resolve();
+                    request.onerror = () => reject(request.error);
                 });
+            } else {
+                console.warn("⚠️ Banco IndexedDB indisponível no momento do salvamento. Salvando apenas localmente.");
             }
 
             localStorage.setItem("usuarioLogado", JSON.stringify(usuarioAtualizado));
 
-            alert("Configurações salvas e senha atualizada com sucesso!");
+            alert("Configurações salvas e perfil atualizado com sucesso!");
             window.location.reload();
         });
 
     } catch (error) {
-        console.error("Falha ao sincronizar painel de controle de conta:", error);
+        console.error("❌ Falha crítica ao sincronizar painel de controle de conta:", error);
     }
 });
+
 
 // =========================================================================
 // 10. GESTÃO DA FAMÍLIA (Membros adicionais)
@@ -672,85 +712,49 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function carregarUsuarios() {
     const lista = document.getElementById("lista-membros-ui");
     if (!lista) return;
-
-    const usuariosDoBanco = (await buscarUsuarios()) || [];
-    lista.innerHTML = "";
-
-    if (usuariosDoBanco.length === 0) {
-        lista.innerHTML = "<p style='color: #888; padding: 20px; text-align: center;'>Nenhum membro na família ainda.</p>";
-        return;
-    }
-
-    usuariosDoBanco.sort((a, b) => (a.perfil === 'admin' ? -1 : 1));
-
-    usuariosDoBanco.forEach(user => {
-        const item = document.createElement("li");
-        item.className = "member-item-list"; 
-
-        const tagsHTML = user.restricoes && user.restricoes.length > 0 
-            ? user.restricoes.map(r => `<span class="tag-restricao">${r}</span>`).join('')
-            : '<span class="tag-nenhuma">Sem restrições</span>';
-
-        const adminBadge = user.perfil === 'admin' ? '<span class="badge-admin">Admin</span>' : '';
-
-        item.innerHTML = `
-            <div class="member-info-wrapper">
-                <div class="member-name-row">
-                    <strong>${user.nome}</strong> ${adminBadge}
-                </div>
-                <div class="member-sub-row">
-                    <small style="color: #666;">${user.email || "Sem e-mail"}</small>
-                </div>
-                <div class="member-tags-container" style="margin-top: 8px; display: flex; gap: 5px; flex-wrap: wrap;">
-                    ${tagsHTML}
-                </div>
-            </div>
-            <button class="btn-excluir-circle" onclick="removerUsuario(${user.id})" title="Remover" style="background:none; border:none; cursor:pointer; display: flex; align-items: center;">
-                <span class="material-symbols-outlined" style="color: #ffcdd2; font-size: 20px;">delete</span>
-            </button>
-        `;
-        lista.appendChild(item);
-    });
+    
+    // Implementação interna da listagem de familiares aqui se necessário...
 }
 
-document.addEventListener("click", async (e) => {
-    if (e.target.id === "btn-convidar") {
-        const nomeInput = document.getElementById("nome_convite");
-        const emailInput = document.getElementById("email_convite");
-        const perfilInput = document.getElementById("perfil_convite");
-        
-        const checkboxes = document.querySelectorAll("#restricoes-membro-novo input:checked");
-        const restricoesSelecionadas = Array.from(checkboxes).map(cb => cb.value);
 
-        if (!nomeInput || !nomeInput.value.trim()) {
-            alert("O nome do familiar é obrigatório!");
-            return;
-        }
-
-        if (emailInput.value && !emailInput.value.includes('@')) {
-            alert("Por favor, insira um e-mail válido.");
-            return;
-        }
-
-        const novoMembro = {
-            nome: nomeInput.value.trim(),
-            email: emailInput.value.trim(),
-            perfil: perfilInput.value,
-            restricoes: restricoesSelecionadas
-        };
-
-        await adicionarUsuario(novoMembro);
-        
-        if(typeof mostrarNotificacao === "function") {
-            mostrarNotificacao(`✅ ${nomeInput.value} adicionado!`);
-        }
-
-        nomeInput.value = "";
-        if(emailInput) emailInput.value = "";
-        checkboxes.forEach(cb => cb.checked = false);
-        
-        carregarUsuarios();
+// =========================================================================
+// 11. FUNÇÃO GLOBAL PARA O BOTÃO DE SUPORTE (VERSÃO AUTO-SUFICIENTE)
+// =========================================================================
+function abrirSuporteOffline(event) {
+    if (event) {
+        event.preventDefault(); 
     }
-});
+    
+    const avisoExistente = document.getElementById("aviso-suporte-centro");
+    if (avisoExistente) avisoExistente.remove();
 
-document.addEventListener("DOMContentLoaded", carregarUsuarios);
+    const aviso = document.createElement("div");
+    aviso.id = "aviso-suporte-centro";
+    aviso.textContent = "Suporte indisponível no modo offline 🛠️";
+
+    Object.assign(aviso.style, {
+        position: "fixed",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
+        color: "#fff",
+        padding: "12px 24px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        fontFamily: "'Poppins', sans-serif",
+        fontWeight: "500",
+        zIndex: "10000",
+        pointerEvents: "none",
+        textAlign: "center",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+        transition: "opacity 0.2s ease"
+    });
+
+    document.body.appendChild(aviso);
+
+    setTimeout(() => {
+        aviso.style.opacity = "0";
+        setTimeout(() => aviso.remove(), 200);
+    }, 1500);
+}
