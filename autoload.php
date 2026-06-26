@@ -1,21 +1,31 @@
 <?php
-// autoload.php na raiz do projeto
-
 spl_autoload_register(function ($classe) {
-    // Mapeia todas as novas pastas onde o PHP deve procurar as classes
+    // Lista exaustiva de possíveis nomes de pastas (segurança máxima no Linux)
     $diretorios = [
-        __DIR__ . '/app/controller/',
-        __DIR__ . '/app/model/',
-        __DIR__ . '/app/services/',
-        __DIR__ . '/app/router/',
-        __DIR__ . '/app/middleware/'
+        'app/',
+        'app/controller/',
+        'app/controllers/',
+        'app/Controller/',
+        'app/Controllers/',
+        'app/model/',
+        'app/models/',
+        'app/Model/',
+        'app/service/',
+        'app/services/',
+        'app/Service/',
+        'app/repository/',
+        'app/repositories/',
+        'app/Repository/'
     ];
 
     foreach ($diretorios as $diretorio) {
-        $arquivo = $diretorio . $classe . '.php';
+        $arquivo = __DIR__ . '/' . $diretorio . $classe . '.php';
         if (file_exists($arquivo)) {
-            require_once $arquivo;
-            return;
+            // Se o arquivo existir mas tiver 0 bytes (vazio), o PHP não carrega a classe
+            if (filesize($arquivo) > 0) {
+                require_once $arquivo;
+                return;
+            }
         }
     }
 });
